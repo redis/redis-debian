@@ -1,3 +1,9 @@
+redis (6:6.0.6-1redislabs1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Bump epoch for new PPA.
+
+ -- Redis Labs <redis@redis.io>  Tue, 25 Aug 2020 21:57:47 +0300
+
 redis (5:6.0.6-3chl1~focal1) focal; urgency=low
 
   * Compile with TLS support. 
