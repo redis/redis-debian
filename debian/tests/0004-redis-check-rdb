@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Test redis-check-rdb
+
+set -eu
+
+# Perform a synchronous save to ensure .rdb file eixsts
+redis-cli SAVE
+
+redis-check-rdb /var/lib/redis/dump.rdb

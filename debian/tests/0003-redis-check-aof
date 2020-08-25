@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Smoke test redis-check-aof
+
+redis-check-aof 2>&1 | grep -qsi usage:

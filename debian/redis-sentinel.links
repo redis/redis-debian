@@ -1,0 +1,1 @@
+usr/bin/redis-check-rdb usr/bin/redis-sentinel

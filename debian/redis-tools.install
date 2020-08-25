@@ -1,0 +1,5 @@
+debian/bash_completion.d/*	/usr/share/bash-completion/completions
+src/redis-benchmark		/usr/bin
+src/redis-check-aof	/usr/bin
+src/redis-check-rdb	/usr/bin
+src/redis-cli		/usr/bin

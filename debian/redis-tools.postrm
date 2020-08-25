@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -eu
+
+if [ "${1}" = "purge" ]
+then
+	userdel redis || true
+	rm -rf /var/lib/redis /var/log/redis
+fi
+
+#DEBHELPER#
+
+exit 0

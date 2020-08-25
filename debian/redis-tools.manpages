@@ -1,0 +1,4 @@
+debian/redis-benchmark.1
+debian/redis-check-aof.1
+debian/redis-check-rdb.1
+debian/redis-cli.1

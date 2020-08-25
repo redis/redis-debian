@@ -1,0 +1,4 @@
+rm_conffile /etc/redis/redis-sentinel.post-down.d/00_example 4:4.0.2-3~
+rm_conffile /etc/redis/redis-sentinel.post-up.d/00_example 4:4.0.2-3~
+rm_conffile /etc/redis/redis-sentinel.pre-down.d/00_example 4:4.0.2-3~
+rm_conffile /etc/redis/redis-sentinel.pre-up.d/00_example 4:4.0.2-3~

@@ -1,0 +1,8 @@
+Tests: 0001-redis-cli
+
+Tests: 0002-benchmark
+
+Tests: 0003-redis-check-aof
+
+Tests: 0004-redis-check-rdb
+Restrictions: needs-root

@@ -1,0 +1,66 @@
+From: Chris Lamb <lamby@debian.org>
+Date: Wed, 24 Jan 2018 22:06:35 +1100
+Subject: Use get_current_dir_name over PATHMAX, etc.
+
+---
+ src/aof.c | 1 +
+ src/rdb.c | 7 ++++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/aof.c b/src/aof.c
+index 301a408..8386764 100644
+--- a/src/aof.c
++++ b/src/aof.c
+@@ -263,6 +263,7 @@ int startAppendOnly(void) {
+             server.aof_filename,
+             cwdp ? cwdp : "unknown",
+             strerror(errno));
++        zfree(cwdp);
+         return C_ERR;
+     }
+     if (hasActiveChildProcess() && server.aof_child_pid == -1) {
+diff --git a/src/rdb.c b/src/rdb.c
+index 9f6bf13..4b091d4 100644
+--- a/src/rdb.c
++++ b/src/rdb.c
+@@ -1272,7 +1272,6 @@ werr: /* Write error. */
+ /* Save the DB on disk. Return C_ERR on error, C_OK on success. */
+ int rdbSave(char *filename, rdbSaveInfo *rsi) {
+     char tmpfile[256];
+-    char cwd[MAXPATHLEN]; /* Current working dir path for error messages. */
+     FILE *fp;
+     rio rdb;
+     int error = 0;
+@@ -1280,13 +1279,14 @@ int rdbSave(char *filename, rdbSaveInfo *rsi) {
+     snprintf(tmpfile,256,"temp-%d.rdb", (int) getpid());
+     fp = fopen(tmpfile,"w");
+     if (!fp) {
+-        char *cwdp = getcwd(cwd,MAXPATHLEN);
++        char *cwdp = get_current_dir_name();
+         serverLog(LL_WARNING,
+             "Failed opening the RDB file %s (in server root dir %s) "
+             "for saving: %s",
+             filename,
+             cwdp ? cwdp : "unknown",
+             strerror(errno));
++        zfree(cwdp);
+         return C_ERR;
+     }
+ 
+@@ -1309,7 +1309,7 @@ int rdbSave(char *filename, rdbSaveInfo *rsi) {
+     /* Use RENAME to make sure the DB file is changed atomically only
+      * if the generate DB file is ok. */
+     if (rename(tmpfile,filename) == -1) {
+-        char *cwdp = getcwd(cwd,MAXPATHLEN);
++        char *cwdp = get_current_dir_name();
+         serverLog(LL_WARNING,
+             "Error moving temp DB file %s on the final "
+             "destination %s (in server root dir %s): %s",
+@@ -1317,6 +1317,7 @@ int rdbSave(char *filename, rdbSaveInfo *rsi) {
+             filename,
+             cwdp ? cwdp : "unknown",
+             strerror(errno));
++        zfree(cwdp);
+         unlink(tmpfile);
+         stopSaving(0);
+         return C_ERR;

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -eu
+
+CONFFILE="/etc/redis/redis.conf"
+
+if [ "${1}" = "purge" ]
+then
+	dpkg-statoverride --remove ${CONFFILE} || test $? -eq 2
+fi
+
+#DEBHELPER#
+
+exit 0

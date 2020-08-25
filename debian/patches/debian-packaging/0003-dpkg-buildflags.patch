@@ -1,0 +1,24 @@
+diff -urN redis-6.0.6.orig/deps/linenoise/Makefile redis-6.0.6/deps/linenoise/Makefile
+--- redis-6.0.6.orig/deps/linenoise/Makefile	2020-07-20 11:08:26.000000000 -0700
++++ redis-6.0.6/deps/linenoise/Makefile	2020-08-01 00:16:29.900476593 -0700
+@@ -6,7 +6,7 @@
+ R_LDFLAGS= $(LDFLAGS)
+ DEBUG= -g
+ 
+-R_CC=$(CC) $(R_CFLAGS)
++R_CC=$(CC) $(R_CFLAGS) $(CPPFLAGS)
+ R_LD=$(CC) $(R_LDFLAGS)
+ 
+ linenoise.o: linenoise.h linenoise.c
+diff -urN redis-6.0.6.orig/src/Makefile redis-6.0.6/src/Makefile
+--- redis-6.0.6.orig/src/Makefile	2020-07-20 11:08:26.000000000 -0700
++++ redis-6.0.6/src/Makefile	2020-08-01 00:17:06.818594442 -0700
+@@ -209,7 +209,7 @@
+ 	FINAL_LIBS += ../deps/hiredis/libhiredis_ssl.a $(LIBSSL_LIBS) $(LIBCRYPTO_LIBS)
+ endif
+ 
+-REDIS_CC=$(QUIET_CC)$(CC) $(FINAL_CFLAGS)
++REDIS_CC=$(QUIET_CC)$(CC) $(FINAL_CFLAGS) $(CPPFLAGS)
+ REDIS_LD=$(QUIET_LINK)$(CC) $(FINAL_LDFLAGS)
+ REDIS_INSTALL=$(QUIET_INSTALL)$(INSTALL)
+ 

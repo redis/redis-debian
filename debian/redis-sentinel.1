@@ -1,0 +1,23 @@
+.TH REDIS-SENTINEL 1 "March 20, 2009"
+.SH NAME
+redis-sentinel \- Persistent key-value database (cluster mode)
+.SH SYNOPSIS
+.B redis-sentinel
+.RI configfile
+.SH DESCRIPTION
+Redis is a key-value database. It is similar to memcached but the dataset is
+not volatile and other datatypes (such as lists and sets) are natively
+supported.
+.PP
+.SH OPTIONS
+.IP "configfile"
+Read options from specified configuration file.
+.SH NOTES
+On Debian GNU/Linux systems, \fBredis-sentinel\fP is typically started via the
+\fB/etc/init.d/redis-sentinel\fP initscript, not manually. This defaults to using
+\fB/etc/redis/sentinel.conf\fP as a configuration file.
+.SH AUTHOR
+\fBredis-sentinel\fP was written by Salvatore Sanfilippo.
+.PP
+This manual page was written by Chris Lamb <lamby@debian.org> for the Debian
+project (but may be used by others).

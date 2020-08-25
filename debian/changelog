@@ -1,0 +1,1809 @@
+redis (5:6.0.6-3chl1~focal1) focal; urgency=low
+
+  * Compile with TLS support. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 01 Aug 2020 15:16:02 -0700
+
+redis (5:6.0.6-2chl1~focal1) focal; urgency=medium
+
+  * Bump to make Launchpad build with sanctioned orig source. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 01 Aug 2020 00:32:35 -0700
+
+redis (5:6.0.6-1chl1~focal1) focal; urgency=medium
+
+  * Fix crash when enabling CLIENT TRACKING with prefix
+  * EXEC always fails with EXECABORT and multi-state is cleared
+  * RESTORE ABSTTL won't store expired keys into the db
+  * redis-cli better handling of non-pritable key names
+  * TLS: Ignore client cert when tls-auth-clients off
+  * Tracking: fix invalidation message on flush
+  * Notify systemd on Sentinel startup
+  * Fix crash on a misuse of STRALGO
+  * Few fixes in module API
+  * Fix a few rare leaks (STRALGO error misuse, Sentinel)
+  * Fix a possible invalid access in defrag of scripts (unlikely to cause real harm)
+  * LPOS command to search in a list
+  * Use user+pass for MIGRATE in redis-cli and redis-benchmark in cluster mode
+  * redis-cli support TLS for --pipe, --rdb and --replica options
+  * TLS: Session caching configuration support
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 01 Aug 2020 00:13:27 -0700
+
+redis (5:6.0.5-1chl1~focal1) focal; urgency=medium
+
+  * Fix handling of speical chars in ACL LOAD.
+  * Make Redis Cluster more robust about operation errors that may lead
+    to two clusters to mix together.
+  * Revert the sendfile() implementation of RDB transfer. It causes some delay.
+  * Fix TLS certificate loading for chained certificates.
+  * Fix AOF rewirting of KEEPTTL SET option.
+  * Fix MULTI/EXEC behavior during -BUSY script errors.
+
+ -- Chris Lea <chris.lea@gmail.com>  Thu, 11 Jun 2020 20:03:31 -0700
+
+redis (5:6.0.4-2chl1~focal1) focal; urgency=high
+
+  * Bump to use a source tarball already in the Ubuntu repos. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Wed, 03 Jun 2020 20:54:26 -0700
+
+redis (5:6.0.4-1chl1~focal1) focal; urgency=high
+
+  * New upstream release.
+  * PSYNC2 tests improved.
+  * Fix a rare active defrag edge case bug leading to stagnation
+  * Fix Redis 6 asserting at startup in 32 bit systems.
+  * Redis 6 32 bit is now added back to our testing environments.
+  * Fix server crash for STRALGO command,
+  * Implement sendfile for RDB transfer.
+  * TLS fixes.
+  * Make replication more resistant by disconnecting the master if we
+    detect a protocol error. Basically we no longer accept inline protocol
+    from the master.
+  * Other improvements in the tests.
+  * Fix for a severe replication bug.
+
+ -- Chris Lea <chris.lea@gmail.com>  Wed, 03 Jun 2020 20:06:06 -0700
+
+redis (5:5.0.8-1chl1~focal1) focal; urgency=high
+
+  * Merge pull request #6975 from dustinmm80/add-arm-latomic-linking
+  * Fix Pi building needing -latomic, backport
+  * fix impl of aof-child whitelist SIGUSR1 feature.
+  * fix ThreadSafeContext lock/unlock function names
+  * XREADGROUP should propagate XCALIM/SETID in MULTI/EXEC
+  * Fix client flags to be int64 in module.c
+  * Fix small bugs related to replica and monitor ambiguity
+  * Fix lua related memory leak.
+  * Simplify #6379 changes.
+  * Free allocated sds in pfdebugCommand() to avoid memory leak.
+  * Jump to right label on AOF parsing error.
+  * Free fakeclient argv on AOF error.
+  * Fix potential memory leak of rioWriteBulkStreamID().
+  * Fix potential memory leak of clusterLoadConfig().
+  * Fix bug on KEYS command where pattern starts with * followed by \x00 (null char
+  * Blocking XREAD[GROUP] should always reply with valid data (or timeout)
+  * XCLAIM: Create the consumer only on successful claims.
+  * Stream: Handle streamID-related edge cases
+  * Fix ip and missing mode in RM_GetClusterNodeInfo().
+  * Inline protocol: handle empty strings well.
+  * Mark extern definition of SDS_NOINIT in sds.h
+  * [FIX] revisit CVE-2015-8080 vulnerability
+  * avoid sentinel changes promoted_slave to be its own replica.
+
+ -- Chris Lea <chris.lea@gmail.com>  Mon, 16 Mar 2020 17:25:07 -0700
+
+redis (5:5.0.7-1chl1~focal1) focal; urgency=high
+
+  * Test: fix implementation-dependent test after code change.
+  * RED-31295 - redis: avoid race between dlopen and thread creation
+  * Cluster: fix memory leak of cached master.
+  * Fix usage of server.stream_node_max_*
+  * Update mkreleasehdr.sh
+  * Remove additional space from comment.
+  * Fix stream test after addition of 0-0 ID test.
+  * aof: fix assignment for aof_fsync_offset
+  * Merge branch '5.0' of github.com:/antirez/redis into 5.0
+  * Rename var to fixed_time_expire now that is more general.
+  * Fix patch provided in #6554.
+  * expires & blocking: handle ready keys as call()
+  * XADD with ID 0-0 stores an empty key
+  * fix unreported overflow in autogerenared stream IDs
+  * Merge pull request #6600 from oranagra/5_module_flags
+  * module documentation mismatches: loading and fork child for 5.0 branch
+  * Modules: RM_GetContextFlags(): remove non Redis 5 features.
+  * Modules: fix moduleCreateArgvFromUserFormat() casting bug.
+  * module: fix propagation API bug.
+  * Modules: add new flags to context, replica state + more.
+  * Modules: RM_Call(): give pointer to documentation.
+  * Modules: RM_Call/Replicate() ability to exclude AOF/replicas.
+  * Modules: RM_Replicate() in thread safe contexts.
+  * Modules: implement RM_Replicate() from async callbacks.
+  * Modules: handle propagation when ctx is freed. Flag modules commands ctx.
+  * Update PR #6537: use a fresh time outside call().
+  * Update PR #6537 patch to for generality.
+  * expires: refactoring judgment about whether a key is expired
+  * Modules: fix thread safe context creation crash.
+
+ -- Chris Lea <chris.lea@gmail.com>  Mon, 02 Dec 2019 14:11:13 -0800
+
+redis (5:5.0.6-1chl1~focal1) focal; urgency=high
+
+  * Critical fix for a corruption related to the HyperLogLog. 
+  * New modules APIs merged from Redis unstable to Redis 5.
+  * Some memory optimization related to objects creation.
+  * Fixes to flushSlaveOutputBuffer() that make sure that SHUTDOWN will
+    transfer pending buffers to replicas.
+
+ -- Chris Lea <chris.lea@gmail.com>  Fri, 27 Sep 2019 11:31:26 -0700
+
+redis (5:5.0.5-1chl1~focal1) focal; urgency=medium
+
+  * Redis 5.0.5 fixes an important issue with AOF and adds multiple very useful
+    modules APIs. Moreover smaller bugs in other parts of Redis are fixed in
+    this release.
+  * Streams: a bug in the iterator could prevent certain items to be returned in
+    range queries under specific conditions.
+  * Memleak in bitfieldCommand fixed.
+  * Modules API: Preserve client*>id for blocked clients.
+  * Fix memory leak when rewriting config file in case of write errors.
+  * New modules API: RedisModule_GetKeyNameFromIO().
+  * Fix non critical bugs in diskless replication.
+  * New mdouels API: command filtering. See RedisModule_RegisterCommandFilter();
+  * Tests improved to be more deterministic.
+  * Fix a Redis Cluster bug, manual failover may abort because of the master
+    sending PINGs to the replicas.
+
+ -- Chris Lea <chris.lea@gmail.com>  Fri, 17 May 2019 21:58:37 -0700
+
+redis (5:5.0.4-1chl1~focal1) focal; urgency=medium
+
+  * Hyperloglog different coding errors leading to potential crashes
+    were fixed.
+  * A replication bug leading to a potential crash in case of plain
+    misuse of handshake commands was fixed.
+  * XCLAIM command incrementing of number of deliveries was fixed.
+  * LFU field management in objects was improved.
+  * A potential overflow in the redis-check-aof was fixed.
+  * A memory leak in case of API misuse was fixed.
+  * ZPOP* behavior when count is 0 is fixed.
+  * A few redis-cli --cluster bugs were fixed, plus a few improvements.
+  * Many other smaller bugs.
+
+ -- Chris Lea <chris.lea@gmail.com>  Tue, 19 Mar 2019 18:40:39 -0700
+
+redis (5:5.0.3-3chl1~focal1) focal; urgency=low
+
+  * Minor formatting tweak for service files. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Fri, 21 Dec 2018 19:30:47 -0800
+
+redis (5:5.0.3-2chl1~focal1) focal; urgency=medium
+
+  * Remove RestrictAddressFamilies from service file on older distros. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Thu, 20 Dec 2018 10:34:39 -0800
+
+redis (5:5.0.3-1chl1~focal1) focal; urgency=low
+
+  * New upstream release. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Thu, 13 Dec 2018 17:31:53 -0800
+
+redis (5:5.0.2-1chl1~focal1) focal; urgency=medium
+
+  * New upstream release.
+  * Try different approach to fix systemd service file for older distros. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 24 Nov 2018 20:07:47 -0800
+
+redis (5:5.0.0-4chl1~focal1) focal; urgency=medium
+
+  * Don't include some lvalues in systemd service file for older distros.
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 24 Nov 2018 14:08:40 -0800
+
+redis (5:5.0.0-3chl1~focal1) focal; urgency=low
+
+  * Relax dpkg-dev version requirement for 14.04. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 03 Nov 2018 16:38:06 -0700
+
+redis (5:5.0.0-2chl1~focal1) focal; urgency=low
+
+  * Backport to focal.
+  * Used bundled lua, hiredis, and jemalloc.
+  * Ease debhelper requirement to 9 so can build for older distros. 
+
+ -- Chris Lea <chris.lea@gmail.com>  Sat, 03 Nov 2018 16:27:12 -0700
+
+redis (5:5.0.0-2) unstable; urgency=medium
+
+  * Update our patch to sentinel.conf to ensure the correct runtime PID file
+    location. (Closes: #911407)
+  * Listen on ::1 interfaces too for redis-sentinel to match redis-server.
+  * Also run the new "LOLWUT" command in the redis-cli autopkgtest.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 19 Oct 2018 22:36:40 -0400
+
+redis (5:5.0.0-1) unstable; urgency=medium
+
+  * New upstream stable release to unstable.
+    <https://groups.google.com/forum/#!topic/redis-db/l0OXDAlwosU>
+  * Refresh patches.
+  * Update Vcs-Git.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 18 Oct 2018 21:56:02 -0400
+
+redis (5:5.0~rc5-2) experimental; urgency=medium
+
+  * Use the system hiredis now that #907259 has landed. (Closes: #907258)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 03 Oct 2018 19:54:17 +0100
+
+redis (5:5.0~rc5-1) experimental; urgency=medium
+
+  * New upstream release.
+    - Drop 0004-SOURCE_DATE_EPOCH.patch; merged upstream.
+  * debian/watch: Use releases from <https://github.com/antirez/redis/releases>
+    (not Git) to find RC/beta releases, etc.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 24 Sep 2018 21:24:48 +0100
+
+redis (5:5.0~rc4-4) experimental; urgency=medium
+
+  * Stop playing whack-a-mole with nondeterminstic testsuite and run with
+    "|| true" on all architectures. (Closes: #908540)
+  * Drop ${shlibs:Depends} substvars on "Architecture: any" binary packages.
+  * Add upstream URIs for patches to support non-embedded jemalloc and Lua.
+  * Bump Standards-Version to 4.2.1.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 15 Sep 2018 19:44:35 +0100
+
+redis (5:5.0~rc4-3) experimental; urgency=medium
+
+  * Add support for (and use) a USE_SYSTEM_LUA flag. (Closes: #901669)
+  * Add support for (and use) a USE_SYSTEM_JEMALLOC flag.
+  * Refresh 0003-dpkg-buildflags patch.
+  * Append "-b debian/experimental" to Vcs-Git line to fix "unpushed changes"
+    vcswatch.cgi false-positives.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 26 Aug 2018 14:37:25 +0200
+
+redis (5:5.0~rc4-2) experimental; urgency=medium
+
+  * Drop a non-determinstic "dump" test.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 07 Aug 2018 11:04:16 +0800
+
+redis (5:5.0~rc4-1) experimental; urgency=medium
+
+  * New upstream RC release.
+    <https://groups.google.com/forum/#!topic/redis-db/aXusvS8da8g>
+    - Refresh 0002-use-system-jemalloc.patch
+    - Refresh 0003-dpkg-buildflags.patch
+    - Refresh 0006-Drop-tests-with-timing-issues.patch
+    - Refresh 0009-Drop-memory-efficiency-tests-on-advice-from-upstream.patch
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 07 Aug 2018 11:04:14 +0800
+
+redis (5:4.0.11-3) unstable; urgency=medium
+
+  * Stop playing whack-a-mole with nondeterminstic testsuite and run with
+    "|| true" on all architectures. (Closes: #908540)
+  * Drop ${shlibs:Depends} substvars on "Architecture: any" binary packages.
+  * Bump Standards-Version to 4.2.1.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 15 Sep 2018 19:55:23 +0100
+
+redis (5:4.0.11-2) unstable; urgency=medium
+
+  * Revert "Move to debhelper-compat (= 11) in Build-Depends." as dak will
+    REJECT with "missing-build-dependency debhelper".
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 06 Aug 2018 11:42:41 +0800
+
+redis (5:4.0.11-1) unstable; urgency=medium
+
+  * New upstream release.
+    <https://groups.google.com/forum/#!topic/redis-db/aXusvS8da8g>
+  * Bump Standards-Version to 4.2.0.
+  * Move to debhelper-compat (= 11) in Build-Depends.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 06 Aug 2018 11:42:38 +0800
+
+redis (5:4.0.10-2) unstable; urgency=medium
+
+  [ Daniel Shahaf ]
+  * redis-benchmark(1): Fix default of -n argument. (Closes: #903044)
+
+  [ Chris Lamb ]
+  * Add CVE entries to (released) changelog entry.
+  * Bump Standards-Version to 4.1.5.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 05 Jul 2018 22:14:45 +0200
+
+redis (5:4.0.10-1) unstable; urgency=medium
+
+  * CVE-2018-11218, CVE-2018-11219: New upstream security release.
+    <https://github.com/antirez/redis/issues/5017> for more information.
+    (Closes: #901495)
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 14 Jun 2018 08:37:09 +0200
+
+redis (5:4.0.9-4) unstable; urgency=medium
+
+  * Update Vcs-* headers to point to salsa.debian.org.
+  * Move to HTTPS Homepage URI.
+  * wrap-and-sort -sa.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 09 Jun 2018 20:11:35 +0100
+
+redis (5:4.0.9-3) unstable; urgency=medium
+
+  * Make /var/log/redis, etc. owned by root:adm, not root:root. Thanks to
+    Thomas Goirand. (Closes: #900496)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 01 Jun 2018 08:56:48 +0100
+
+redis (5:4.0.9-2) unstable; urgency=medium
+
+  * Ignore test failures on problematic archs.
+  * Bump Standards-Version to 4.1.4.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 08 May 2018 23:08:36 -0700
+
+redis (5:4.0.9-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh all patches.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 02 Apr 2018 20:37:12 +0100
+
+redis (5:4.0.8-2) unstable; urgency=medium
+
+  * Also listen on ::1 for IPv6 by default. (Closes: #891432)
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 25 Feb 2018 14:59:55 +0000
+
+redis (5:4.0.8-1) unstable; urgency=medium
+
+  * New upstream release.
+    <https://groups.google.com/forum/#!topic/redis-db/FGplxMEGEMo>
+  * Update lintian overrides after rename of
+    debian-watch-may-check-gpg-signature →
+    debian-watch-does-not-check-gpg-signature.
+  * Drop "recursive" argument to chown in postinst script to prevent hardlink
+    vulnerability.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 05 Feb 2018 17:09:44 +0000
+
+redis (5:4.0.7-1) unstable; urgency=medium
+
+  * New upstream release.
+    <https://groups.google.com/forum/#!topic/redis-db/gngqHoh-kRM>
+  * Refresh patches.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 24 Jan 2018 22:10:06 +1100
+
+redis (5:4.0.6-5) unstable; urgency=medium
+
+  * Update redis-sentinel's symlink to usr/bin/redis-check-rdb to match
+    redis-server. This avoids a dangling symlink (and thus a broken package) if
+    redis-server is not installed. (Closes: #884321)
+  * Move to debhelper compat level 11.
+    - Drop reference to --with=systemd - systemd-sequence is no longer provided
+      in compat >= 11.
+  * Use https URI for copyright format specification in debian/copyright.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 20 Jan 2018 11:21:11 +1100
+
+redis (5:4.0.6-4) unstable; urgency=medium
+
+  * Re-add procps to Build-Depends. (Closes: #887075)
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 13 Jan 2018 19:01:56 +0530
+
+redis (5:4.0.6-3) unstable; urgency=medium
+
+  * Use --clients argument to runtest to force single-threaded operation over
+    using taskset.
+  * Bump Standards-Version to 4.1.3.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 13 Jan 2018 12:55:27 +0530
+
+redis (5:4.0.6-2) unstable; urgency=medium
+
+  * Replace redis-sentinel's main dependency with redis-tools from
+    redis-server, necessarily moving the creating/deletion of the "redis" user
+    and associated data and log directories to redis-tools. (Closes: #884321)
+  * Add stub manpages for redis-sentinel, redis-check-aof and redis-check-rdb.
+  * Bump Standards-Version to 4.1.2.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 14 Dec 2017 10:08:30 +0000
+
+redis (5:4.0.6-1) unstable; urgency=medium
+
+  * New upstream bugfix release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 05 Dec 2017 13:00:47 +0000
+
+redis (5:4.0.5-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/control: Use "metapackage" over "meta-package".
+  * debian/patches:
+    - Drop 0008-CVE-2017-15047-Fix-buffer-overflows-occurring-readin.
+    - Refresh.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 02 Dec 2017 18:54:58 +0000
+
+redis (4:4.0.2-9) unstable; urgency=medium
+
+  * Also update aof.c for MAXPATHLEN issues. (Closes: #881684)
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 16 Nov 2017 10:21:37 +0900
+
+redis (4:4.0.2-8) unstable; urgency=medium
+
+  * Use get_current_dir_name over PATHMAX, etc. (Closes: #881684)
+  * Don't rely on taskset existing for kFreeBSD-*. (Closes: #881683)
+  * Drop "memory efficiency" tests on advice from upstream. (Closes: #881682)
+  * Correct BSD-3-clause -> BSD-2-clause for Marc Alexander Lehmann's
+    attribution in debian/copyright.
+  * Let package be bin-NMUable.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 16 Nov 2017 03:50:00 +0900
+
+redis (4:4.0.2-7) unstable; urgency=medium
+
+  * Add a "redis" metapackage. (Closes: #876475)
+  * Drop conditionally exporting FORCE_LIBC_MALLOC; upstreamed since 2.6.0-1.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 12 Nov 2017 08:54:24 +0000
+
+redis (4:4.0.2-6) unstable; urgency=medium
+
+  * Correct locations of redis-sentinel pidfiles. Thanks to Nicolas Payart for
+    the patch. (Closes: #880980)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 06 Nov 2017 22:02:19 +0000
+
+redis (4:4.0.2-5) unstable; urgency=medium
+
+  * CVE-2017-15047: Replace existing patch with upstream-blessed version that
+    covers another case. (Closes: #878076)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 31 Oct 2017 11:13:40 +0100
+
+redis (4:4.0.2-4) unstable; urgency=medium
+
+  * CVE-2017-15047: Add input validity checking to redis cluster config slot
+    numbers. (Closes: #878076)
+  * Drop debian/bin/generate-parts script now we aren't calling it.
+  * Correct Bash-esque in NEWS.
+  * Upstream are not providing signed tarballs, so ignore the
+    "debian-watch-may-check-gpg-signature" Lintian tag,
+  * Drop trailing whitespace in debian/changelog.
+  * Use HTTPS URI in debian/watch.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 30 Oct 2017 10:32:04 +0000
+
+redis (4:4.0.2-3) unstable; urgency=medium
+
+  * Drop Debian-specific support for
+    /etc/redis/redis-{server,sentinel}.{pre,post}-{up,down}.d and remove them
+    if unchanged.
+  * Include systemd redis-server@.service and redis-sentinel@.service template
+    files to easily run multiple instances. (Closes: #877702)
+  * Patch redis.conf and sentinel.conf with quilt instead of maintaining our
+    own versions under debian/.
+  * Refresh all patches.
+  * Bump Standards-Version to 4.1.1.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 12 Oct 2017 14:54:27 -0400
+
+redis (4:4.0.2-2) unstable; urgency=medium
+
+  * Update 0004-redis-check-rdb test to ensure that redis.rdb exists before
+    testing it.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 25 Sep 2017 10:16:18 +0100
+
+redis (4:4.0.2-1) unstable; urgency=medium
+
+  * New upstream release ("Upgrade urgency HIGH: Several potentially critical
+    bugs fixed.")
+  * Bump Standards-Version to 4.1.0.
+  * Drop Build-Depends on dh-systemd (>= 1.5).
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 24 Sep 2017 19:46:10 +0100
+
+redis (4:4.0.1-7) unstable; urgency=medium
+
+  * Don't let sentinel tests fail the build; they use too many timers to be
+    useful and/or meaningful. (Closes: #872075)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 14 Aug 2017 07:35:38 -0700
+
+redis (4:4.0.1-6) unstable; urgency=medium
+
+  * Don't install completions to
+    /usr/share/bash-completion/completions/debian/bash_completion/.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 13 Aug 2017 21:29:07 -0700
+
+redis (4:4.0.1-5) unstable; urgency=medium
+
+  * Tidy debian/tests/control.
+  * Drop even more tests with timing issues.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 13 Aug 2017 13:02:52 -0700
+
+redis (4:4.0.1-4) unstable; urgency=medium
+
+  * Split tests into separate files.
+  * Tighten systemd/seccomp hardening.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 12 Aug 2017 12:53:50 -0400
+
+redis (4:4.0.1-3) unstable; urgency=medium
+
+  * Drop yet more non-deterministic tests.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 05 Aug 2017 21:01:03 -0400
+
+redis (4:4.0.1-2) unstable; urgency=medium
+
+  * Skip yet more non-deterministic replication tests that rely on timing.
+    (Closes: #857855)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 25 Jul 2017 18:57:39 +0100
+
+redis (4:4.0.1-1) unstable; urgency=medium
+
+  * New upstream version.
+  * Install 00-RELEASENOTES as the upstream changelog.
+  * Use "dh_auto_clean" over "clean" target.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 24 Jul 2017 16:27:51 +0100
+
+redis (4:4.0.0-3) unstable; urgency=medium
+
+  * Add -latomic to LDFLAGS to attempt to avoid FTBFS on mips{,el}.
+  * Allow ulimit calls to fail in sysvinit scripts to avoid issues when
+    running in a containerised environment. See
+    <https://github.com/travis-ci/travis-ci/issues/7941>.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 23 Jul 2017 15:42:18 +0100
+
+redis (4:4.0.0-2) unstable; urgency=medium
+
+  * Make /usr/bin/redis-server in the main redis-server package a symlink to
+    /usr/bin/redis-check-rdb in the redis-tools package.
+
+    Whilst this prevents a wasteful duplication of a binary, it moreover
+    ensures there are no duplicate debug symbols which was preventing the
+    simultaneous installation of the redis-server-dbgsym and
+    redis-tools-dbgsym packages.
+
+    Note that this results in the peculiar (and possibily confusing) situation
+    where the main package does not have the main binary anymore, or indeed
+    any binaries whatsoever. See also the previous parallel attempt at a
+    symlink changes in 3.2.6-3 which was reverted in 3.2.8-3. Thanks to Adrian
+    Bunk for the report. (Closes: #868551)
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 16 Jul 2017 22:38:57 +0100
+
+redis (4:4.0.0-1) unstable; urgency=medium
+
+  * New upstream major release.
+  * Bump Standards-Version to 4.0.0.
+  * Refresh, renumber and reorganise patches.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 14 Jul 2017 22:00:59 +0100
+
+redis (3:3.2.9-1) unstable; urgency=medium
+
+  * New upstream minor bugfix release.
+  * Specify <!nocheck> for test-related Build-Depends.
+  * Bump debhelper compatibility level to 10.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 18 May 2017 12:32:02 +0200
+
+redis (3:3.2.8-3) unstable; urgency=medium
+
+  * Revert the creation of the redis-tools:/usr/bin/redis-check-rdb ->
+    redis-server:/usr/bin/redis-server symlink to avoid a dangling symlink if
+    only the redis-tools binary package is installed.
+
+    This was a regression since 3:3.2.6-3 where we attempted to avoid shipping
+    duplicate file; the redis-server binary changes behaviour based on the
+    contents of argv.
+
+    One alternative would be to ship a symlink in redis-server but that would
+    mean users wishing to check RDB databases would have to install the server
+    package, so reverting to shipping a duplicate file seems justified.
+    (Closes: #858519)
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 23 Mar 2017 12:00:22 +0000
+
+redis (3:3.2.8-2) unstable; urgency=medium
+
+  * Avoid conflict between RuntimeDirectory and tmpfiles.d(5) both attempting
+    to create /run/redis with differing permissions.
+
+    This prevents an installation error on Jessie where /run/redis was first
+    being created by the tmpfiles.d(5) mechanism and then subsequently via the
+    RuntimeDirectory directive. Due to a bug in Jessie's systemd, this caused a
+    package installation error as systemd was too strict about permissions if
+    the target already exists: <https://github.com/systemd/systemd/pull/896>
+
+    The redis-{server,sentinel} daemon would actually start successfully a few
+    milliseconds later due to the Restart=always directive.
+
+    We work around this this by dropping the tmpfiles.d(5) handling and moving
+    entirely to RuntimeDirectory{,Mode}; we are not using any special handling
+    requiring tmpfiles.d(5) and we appear to need RuntimeDirectory anyway for
+    #846350. (Closes: #856116)
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 11 Mar 2017 12:53:14 +0000
+
+redis (3:3.2.8-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 13 Feb 2017 10:15:53 +1300
+
+redis (3:3.2.7-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 01 Feb 2017 09:27:05 +1300
+
+redis (3:3.2.6-6) unstable; urgency=medium
+
+  * Use --cpu-list 0 (not --cpu-list 1) to ensure compilation on single-CPU
+    machines. (Closes: #852347)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 24 Jan 2017 11:59:02 +1300
+
+redis (3:3.2.6-5) unstable; urgency=medium
+
+  * Re-add taskset calls to try and avoid FTBFS due to parallelism in upstream
+    test suite.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 23 Jan 2017 13:24:39 +1300
+
+redis (3:3.2.6-4) unstable; urgency=medium
+
+  * Expand the documentation in redis-server.service and redis-sentinel
+    regarding the default hardening options.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 21 Jan 2017 11:21:33 +1100
+
+redis (3:3.2.6-3) unstable; urgency=medium
+
+  * Don't ship a "duplicate" redis-server binary in redis-tools as
+    /usr/bin/redis-check-rdb (it checks argv to change its behaviour) by
+    replacing it with a symlink. Found by <https://dedup.debian.net/>.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 11 Jan 2017 17:04:33 +0000
+
+redis (3:3.2.6-2) unstable; urgency=medium
+
+  * Rename RunTimeDirectory -> RuntimeDirectory in .service files.
+    (Closes: #850534)
+  * Refresh all patches with pq import -> pq export.
+  * Tidy all patches, updating descriptions and use Pq-Topic to organise.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 07 Jan 2017 18:06:14 +0000
+
+redis (3:3.2.6-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Add debian/gbp.conf to reflect new repository layout.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 06 Dec 2016 09:23:20 +0000
+
+redis (3:3.2.5-6) unstable; urgency=medium
+
+  * Add missing Depends on lsb-base for /lib/lsb/init-functions usage in
+    redis-sentinel's initscript too. See #838966 for the parallel change to
+    redis-server's initscript.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 01 Dec 2016 12:07:51 +0000
+
+redis (3:3.2.5-5) unstable; urgency=medium
+
+  * Add RunTimeDirectory=redis to systemd .service files.
+    (Closes: #846350)
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 01 Dec 2016 11:48:51 +0000
+
+redis (3:3.2.5-4) unstable; urgency=medium
+
+  * Install upstream's MANIFESTO and README.md.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 23 Nov 2016 15:45:48 +0000
+
+redis (3:3.2.5-3) unstable; urgency=medium
+
+  * Also run redis-benchmark in autopkgtests to stress-test the installation
+    better.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 13 Nov 2016 15:03:18 +0000
+
+redis (3:3.2.5-2) unstable; urgency=medium
+
+  * Tighten permissions of /var/{lib,log}/redis. (Closes: #842987)
+    - chmod(1) directories to 0750.
+    - Allow local administrator to override permissions with
+      dpkg-statoverride.
+    - Set UMask= in .service files, at least to match SystemV initscripts.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 03 Nov 2016 12:08:08 +0000
+
+redis (3:3.2.5-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Refresh debian/patches/0003-use-system-jemalloc.patch to accomodate
+      missing -ldl flag.
+  * Refresh all patches with "pq import / pq export".
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 26 Oct 2016 16:36:49 +0100
+
+redis (3:3.2.4-2) unstable; urgency=medium
+
+  * Ensure that sentinel's configuration actually writes to a pidfile location
+    so that systemd can detect that the daemon has started.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 10 Oct 2016 12:05:20 +0100
+
+redis (3:3.2.4-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Sync debian/sentinel.conf.
+  * Add missing -ldl for dladdr(3).
+  * Add missing Depends on lsb-base for /lib/lsb/init-functions usage in
+    initscript. Thanks to Santiago Vila. (Closes: #838966)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 27 Sep 2016 11:12:13 +0200
+
+redis (3:3.2.3-2) unstable; urgency=medium
+
+  * Call `ulimit -n 65536` by default from sysvinit scripts so behaviour is
+    consistent with systemd.
+  * Bump epoch as the "2" prefix makes it look like we are shipping version 2.x
+    of Redis itself.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 05 Sep 2016 11:23:18 +0100
+
+redis (2:3.2.3-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Drop 0007-Avoid-world-readable-.rediscli_history-Closes-832460.patch as
+      was applied upstream.
+  * Add copyright-format 1.0 headers.
+    - Use "BSD-3-clause" over "BSD".
+    - Use separate ``License`` paragraphs.
+    - Ensure all wildcards in ``Files:`` sections match.
+  * Check we are running as root in LSB initscripts.
+  * Add debian/README.source regarding debian/{redis,sentinel}.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 02 Aug 2016 13:40:01 -0400
+
+redis (2:3.2.2-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Sync debian/redis.conf with upstream.
+    - Sync debian/sentinel.conf with upstream.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 29 Jul 2016 10:08:08 -0400
+
+redis (2:3.2.1-4) unstable; urgency=high
+
+  * Avoid race condition by setting and resetting umask(2) when
+    writing to ~/.rediscli_history. (Closes: #832460)
+  * Skip replication tests with timing issues.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 28 Jul 2016 08:35:50 -0400
+
+redis (2:3.2.1-3) unstable; urgency=medium
+
+  * Avoid world_readable ~/.rediscli_history files. Thanks to kpcyrd
+    <kpcyrd@rxv.cc>. (Closes: #832460)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 26 Jul 2016 23:48:07 -0400
+
+redis (2:3.2.1-2) unstable; urgency=medium
+
+  * Avoid race conditions in upstream test suite. Thanks to Daniel Schepler
+    <dschepler@gmail.com>. (Closes: #830500)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 13 Jul 2016 09:56:06 +0200
+
+redis (2:3.2.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Sync debian/redis.conf
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 18 Jun 2016 20:13:44 +0100
+
+redis (2:3.2.0-3) unstable; urgency=medium
+
+  * Skip logging tests as not all architectures support it yet.
+  * Tidy patches.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 16 May 2016 10:28:51 +0100
+
+redis (2:3.2.0-2) unstable; urgency=medium
+
+  * Update redis.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 07 May 2016 11:05:52 +0100
+
+redis (2:3.2.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update 03-use-system-jemalloc.diff.
+  * Install redis-check-rdb (was: redis-check-dump).
+  * Bump Standards-Version to 3.9.8.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 06 May 2016 23:55:02 +0100
+
+redis (2:3.0.7-4) unstable; urgency=medium
+
+  * Actually specify a value for LimitNOFILE.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 07 Apr 2016 11:08:34 +0100
+
+redis (2:3.0.7-3) unstable; urgency=medium
+
+  * Update .travis.yml.
+  * Update redis-benchmark manpage. Thanks to Joe Doherty (docapotamus).
+  * Add LimitNOFILE to allow a higher number of open file descriptors
+    <https://github.com/lamby/pkg-redis/issues/8>. Thanks to @alexber220.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 06 Apr 2016 15:23:06 +0100
+
+redis (2:3.0.7-2) unstable; urgency=medium
+
+  * Correct SOURCE_DATE_EPOCH patch to invert conditional. Thanks to Reiner
+    Herrmann <reiner@reiner-h.de>.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 02 Feb 2016 10:53:26 +0100
+
+redis (2:3.0.7-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Actually drop unused 05-reproducible-build.diff file.
+  * Move to https Vcs-Git URI.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 29 Jan 2016 14:56:43 +0100
+
+redis (2:3.0.6-2) unstable; urgency=medium
+
+  * Ensure that we always properly cleanup test processes (Closes: #808862)
+  * Add explicit Build-Depends on procps.
+    - Drop explicit pkill.
+  * Use SOURCE_DATE_EPOCH instead of dpkg-parsechangelog so patch can go
+    upstream.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 06 Jan 2016 11:38:14 +0000
+
+redis (2:3.0.6-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Drop 06-CVE-2015-8080-Integer-wraparound-in-lua_struct.c-cau.patch as an
+    equivalent change merged upstream.
+  * Don't fail if redis user already exists. (Closes: #774736)
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 19 Dec 2015 11:27:41 +0000
+
+redis (2:3.0.5-4) unstable; urgency=high
+
+  * CVE-2015-8080: Integer wraparound in lua_struct.c causing stack-based
+    buffer overflow (Closes: #804419)
+  * Correct call to /bin/kill in redis-{server,sentinel}.service to avoid
+    "kill: invalid argument T" messages when $MAINPID is not set.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 21 Nov 2015 16:22:45 +0200
+
+redis (2:3.0.5-3) unstable; urgency=medium
+
+  * Add a redis-sentinel.tmpfile matching redis-server.tmpfile.
+  * wrap-and-sort -sa
+  * Rebase all patches with `gbp pq`.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 30 Oct 2015 10:54:30 +0000
+
+redis (2:3.0.5-2) unstable; urgency=medium
+
+  * Also specify `ProtectSystem=true` over `ProtectSystem=full` in
+    redis-server.service so that it can write its own configuration file
+    when being run in cluster mode. (Closes: #803366)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 30 Oct 2015 00:01:17 +0000
+
+redis (2:3.0.5-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Sync ./redis.conf and ./debian/redis.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 15 Oct 2015 16:12:17 +0100
+
+redis (2:3.0.4-8) unstable; urgency=medium
+
+  * Use `ProtectSystem=true` over `ProtectSystem=full` in
+    redis-sentinel.service so that it can write its own configuration file
+    under /etc. Thanks to Pete Hicks <jph@bebo.com> for the report and fix.
+    (Closes: #799696)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 13 Oct 2015 20:46:23 +0100
+
+redis (2:3.0.4-7) unstable; urgency=medium
+
+  * Change the default (and commented-out) value for "unixsocket" from
+    /tmp/redis.sock -> /var/run/redis/redis.sock so that it will work even
+    under systemd's PrivateTmp=True. Thanks to
+    Chris <Fisch.666@gmx.de> (Closes: #801464)
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 10 Oct 2015 21:11:57 +0200
+
+redis (2:3.0.4-6) unstable; urgency=medium
+
+  * Allow redis-sentinel to actually write to its own directory;
+    ReadWriteDirectories cannot take a filename as I previously thought.
+    Thanks to Bernd Zeimetz <b.zeimetz@conova.com> for the prompt report.
+    (Closes: #799696)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 29 Sep 2015 23:24:31 +0200
+
+redis (2:3.0.4-5) unstable; urgency=medium
+
+  * Don't install /etc/redis/{redis,sentinel}.conf world-readable as they may
+    contain passwords, additionally setting the ownership to ensure they can
+    read their own configuration. (Closes: #800435)
+  * Disable CAP_SYS_PTRACE in systemd service files
+  * Add Documentation= header to systemd service files.
+  * Add a "redis" systemd unit alias.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 29 Sep 2015 17:42:22 +0200
+
+redis (2:3.0.4-4) unstable; urgency=medium
+
+  * Make the parallel change in 2:30.4-3 to redis-server's initscript, not just
+    redis-sentinel's.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 14 Sep 2015 14:18:42 +0100
+
+redis (2:3.0.4-3) unstable; urgency=medium
+
+  * Specific `-s /bin/sh` in su's call to start run-parts as the redis's user's
+    shell of /bin/false was preventing it from starting under sysvinit. Thanks to
+    Michal Humpula <michal.humpula@hudrydum.cz>. (Closes: #798951)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 14 Sep 2015 14:13:26 +0100
+
+redis (2:3.0.4-2) unstable; urgency=medium
+
+  * Add PIDFile= to systemd service files.
+  * Run /etc/redis/redis-server.post-up.d (etc.) under the 'redis' user, not
+    root in initscript.
+    - Document this in 00_example files.
+  * Execute run-parts files under systemd, not just under sysvinit.
+    (Closes: #798771)
+  * Add rudimentary hardening under systemd. (Closes: #798770)
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 13 Sep 2015 07:18:13 +0100
+
+redis (2:3.0.4-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Sync debian/redis.conf.
+  * Put --system further on to avoid issues with lintian false-positive (and to
+    match the manpage).
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 08 Sep 2015 10:28:51 +0100
+
+redis (2:3.0.3-3) unstable; urgency=medium
+
+  * Replace ExecStop in systemd configuration with TimeoutStopSpec. Calls to
+    `redis-cli shutdown` were not reliable if the port/UNIX socket had changed
+    from the defaults (or is not accessible due to firewalling, permissions,
+    etc.)
+
+    Note that we cannot simply remove ExecStop (hence TimeoutStopSpec) as we
+    must wait for the server to fully shutdown - it may not have finished
+    writing the dump file to disk and thus we would be risking silent data loss
+    if it is SIGKILL'd.
+
+    Thanks to Chris Kuehl <ckuehl@ocf.berkeley.edu>. (Closes: #794437)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 05 Aug 2015 14:40:19 +0100
+
+redis (2:3.0.3-2) unstable; urgency=medium
+
+  * Switch from RuntimeDirectory to systemd-tempfiles.
+
+    Both redis-server and redis-sentinel use the the same RuntimeDirectory
+    (/run/redis). This is wrong since systemd removes RuntimeDirectory on
+    service stop. So, stopping redis-server removes redis-sentinel.pid as well.
+
+    Using a systemd-tempfile is a more robust approach. We are also removing
+    ExecStartPre lines since directory creation is handled in a different
+    level.
+
+    Thanks to Christos Trochalakis <yatiohi@ideopolis.gr>. (Closes: #793016)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 20 Jul 2015 14:52:01 +0100
+
+redis (2:3.0.3-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 17 Jul 2015 14:48:12 +0100
+
+redis (2:3.0.2-3) unstable; urgency=medium
+
+  * Add some missing tools:
+    - ./utils/lru/
+    - ./src/redis-trib.rb
+    - Don't compress redis-trib.rb
+    - Add ruby-redis to Suggests.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 11 Jul 2015 15:23:33 +0100
+
+redis (2:3.0.2-2) unstable; urgency=medium
+
+  * Create /var/run/redis with the correct permissions in systemd .service
+    files. Thanks to Sebastian Lipponer <mail@sebastianlipponer.de>.
+    (Closes: #787257)
+  * Install Bash completions to /usr/share/bash-completion/completions instead
+    of /etc/bash_completion.d (see #787257).
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 17 Jun 2015 15:56:52 +0100
+
+redis (2:3.0.2-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 04 Jun 2015 12:38:22 +0100
+
+redis (2:3.0.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 05 May 2015 16:23:59 +0100
+
+redis (2:3.0.0-2) unstable; urgency=medium
+
+  * redis-server was not able to start under systemd with default redis.conf
+    due to the absence of /var/run/redis; when RuntimeDirectory is specified in
+    *.service file, systemd creates the directory in /var/run and sets the
+    correct permissions. Thanks to Mikhael A <spir@spir.ru>.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 09 Apr 2015 13:27:08 +0100
+
+redis (2:3.0.0-1) unstable; urgency=medium
+
+  * New upstream stable release.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 01 Apr 2015 18:08:31 +0100
+
+redis (2:3.0.0~rc6-2) unstable; urgency=medium
+
+  * Don't make test failures cause a build failure - known timing issues
+    upstream.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 27 Mar 2015 13:37:18 +0000
+
+redis (2:3.0.0~rc6-1) unstable; urgency=medium
+
+  * New upstream RC release.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 25 Mar 2015 23:12:29 +0000
+
+redis (2:3.0.0~rc5-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 20 Mar 2015 19:16:34 +0000
+
+redis (2:3.0.0~rc5-1) experimental; urgency=medium
+
+  * New upstream RC release.
+  * wrap-and-sort entries.
+  * Tidy debian/rules.
+  * Move to debhelper compatibility level 9.
+  * Don't run tests if nocheck specified.
+  * Update debian/copyright.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 20 Mar 2015 11:36:46 +0000
+
+redis (2:3.0.0~rc4-1) experimental; urgency=medium
+
+  * New upstream RC release.
+  * wrap-and-sort.
+  * Use the latest debian/changelog date in 05-reproducible-build.diff.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 13 Feb 2015 23:33:53 +0000
+
+redis (2:3.0.0~rc3-1) experimental; urgency=medium
+
+  * New upstream RC release.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 30 Jan 2015 19:03:31 +0000
+
+redis (2:3.0.0~rc2-2) experimental; urgency=medium
+
+  * Add Build-Depends on `tcl` for tests.
+  * Add the following run-parts(8) directories that are be executed at the
+    appropriate daemon start and stop actions:
+
+    - /etc/redis/redis-server.pre-up.d
+    - /etc/redis/redis-server.pre-down.d
+    - /etc/redis/redis-server.post-up.d
+    - /etc/redis/redis-server.post-down.d
+    - /etc/redis/redis-sentinel.pre-up.d
+    - /etc/redis/redis-sentinel.pre-down.d
+    - /etc/redis/redis-sentinel.post-up.d
+    - /etc/redis/redis-sentinel.post-down.d
+
+    This is useful for loading Lua scripts which are not persisted across
+    restarts. Scripts should be idempotent so that multiple calls to (eg.)
+    "/etc/init.d/redis-server start" do not result in unintended consequences.
+  * Also run Redis Sentinel tests.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 27 Jan 2015 05:04:24 +0000
+
+redis (2:3.0.0~rc2-1) experimental; urgency=low
+
+  * New upstream RC release.
+    - Sync debian/redis.conf.
+  * Renable testsuite.
+  * Add --oknodo to initscript "start" action to ensure correct return code if
+    is already running.
+  * Split redis-sentinel into its own package (Closes: #775414)
+    - Move /usr/bin/redis-sentinel symlink to new package.
+    - Fork ./sentinel.conf -> debian/sentinel.conf for own changes.
+    - Add logrotate stanza.
+    - Override permissions of /etc/redis/sentinel.conf with dpkg-statoverride -
+      needs to be writable by Sentinel itself.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 16 Jan 2015 10:55:28 +0000
+
+redis (2:2.8.19-3) unstable; urgency=medium
+
+  * Add DEP-8 smoke test.
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 08 Feb 2015 19:19:42 +0000
+
+redis (2:2.8.19-2) unstable; urgency=low
+
+  * Re-enable testsuite.
+    - Add tcl to Build-Depends.
+  * Add --oknodo to initscript "start" action to ensure correct return code if
+    is already running.
+  * Use the latest debian/changelog date in 05-reproducible-build.diff.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 27 Jan 2015 04:48:25 +0000
+
+redis (2:2.8.19-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 30 Dec 2014 10:06:28 +0000
+
+redis (2:2.8.18-1) unstable; urgency=low
+
+  * New upstream release.
+    - Sync debian/redis.conf.
+  * Attempt to make build reproducible by dropping timestamp/uname name from
+    release.h.
+  * Bump Standards-Version to 3.9.6.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 11 Dec 2014 12:19:43 +0000
+
+redis (2:2.8.17-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 09 Oct 2014 11:47:32 +0100
+
+redis (2:2.8.14-1) unstable; urgency=low
+
+  * New upstream release.
+  * Guillaume Delacour:
+    - Use dpkg-buildflags CFLAGS, CPPFLAGS (patch upstream Makefile) and
+      LDFLAGS, also use pie and relro via DEB_BUILD_MAINT_OPTIONS
+    - Call make V=1 to show gcc command lines (blhc) and enable parallel build
+  * Sync debian/redis.conf and redis.conf.
+  * Refresh 02-fix-ftbfs-on-kfreebsd patch.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 05 Sep 2014 13:54:51 +0100
+
+redis (2:2.8.13-3) unstable; urgency=low
+
+  * Correct permissions of our /var directories by chowning them recursively.
+    This is necessary, at least temporarily, as systemd users were previously
+    running the daemon as root causing the files in those dirs to be owned by
+    that user. We could be clever and only chown files owned by root to
+    accomodate users who are not running as redis:redis but I think that's
+    overkill. (Closes: #756709)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 05 Aug 2014 17:16:53 +0100
+
+redis (2:2.8.13-2) unstable; urgency=low
+
+  * Under systemd, run under redis:redis. (Closes: #756621)
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 31 Jul 2014 14:49:48 +0100
+
+redis (2:2.8.13-1) unstable; urgency=low
+
+  * New upstream release.
+  * Synchronise ./debian/redis.conf with ./redis.conf.
+  * Update 03-use-system-jemalloc.diff.
+  * Fix FTBFS under kfreebsd (Closes: #754634)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 14 Jul 2014 22:49:15 +0100
+
+redis (2:2.8.12-1) unstable; urgency=low
+
+  * New upstream release.
+    - Synchronise ./debian/redis.conf with ./redis.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 05 Jul 2014 17:15:01 +0100
+
+redis (2:2.8.11-1) unstable; urgency=low
+
+  * New upstream release.
+    - Synchronise ./debian/redis.conf with ./redis.conf.
+  * Drop copytruncate from logrotate stanza.
+  * Prefer status_of_proc over `start-stop-daemon --stop --signal 0 ...`
+    (Closes: #751839)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 17 Jun 2014 16:36:58 +0100
+
+redis (2:2.8.8-2) unstable; urgency=low
+
+  * Add systemd support. Thanks to Wasif Malik <wmalik.ml@gmail.com>.
+    (Closes: #743750)
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 06 Apr 2014 11:24:36 +0100
+
+redis (2:2.8.8-1) unstable; urgency=low
+
+  * New upstream release.
+    - Sync debian/redis.conf and redis.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 01 Apr 2014 19:32:15 +0100
+
+redis (2:2.8.7-2) unstable; urgency=low
+
+  * Revamp maintainer scripts. (Closes: #741216)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 10 Mar 2014 22:18:29 +0000
+
+redis (2:2.8.7-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 05 Mar 2014 23:16:17 +0000
+
+redis (2:2.8.6-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 15 Feb 2014 22:47:34 +0000
+
+redis (2:2.8.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * Update debian/redis.conf to include new tcp-backlog option.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 08 Feb 2014 12:01:48 +0000
+
+redis (2:2.8.4-2) unstable; urgency=low
+
+  * Symlink redis-sentinel to redis-server as it's the same binary.
+  * Install sentinel.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 14 Jan 2014 12:31:14 +0000
+
+redis (2:2.8.4-1) unstable; urgency=low
+
+  * New upstream version.
+  * Sync debian/redis.conf.
+  * Also ship redis-sentinel (Closes: #735272)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 14 Jan 2014 10:42:09 +0000
+
+redis (2:2.8.2-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 06 Dec 2013 14:37:54 +0000
+
+redis (2:2.8.0-1) unstable; urgency=low
+
+  * New upstream release.
+    - Update debian/patches/02-fix-ftbfs-on-kfreebsd.
+    - Update debian/patches/03-use-system-jemalloc.diff.
+    - Update debian/redis.conf
+  * Bump Standards-Version to 3.9.4.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 22 Nov 2013 16:51:55 +0000
+
+redis (2:2.6.16-3) unstable; urgency=low
+
+  * Add missing Replaces and Breaks to redis-tools. Thanks to Andreas Beckmann
+    (anbe). (Closes: #723703)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 20 Sep 2013 14:35:24 +0100
+
+redis (2:2.6.16-2) unstable; urgency=low
+
+  * Completely rework and refresh debian/copyright. (Closes: #723162)
+  * Update website in debian/copyright.
+  * Drop client library references from debian/copyright (dropped in
+    2:1.1.90~beta-1).
+  * Update main copyright year.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 17 Sep 2013 19:08:01 +0100
+
+redis (2:2.6.16-1) unstable; urgency=low
+
+  * New upstream release.
+  * Split non-server binaries into redis-tools package. (Closes: #723006)
+  * Update debian/watch.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 16 Sep 2013 09:53:49 +0100
+
+redis (2:2.6.14-2) unstable; urgency=low
+
+  * Source /lib/lsb/init-functions in initscript for systemd compatibility.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 12 Aug 2013 16:17:47 +0100
+
+redis (2:2.6.14-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 06 Aug 2013 12:14:12 +0100
+
+redis (2:2.6.13-1) unstable; urgency=low
+
+  * New upstream release.
+    - Sync debian/redis.conf.
+    - Update 02-fix-ftbfs-on-kfreebsd.diff.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 17 Jun 2013 00:49:42 +0100
+
+redis (2:2.6.7-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add missing "status" command from usage. Thanks to Dererk
+    <dererk@debian.org>. (Closes: #696339)
+  * Enable building on kfreebsd-amd64 (and possibly kfreebsd-i386 and
+    hurd-i386) by not depending on 'jemalloc' which would not be used anyway.
+    Thanks to Jeff Epler <jepler@unpythonic.net>. (Closes: #696618)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 28 Dec 2012 17:00:06 +0000
+
+redis (2:2.6.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Update 02-fix-ftbfs-on-kfreebsd.diff.
+  * Update 03-use-system-jemalloc.diff.
+  * Update configuration file.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 23 Oct 2012 15:04:17 +0100
+
+redis (2:2.4.17-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump Standards-Version to 3.9.3.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 10 Oct 2012 21:16:47 +0100
+
+redis (2:2.4.15-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 02 Jul 2012 10:56:28 +0100
+
+redis (2:2.4.14-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 08 Jun 2012 17:21:49 +0100
+
+redis (2:2.4.13-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #673202)
+  * Sync upstream redis.conf changes with debian/redis.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 17 May 2012 10:32:33 +0100
+
+redis (2:2.4.9-2) unstable; urgency=low
+
+  * Add /etc/default/redis-server option to call ``ulimit -n'' before
+    invoking Redis. (Closes: #672638)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 14 May 2012 10:34:21 +0000
+
+redis (2:2.4.9-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 26 Mar 2012 12:21:29 +0100
+
+redis (2:2.4.8-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fix debian/watch (Closes: #661919)
+  * Don't use jemalloc on archs not supporting it (Closes: #661354)
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 11 Mar 2012 22:19:51 +0000
+
+redis (2:2.4.5-1) unstable; urgency=low
+
+  * New upstream version (Closes: #655416)
+  * Use system jemalloc. (Closes: #654900, #654902)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 11 Jan 2012 12:30:27 +0000
+
+redis (2:2.4.2-2) unstable; urgency=low
+
+  * Fix test suite on sparc (Closes: #647627)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 07 Dec 2011 16:55:23 +0000
+
+redis (2:2.4.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * /etc/init.d/redis-server fixes:
+    - Send TERM, not QUIT signal.
+    - Sleep 1 second after exiting as although the process has disappeared the
+      server socket is somehow still in use which causes the start to fail.
+  * Drop 01-fix-link-ordering patch; fixed upstream.
+    <http://code.google.com/p/redis/issues/detail?id=562>.
+  * Update 02-fix-ftbfs-on-kfreebsd.
+  * Drop redis-doc package now that upstream no longer ship documentation.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 16 Nov 2011 16:00:23 +0000
+
+redis (2:2.4.0~rc5-1) experimental; urgency=low
+
+  * New upstream RC release.
+  * Update debian/redis.conf.
+  * Drop documentation package - dropped upstream.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 29 Jul 2011 21:41:25 +0200
+
+redis (2:2.2.12-1) unstable; urgency=low
+
+  * New upstream release.
+  * Move runtime files to /var/run/redis/ and set that as default location for
+    socket file. Thanks to Sandro Tosi <morph@debian.org>. (Closes: #632931)
+  * Refresh fix-link-ordering patch.
+  * Use "defined(__linux__) || defined(__GLIBC__)" for kfreebsd compatibility.
+    Thanks to Robert Millan <rmh@debian.org>. (Closes: #632499)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 27 Jul 2011 19:20:26 +0200
+
+redis (2:2.2.11-3) unstable; urgency=low
+
+  * Change default loglevel to "notice".
+  * Wait forever for redis to stop - only waiting 10 seconds could cause data
+    loss.
+  * Set a proper default location for socket file. (Closes: #632931)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 18 Jul 2011 13:25:16 +0100
+
+redis (2:2.2.11-2) unstable; urgency=low
+
+  * Fix FTBFS on kfreebsd. Thanks to Christoph Egger <christoph@debian.org> for
+    the patch. (Closes: #632499)
+  * Ship redis-check-aof and redis-check-dump. (Closes: #632858)
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 06 Jul 2011 22:36:18 +0100
+
+redis (2:2.2.11-1) unstable; urgency=low
+
+  * New upstream release.
+  * Correct spelling of "Description" in patch system.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 02 Jul 2011 00:43:37 +0100
+
+redis (2:2.2.10-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump Standards-Version to 3.9.2.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 18 Jun 2011 14:53:41 +0100
+
+redis (2:2.2.8-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add patch from Ubuntu to fix FTBFS due to --as-needed linking.
+    Thanks to Nigel Babu <nigelbabu@ubuntu.com>. (Closes: #628056)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 07 Jun 2011 16:43:58 +0100
+
+redis (2:2.2.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 25 Apr 2011 14:04:29 +0100
+
+redis (2:2.2.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 22 Apr 2011 14:05:43 +0100
+
+redis (2:2.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use userdel over deluser to prevent problems when purging package.
+    (Closes: #618326)
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 15 Mar 2011 11:13:21 +0000
+
+redis (2:2.2.1-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #604076)
+  * Update install paths.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 24 Feb 2011 19:39:43 +0000
+
+redis (2:2.0.1-2) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 10 Sep 2010 14:49:30 +0100
+
+redis (2:2.0.1-1) experimental; urgency=low
+
+  * New upstream release.
+  * Update debian/watch to not match old tarballs.
+  * Upstream now ships an install target; let's just ignore it for now.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 10 Sep 2010 14:40:01 +0100
+
+redis (2:2.0.0~rc4-1) experimental; urgency=low
+
+  * New upstream RC release.
+  * Bump Standards-Version to 3.9.1.
+  * Remove mkreleasehdr.sh when building to avoid debian diff - it will
+    regenerate release.h with different contents.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 29 Jul 2010 09:13:31 -0400
+
+redis (2:2.0.0~rc3-1) experimental; urgency=low
+
+  * New upstream RC release.
+  * Bump Standards-Version to 3.9.0.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 23 Jul 2010 11:59:16 +0100
+
+redis (2:2.0.0~rc2-1) experimental; urgency=low
+
+  * New upstream RC release.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 01 Jul 2010 23:15:02 +0100
+
+redis (2:2.0.0~rc1-2) experimental; urgency=low
+
+  * Add 'status' command to initscript.
+  * Add redis-benchmark (and manpage) to package. (Closes: #587395)
+
+ -- Chris Lamb <lamby@debian.org>  Mon, 28 Jun 2010 11:02:31 +0100
+
+redis (2:2.0.0~rc1-1) experimental; urgency=low
+
+  * New upstream release candidate.
+  * Remove '01-dont-print-pid-on-startup.diff' patch.
+  * Update local copy of redis.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 01 Jun 2010 10:51:05 +0100
+
+redis (2:1.2.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 30 Mar 2010 14:13:52 +0100
+
+redis (2:1.2.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * Drop 02-fix-segfault-indupClientReplyValue.diff; applied upstream via
+    <http://code.google.com/p/redis/issues/detail?id=177>.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 11 Mar 2010 21:34:37 +0000
+
+redis (2:1.2.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 09 Mar 2010 16:18:19 +0000
+
+redis (2:1.2.3-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 02 Mar 2010 16:45:07 +0000
+
+redis (2:1.2.2-2) unstable; urgency=low
+
+  * Really fix segfault in dupClientReplyValue. (Closes: #570371)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 19 Feb 2010 09:16:48 +0000
+
+redis (2:1.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+    - Fixes segfault in dupClientReplyValue. Thanks to Hirling Endre
+      <endre@dawn.royalcomp.hu> (Closes: #570371)
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 18 Feb 2010 22:02:10 +0000
+
+redis (2:1.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add Bash completion script for redis-cli by Steve Kemp <skx@debian.org>.
+    (Closes: #565358)
+  * Bump Standards-Version to 3.8.4.
+  * Add $remote_fs to LSB "Required-{Start,Stop}" initscript headers.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 09 Feb 2010 14:37:32 +0000
+
+redis (2:1.2.0-1) unstable; urgency=low
+
+  * New upstream stable release.
+  * Switch to dpkg-source 3.0 (quilt) format.
+  * Patch out printing of pid on startup.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 14 Jan 2010 15:50:36 +0000
+
+redis (2:1.1.95~beta-2) unstable; urgency=low
+
+  * Set source section to "database" from "misc".
+  * Add redis-cli binary to "redis-server" package.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 13 Jan 2010 23:36:30 +0000
+
+redis (2:1.1.95~beta-1) unstable; urgency=low
+
+  * New upstream release.
+  * Sync debian/redis.conf with upstream version (new "rdbcompression" and
+    "masterauth" commands).
+
+ -- Chris Lamb <lamby@debian.org>  Sun, 10 Jan 2010 22:59:06 +0000
+
+redis (2:1.1.90~beta-1) unstable; urgency=low
+
+  * New upstream release:
+    - Bump the epoch as dpkg considers 1.1.90 to be less than 1.02.
+    - Sync redis.conf
+  * Don't build client libraries anymore; not part of the upstream tarball
+    anymore.
+  * Don't export CFLAGS from debian/rules to prevent FTBFS when dpkg-provided
+    CFLAGS does not include --std=c99.
+  * Modify debian/watch to consider "-beta" the same as "~beta" for correct
+    dpkg ordering.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 05 Dec 2009 22:10:32 +0000
+
+redis (1:1.02-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 23 Oct 2009 16:26:45 +0100
+
+redis (1:1.01-1) unstable; urgency=low
+
+  * New upstream release.
+    - "maxmemory now works well on 64bit systems with > 4GB of RAM"
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 22 Sep 2009 21:53:48 +0100
+
+redis (1:1.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump Standards-Version to 3.8.3.
+  * Drop patch system:
+    - 01-recommend-sysctl-conf.diff; applied upstream.
+    - 02-warn-after-daemonising.diff; applied upstream.
+    - 03-only-mangle-trace-on-ia64-and-x86.diff; applied upstream.
+    - Drop quilt Build-Depends and remove patches/series.
+  * Use "override_dh_auto_clean" instead of "clean" target.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 08 Sep 2009 22:09:19 +0100
+
+redis (1:0.900-3) unstable; urgency=low
+
+  * Actually add architecture patch introducted in 1:0.900-2 to quilt 'series'
+    (Closes: #533763)
+  * Correct "/proc/sys/vm/overcommit_memory" message to print the correct
+    string to add to sysctl.conf.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 25 Jun 2009 12:13:02 +0100
+
+redis (1:0.900-2) unstable; urgency=low
+
+  * Add patch to avoid mangling the stacktrace on SIGSEGV using X86-specific
+    ucontext struct, etc. (Closes: #533763)
+  * Bump Standards-Version to 3.8.2.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 24 Jun 2009 23:54:42 +0100
+
+redis (1:0.900-1) unstable; urgency=low
+
+  * New upstream release.
+    - Update debian/redis.conf
+  * Update versionmangle in debian/watch.
+  * "/proc/sys/vm/overcommit_memory" message:
+    - Recommend modifying /etc/sysctl.conf instead of using "boot scripts"
+    - Warn after daemonising to avoid message being spammed on every boot.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 17 Jun 2009 10:39:57 +0100
+
+redis (1:0.100-1) unstable; urgency=low
+
+  * New upstream release.
+    - Update debian/redis.conf
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 28 May 2009 00:31:37 +0100
+
+redis (1:0.096-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 09 May 2009 22:16:13 +0100
+
+redis (1:0.095-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Chris Lamb <lamby@debian.org>  Sat, 09 May 2009 12:50:26 +0100
+
+redis (1:0.094-3) unstable; urgency=low
+
+  * Really upload to unstable - I give "debchange -r" less credit than it
+    deserves.
+
+ -- Chris Lamb <lamby@debian.org>  Thu, 07 May 2009 22:02:24 +0100
+
+redis (1:0.094-2) experimental; urgency=low
+
+  * Upload to unstable.
+  * Add libredis-perl package.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 06 May 2009 00:19:35 +0100
+
+redis (1:0.094-1) experimental; urgency=low
+
+  * New upstream release.
+  * Place libphp-redis package into 'php' section.
+  * Update debian/copyright with new libraries.
+  * Correct Vcs-Browser location.
+
+ -- Chris Lamb <lamby@debian.org>  Wed, 06 May 2009 00:08:26 +0100
+
+redis (1.0~beta8-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 24 Mar 2009 22:30:02 +0000
+
+redis (1.0~beta7-1) experimental; urgency=low
+
+  * Initial release. (Closes: #518700)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 20 Mar 2009 00:37:15 +0000
