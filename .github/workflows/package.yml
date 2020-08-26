@@ -29,9 +29,8 @@ jobs:
               sed -i "s/@RELEASE@/$release/g" debian/changelog ;\
               dpkg-buildpackage -S ;\
           done
-
-          # testing -- inspect results
-          ls -lR ..
-          cat ../*.dsc
       env:
         RELEASES: "xenial bionic focal"
+    - name: Upload source packages
+      run: |
+          dput ppa:redislabs/redis ../*.changes
