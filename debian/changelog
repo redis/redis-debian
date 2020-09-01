@@ -1,3 +1,23 @@
+redis (6:6.0.7-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Fix crash when enabling CLIENT TRACKING with prefix
+  * EXEC always fails with EXECABORT and multi-state is cleared
+  * RESTORE ABSTTL won't store expired keys into the db
+  * redis-cli better handling of non-pritable key names
+  * TLS: Ignore client cert when tls-auth-clients off
+  * Tracking: fix invalidation message on flush
+  * Notify systemd on Sentinel startup
+  * Fix crash on a misuse of STRALGO
+  * Few fixes in module API
+  * Fix a few rare leaks (STRALGO error misuse, Sentinel)
+  * Fix a possible invalid access in defrag of scripts (unlikely to cause real harm)
+  * LPOS command to search in a list
+  * Use user+pass for MIGRATE in redis-cli and redis-benchmark in cluster mode
+  * redis-cli support TLS for --pipe, --rdb and --replica options
+  * TLS: Session caching configuration support
+
+ -- Redis Labs <redis@redis.io>  Tue, 01 Sep 2020 10:10:48 +0300
+
 redis (6:6.0.6-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Bump epoch for new PPA.
