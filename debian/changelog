@@ -1,3 +1,18 @@
+redis (6:6.0.8-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * CONFIG REWRITE after setting oom-score-adj-values either via CONFIG SET or
+    loading it from a config file, will generate a corrupt config file that will
+    cause Redis to fail to start
+  * Fix issue with redis-cli --pipe on MacOS
+  * Fix RESP3 response for HKEYS/HVALS on non-existing key
+  * Various small bug fixes
+  * Remove THP warning when set to madvise
+  * Allow EXEC with read commands on readonly replica in cluster
+  * Add masters/replicas options to redis-cli --cluster call command
+  * Add RedisModule_ThreadSafeContextTryLock
+
+ -- Redis Labs <redis@redis.io>  Thu, 10 Sep 2020 15:28:11 +0300
+
 redis (6:6.0.7-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix crash when enabling CLIENT TRACKING with prefix
