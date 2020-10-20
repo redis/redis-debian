@@ -30,7 +30,7 @@ jobs:
               dpkg-buildpackage -S ;\
           done
       env:
-        RELEASES: "xenial bionic cosmic disco eoan focal"
+        RELEASES: "xenial bionic focal"
     - name: Upload source packages
       run: |
           dput ppa:redislabs/redis ../*.changes
