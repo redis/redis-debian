@@ -32,10 +32,11 @@ override_dh_auto_build:
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# Avoid race conditions in upstream testsuite.
-	./utils/gen-test-certs.sh || true
-	./runtest --clients 1 --tls || true
-	./runtest-cluster --tls || true
-	./runtest-sentinel || true
+	./utils/gen-test-certs.sh
+	./runtest --clients 1
+	./runtest --clients 1 --tls
+	./runtest-cluster --tls
+	./runtest-sentinel --tls
 endif
 
 override_dh_auto_clean:
