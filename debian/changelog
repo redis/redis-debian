@@ -1,3 +1,10 @@
+redis (6:6.0.8-2rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Fix crashes when AOF or RDB write errors occur, due to a bad packaging
+    patch.
+
+ -- Redis Labs <redis@redis.io>  Tue, 20 Oct 2020 10:56:01 +0300
+
 redis (6:6.0.8-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * CONFIG REWRITE after setting oom-score-adj-values either via CONFIG SET or
