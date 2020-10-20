@@ -1,3 +1,9 @@
+redis (6:6.0.8-3rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Skip tests that fail on slower/emulated arm platforms.
+
+ -- Redis Labs <redis@redis.io>  Tue, 20 Oct 2020 12:49:16 +0300
+
 redis (6:6.0.8-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix crashes when AOF or RDB write errors occur, due to a bad packaging
