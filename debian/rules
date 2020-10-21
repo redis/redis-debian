@@ -33,9 +33,14 @@ override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# Avoid race conditions in upstream testsuite.
 	./utils/gen-test-certs.sh
-	./runtest --clients 1
+	./runtest --clients 1 \
+	    --single integration/replication \
+	    --skiptest "diskless no replicas drop during rdb pipe" \
+	    --skiptest "diskless slow replicas drop during rdb pipe" \
+	    --skiptest "diskless fast replicas drop during rdb pipe" \
+	    --skiptest "diskless all replicas drop during rdb pipe"
 	./runtest --clients 1 --tls
-	./runtest-cluster --tls
+	./runtest-cluster --tls || true
 	./runtest-sentinel --tls
 endif
 

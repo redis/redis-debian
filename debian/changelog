@@ -1,3 +1,9 @@
+redis (6:6.0.8-4rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * More skipped tests.
+
+ -- Redis Labs <redis@redis.io>  Wed, 21 Oct 2020 13:54:44 +0300
+
 redis (6:6.0.8-3rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip tests that fail on slower/emulated arm platforms.
