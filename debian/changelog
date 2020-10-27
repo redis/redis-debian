@@ -1,3 +1,33 @@
+redis (6:6.0.9-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Memory reporting of clients argv (#7874)
+  * Add redis-cli control on raw format line delimiter (#7841)
+  * Add redis-cli support for rediss:// -u prefix (#7900)
+  * Get rss size support for NetBSD and DragonFlyBSD
+  * WATCH no longer ignores keys which have expired for MULTI/EXEC (#7920)
+  * Correct OBJECT ENCODING response for stream type (#7797)
+  * Allow blocked XREAD on a cluster replica (#7881)
+  * TLS: Do not require CA config if not used (#7862)
+  * INFO report real peak memory (before eviction) (#7894)
+  * Allow requirepass config to clear the password (#7899)
+  * Fix config rewrite file handling to make it really atomic (#7824)
+  * Fix excessive categories being displayed from ACLs (#7889)
+  * Add fsync in replica when full RDB payload was received (#7839)
+  * Don't write replies to socket when output buffer limit reached (#7202)
+  * Fix redis-check-rdb support for modules aux data (#7826)
+  * Other smaller bug fixes
+  * Add APIs for version and compatibility checks (#7865)
+  * Add RM_GetClientCertificate (#7866)
+  * Add RM_GetDetachedThreadSafeContext (#7886)
+  * Add RM_GetCommandKeys (#7884)
+  * Add Swapdb Module Event (#7804)
+  * RM_GetContextFlags provides indication of being in a fork child (#7783)
+  * RM_GetContextFlags document missing flags: MULTI_DIRTY, IS_CHILD (#7821)
+  * Expose real client on connection events (#7867)
+  * Minor improvements to module blocked on keys (#7903)
+
+ -- Redis Labs <redis@redis.io>  Tue, 27 Oct 2020 09:50:41 +0200
+
 redis (6:6.0.8-5rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Final(?) changes to fix build on all PPA builders.
