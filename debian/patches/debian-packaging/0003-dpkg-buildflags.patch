@@ -1,7 +1,6 @@
-diff -urN redis-6.0.6.orig/deps/linenoise/Makefile redis-6.0.6/deps/linenoise/Makefile
---- redis-6.0.6.orig/deps/linenoise/Makefile	2020-07-20 11:08:26.000000000 -0700
-+++ redis-6.0.6/deps/linenoise/Makefile	2020-08-01 00:16:29.900476593 -0700
-@@ -6,7 +6,7 @@
+--- a/deps/linenoise/Makefile
++++ b/deps/linenoise/Makefile
+@@ -6,7 +6,7 @@ R_CFLAGS= $(STD) $(WARN) $(OPT) $(DEBUG)
  R_LDFLAGS= $(LDFLAGS)
  DEBUG= -g
  
@@ -10,10 +9,9 @@ diff -urN redis-6.0.6.orig/deps/linenoise/Makefile redis-6.0.6/deps/linenoise/Ma
  R_LD=$(CC) $(R_LDFLAGS)
  
  linenoise.o: linenoise.h linenoise.c
-diff -urN redis-6.0.6.orig/src/Makefile redis-6.0.6/src/Makefile
---- redis-6.0.6.orig/src/Makefile	2020-07-20 11:08:26.000000000 -0700
-+++ redis-6.0.6/src/Makefile	2020-08-01 00:17:06.818594442 -0700
-@@ -209,7 +209,7 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -226,7 +226,7 @@ endif
  	FINAL_LIBS += ../deps/hiredis/libhiredis_ssl.a $(LIBSSL_LIBS) $(LIBCRYPTO_LIBS)
  endif
  

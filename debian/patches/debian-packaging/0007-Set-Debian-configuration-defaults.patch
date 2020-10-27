@@ -7,20 +7,18 @@ Subject: Set Debian configuration defaults.
  sentinel.conf |  9 +++++----
  2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/redis.conf b/redis.conf
-index 6cec636..f6f7e58 100644
 --- a/redis.conf
 +++ b/redis.conf
-@@ -66,7 +66,7 @@
+@@ -65,7 +65,7 @@
  # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES
- # JUST COMMENT THE FOLLOWING LINE.
+ # JUST COMMENT OUT THE FOLLOWING LINE.
  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -bind 127.0.0.1
 +bind 127.0.0.1 ::1
  
  # Protected mode is a layer of security protection, in order to avoid that
  # Redis instances left open on the internet are accessed and exploited.
-@@ -106,7 +106,7 @@ tcp-backlog 511
+@@ -105,7 +105,7 @@ tcp-backlog 511
  # incoming connections. There is no default, so Redis will not listen
  # on a unix socket when not specified.
  #
@@ -29,7 +27,7 @@ index 6cec636..f6f7e58 100644
  # unixsocketperm 700
  
  # Close the connection after a client is idle for N seconds (0 to disable)
-@@ -202,7 +202,7 @@ tcp-keepalive 300
+@@ -221,7 +221,7 @@ tcp-keepalive 300
  
  # By default Redis does not run as a daemon. Use 'yes' if you need it.
  # Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
@@ -38,7 +36,7 @@ index 6cec636..f6f7e58 100644
  
  # If you run Redis from upstart or systemd, Redis can interact with your
  # supervision tree. Options:
-@@ -224,7 +224,7 @@ supervised no
+@@ -244,7 +244,7 @@ supervised no
  #
  # Creating a pid file is best effort: if Redis is not able to create it
  # nothing bad happens, the server will start and run normally.
@@ -47,7 +45,7 @@ index 6cec636..f6f7e58 100644
  
  # Specify the server verbosity level.
  # This can be one of:
-@@ -237,7 +237,7 @@ loglevel notice
+@@ -257,7 +257,7 @@ loglevel notice
  # Specify the log file name. Also the empty string can be used to force
  # Redis to log on the standard output. Note that if you use standard
  # output for logging but daemonize, logs will be sent to /dev/null
@@ -56,7 +54,7 @@ index 6cec636..f6f7e58 100644
  
  # To enable logging to the system logger, just set 'syslog-enabled' to yes,
  # and optionally update the other syslog parameters to suit your needs.
-@@ -342,7 +342,7 @@ rdb-del-sync-files no
+@@ -362,7 +362,7 @@ rdb-del-sync-files no
  # The Append Only File will also be created inside this directory.
  #
  # Note that you must specify a directory here, not a file name.
@@ -65,8 +63,6 @@ index 6cec636..f6f7e58 100644
  
  ################################# REPLICATION #################################
  
-diff --git a/sentinel.conf b/sentinel.conf
-index 4ca5e5f..133cd3e 100644
 --- a/sentinel.conf
 +++ b/sentinel.conf
 @@ -13,6 +13,7 @@
