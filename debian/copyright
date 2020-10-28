@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Contact: Salvatore Sanfilippo <antirez@gmail.com>
+Upstream-Contact: Redis Core Team <redis@redis.io>
 Upstream-Name: redis
-Source: https://github.com/antirez/redis
+Source: https://github.com/redis/redis
 
 Files: *
 Copyright: © 2006-2014 Salvatore Sanfilippo <antirez@gmail.com>
