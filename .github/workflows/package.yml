@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-          sudo apt-get update && sudo apt-get install debhelper dput tcl-tls
+          sudo apt-get update && sudo apt-get install debhelper dput tcl-tls libsystemd-dev pkg-config
     - name: Setup GPG key
       run: |
           mkdir -p ~/.gnupg
