@@ -1,3 +1,10 @@
+
+redis (6:6.0.9-2rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Fix build to support systemd.
+
+ -- Redis Labs <redis@redis.io>  Wed, 28 Oct 2020 16:26:25 +0200
+
 redis (6:6.0.9-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Memory reporting of clients argv (#7874)
