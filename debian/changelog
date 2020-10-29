@@ -1,3 +1,9 @@
+redis (6:6.0.9-3rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Skip test that are still flaky on some platforms.
+
+ -- Redis Labs <redis@redis.io>  Thu, 29 Oct 2020 09:11:33 +0200
+
 redis (6:6.0.9-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix build to support systemd.
