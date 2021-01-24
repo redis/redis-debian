@@ -66,18 +66,18 @@ do
 # We then listen exlusively on UNIX sockets to avoid TCP port collisions:
 #
 #   $ sed -i -e 's@^port .*@port 0@' /etc/redis/${NAME}-myname.conf
-#   $ sed -i -e 's@^\\(# \\)\\{0,1\\}unixsocket .*@unixsocket /var/run/${NAME}-myname/${BINARY}.sock@' /etc/redis/${NAME}-myname.conf
+#   $ sed -i -e 's@^\\(# \\)\\{0,1\\}unixsocket .*@unixsocket /run/${NAME}-myname/${BINARY}.sock@' /etc/redis/${NAME}-myname.conf
 #
 # ... and ensure we are logging, etc. in a unique location:
 #
 #   $ sed -i -e 's@^logfile .*@logfile /var/log/redis/${BINARY}-myname.log@' /etc/redis/${NAME}-myname.conf
-#   $ sed -i -e 's@^pidfile .*@pidfile /var/run/redis-myname/${BINARY}.pid@' /etc/redis/${NAME}-myname.conf
+#   $ sed -i -e 's@^pidfile .*@pidfile /run/redis-myname/${BINARY}.pid@' /etc/redis/${NAME}-myname.conf
 #
 # We can then start the service as follows, validating we are using our own
 # configuration:
 #
 #   $ systemctl start ${BINARY}@myname.service
-#   $ redis-cli -s /var/run/${NAME}-myname/${BINARY}.sock info | grep config_file
+#   $ redis-cli -s /run/${NAME}-myname/${BINARY}.sock info | grep config_file
 #
 #  -- Chris Lamb <lamby@debian.org>  Mon, 09 Oct 2017 22:17:24 +0100
 EOF
@@ -90,10 +90,10 @@ After=network.target
 Documentation=http://redis.io/documentation, man:${BINARY}(1)
 
 [Service]
-Type=forking
+Type=notify
 ExecStart=/usr/bin/${BINARY} /etc/redis/${NAMESPACED}.conf
 ExecStop=/bin/kill -s TERM \$MAINPID
-PIDFile=/var/run/${NAMESPACED}/${BINARY}.pid
+PIDFile=/run/${NAMESPACED}/${BINARY}.pid
 TimeoutStopSec=0
 Restart=always
 User=redis
@@ -109,7 +109,7 @@ ProtectHome=yes
 ReadOnlyDirectories=/
 ReadWriteDirectories=-/var/lib/redis
 ReadWriteDirectories=-/var/log/redis
-ReadWriteDirectories=-/var/run/${NAMESPACED}
+ReadWriteDirectories=-/run/${NAMESPACED}
 
 NoNewPrivileges=true
 CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE${SYSTEMD_EXTRA}

@@ -18,34 +18,34 @@ Subject: Set Debian configuration defaults.
  
  # Protected mode is a layer of security protection, in order to avoid that
  # Redis instances left open on the internet are accessed and exploited.
-@@ -105,7 +105,7 @@ tcp-backlog 511
+@@ -105,7 +105,7 @@
  # incoming connections. There is no default, so Redis will not listen
  # on a unix socket when not specified.
  #
 -# unixsocket /tmp/redis.sock
-+# unixsocket /var/run/redis/redis-server.sock
++# unixsocket /run/redis/redis-server.sock
  # unixsocketperm 700
  
  # Close the connection after a client is idle for N seconds (0 to disable)
-@@ -221,7 +221,7 @@ tcp-keepalive 300
+@@ -233,7 +233,7 @@
+ #                        UPSTART_JOB or NOTIFY_SOCKET environment variables
+ # Note: these supervision methods only signal "process is ready."
+ #       They do not enable continuous pings back to your supervisor.
+-supervised no
++supervised auto
  
- # By default Redis does not run as a daemon. Use 'yes' if you need it.
- # Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
--daemonize no
-+daemonize yes
- 
- # If you run Redis from upstart or systemd, Redis can interact with your
- # supervision tree. Options:
-@@ -244,7 +244,7 @@ supervised no
+ # If a pid file is specified, Redis writes it where specified at startup
+ # and removes it at exit.
+@@ -244,7 +244,7 @@
  #
  # Creating a pid file is best effort: if Redis is not able to create it
  # nothing bad happens, the server will start and run normally.
 -pidfile /var/run/redis_6379.pid
-+pidfile /var/run/redis/redis-server.pid
++pidfile /run/redis/redis-server.pid
  
  # Specify the server verbosity level.
  # This can be one of:
-@@ -257,7 +257,7 @@ loglevel notice
+@@ -257,7 +257,7 @@
  # Specify the log file name. Also the empty string can be used to force
  # Redis to log on the standard output. Note that if you use standard
  # output for logging but daemonize, logs will be sent to /dev/null
@@ -54,7 +54,7 @@ Subject: Set Debian configuration defaults.
  
  # To enable logging to the system logger, just set 'syslog-enabled' to yes,
  # and optionally update the other syslog parameters to suit your needs.
-@@ -362,7 +362,7 @@ rdb-del-sync-files no
+@@ -362,7 +362,7 @@
  # The Append Only File will also be created inside this directory.
  #
  # Note that you must specify a directory here, not a file name.
@@ -73,18 +73,27 @@ Subject: Set Debian configuration defaults.
  #
  # protected-mode no
  
-@@ -23,17 +24,17 @@ port 26379
- # By default Redis Sentinel does not run as a daemon. Use 'yes' if you need it.
- # Note that Redis will write a pid file in /var/run/redis-sentinel.pid when
+@@ -25,15 +26,27 @@
  # daemonized.
--daemonize no
-+daemonize yes
+ daemonize no
  
++# If you run Redis Sentinel from upstart or systemd, Redis can interact with your
++# supervision tree. Options:
++#   supervised no      - no supervision interaction
++#   supervised upstart - signal upstart by putting Redis into SIGSTOP mode
++#                        requires "expect stop" in your upstart job config
++#   supervised systemd - signal systemd by writing READY=1 to $NOTIFY_SOCKET
++#   supervised auto    - detect upstart or systemd method based on
++#                        UPSTART_JOB or NOTIFY_SOCKET environment variables
++# Note: these supervision methods only signal "process is ready."
++#       They do not enable continuous pings back to your supervisor.
++supervised auto
++
  # When running daemonized, Redis Sentinel writes a pid file in
  # /var/run/redis-sentinel.pid by default. You can specify a custom pid file
  # location here.
 -pidfile /var/run/redis-sentinel.pid
-+pidfile /var/run/sentinel/redis-sentinel.pid
++pidfile /run/sentinel/redis-sentinel.pid
  
  # Specify the log file name. Also the empty string can be used to force
  # Sentinel to log on the standard output. Note that if you use standard
@@ -94,7 +103,7 @@ Subject: Set Debian configuration defaults.
  
  # sentinel announce-ip <ip>
  # sentinel announce-port <port>
-@@ -62,7 +63,7 @@ logfile ""
+@@ -62,7 +75,7 @@
  # For Redis Sentinel to chdir to /tmp at startup is the simplest thing
  # for the process to don't interfere with administrative tasks such as
  # unmounting filesystems.
