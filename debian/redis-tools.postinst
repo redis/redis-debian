@@ -11,17 +11,6 @@ Setup_dir () {
 
 	mkdir -p ${DIR}
 
-	case "${DIR}" in
-	/var/log/redis)
-		MODE="02750"
-		GROUP="adm"
-		;;
-	*)
-		MODE="750"
-		GROUP="${USER}"
-		;;
-	esac
-
 	if ! dpkg-statoverride --list ${DIR} >/dev/null 2>&1
 	then
 		chown ${USER}:${GROUP} ${DIR}
@@ -38,8 +27,9 @@ then
 		--group \
 		${USER} || true
 
-	Setup_dir /var/log/redis ${USER}:adm 2750
-	Setup_dir /var/lib/redis ${USER}:${USER} 750
+	Setup_dir /var/log/redis 2750 adm
+	Setup_dir /var/lib/redis 750 ${USER}
+	Setup_dir /etc/redis 2770 ${USER}
 fi
 
 #DEBHELPER#

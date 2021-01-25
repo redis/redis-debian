@@ -5,7 +5,7 @@ set -eu
 if [ "${1}" = "purge" ]
 then
 	userdel redis || true
-	rm -rf /var/lib/redis /var/log/redis
+	rm -rf /var/lib/redis /var/log/redis /etc/redis
 fi
 
 #DEBHELPER#
