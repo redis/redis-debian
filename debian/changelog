@@ -1,3 +1,18 @@
+redis (6:6.0.11-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * [CVE-2021-21309] Avoid 32-bit overflows when proto-max-bulk-len is set high (#8522)
+  * Fix handling of threaded IO and CLIENT PAUSE (failover), could lead to data loss or a crash (#8520)
+  * Fix the selection of a random element from large hash tables (#8133)
+  * Fix broken protocol in client tracking tracking-redir-broken message (#8456)
+  * XINFO able to access expired keys on a replica (#8436)
+  * Fix broken protocol in redis-benchmark when used with -a or --dbnum (#8486)
+  * Avoid assertions (on older kernels) when testing arm64 CoW bug (#8405)
+  * CONFIG REWRITE should honor umask settings (#8371)
+  * Fix firstkey,lastkey,step in COMMAND command for some commands (#8367)
+  * RM_ZsetRem: Delete key if empty, the bug could leave empty zset keys (#8453)
+
+ -- Redis Labs <redis@redis.io>  Tue, 23 Feb 2021 11:08:20 +0200
+
 redis (6:6.0.10-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * SWAPDB invalidates WATCHed keys (#8239)
