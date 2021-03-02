@@ -1,3 +1,9 @@
+redis (6:6.2.1-3rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Skip more tests, PPA build might be flaky.
+
+ -- Redis Labs <redis@redis.io>  Tue, 02 Mar 2021 14:04:11 +0200
+
 redis (6:6.2.1-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip flaky tests.
