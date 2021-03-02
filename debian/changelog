@@ -1,3 +1,10 @@
+redis (6:6.2.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * New upstream Redis release:
+    https://raw.githubusercontent.com/redis/redis/6.2/00-RELEASENOTES
+
+ -- Redis Labs <redis@redis.io>  Tue, 02 Mar 2021 09:37:23 +0200
+
 redis (6:6.0.11-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * [CVE-2021-21309] Avoid 32-bit overflows when proto-max-bulk-len is set high (#8522)
