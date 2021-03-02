@@ -1,3 +1,9 @@
+redis (6:6.2.1-2rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Skip flaky tests.
+
+ -- Redis Labs <redis@redis.io>  Tue, 02 Mar 2021 12:23:20 +0200
+
 redis (6:6.2.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * New upstream Redis release:

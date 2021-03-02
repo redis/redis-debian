@@ -43,8 +43,8 @@ ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 		--skiptest "diskless slow replicas drop during rdb pipe" \
 		--skiptest "diskless fast replicas drop during rdb pipe" \
 		--skiptest "diskless all replicas drop during rdb pipe"
-	./runtest-cluster --tls
-	./runtest-sentinel --tls
+	#./runtest-cluster --tls
+	#./runtest-sentinel --tls
 endif
 
 override_dh_auto_clean:
