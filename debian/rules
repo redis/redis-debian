@@ -43,8 +43,7 @@ ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 		--skiptest "diskless slow replicas drop during rdb pipe" \
 		--skiptest "diskless fast replicas drop during rdb pipe" \
 		--skiptest "diskless all replicas drop during rdb pipe"
-	# re-enable after #7958 is released:
-	#./runtest-cluster --tls
+	./runtest-cluster --tls
 	./runtest-sentinel --tls
 endif
 
