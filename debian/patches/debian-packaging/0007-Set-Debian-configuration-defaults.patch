@@ -9,43 +9,25 @@ Subject: Set Debian configuration defaults.
 
 --- a/redis.conf
 +++ b/redis.conf
-@@ -65,7 +65,7 @@
- # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES
- # JUST COMMENT OUT THE FOLLOWING LINE.
- # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--bind 127.0.0.1
-+bind 127.0.0.1 ::1
- 
- # Protected mode is a layer of security protection, in order to avoid that
- # Redis instances left open on the internet are accessed and exploited.
-@@ -105,7 +105,7 @@
- # incoming connections. There is no default, so Redis will not listen
- # on a unix socket when not specified.
+@@ -262,7 +262,7 @@ daemonize no
+ # The default is "no". To run under upstart/systemd, you can simply uncomment
+ # the line below:
  #
--# unixsocket /tmp/redis.sock
-+# unixsocket /run/redis/redis-server.sock
- # unixsocketperm 700
- 
- # Close the connection after a client is idle for N seconds (0 to disable)
-@@ -233,7 +233,7 @@
- #                        UPSTART_JOB or NOTIFY_SOCKET environment variables
- # Note: these supervision methods only signal "process is ready."
- #       They do not enable continuous pings back to your supervisor.
--supervised no
+-# supervised auto
 +supervised auto
  
  # If a pid file is specified, Redis writes it where specified at startup
  # and removes it at exit.
-@@ -244,7 +244,7 @@
+@@ -276,7 +276,7 @@ daemonize no
  #
- # Creating a pid file is best effort: if Redis is not able to create it
- # nothing bad happens, the server will start and run normally.
+ # Note that on modern Linux systems "/run/redis.pid" is more conforming
+ # and should be used instead.
 -pidfile /var/run/redis_6379.pid
 +pidfile /run/redis/redis-server.pid
  
  # Specify the server verbosity level.
  # This can be one of:
-@@ -257,7 +257,7 @@
+@@ -289,7 +289,7 @@ loglevel notice
  # Specify the log file name. Also the empty string can be used to force
  # Redis to log on the standard output. Note that if you use standard
  # output for logging but daemonize, logs will be sent to /dev/null
@@ -54,7 +36,7 @@ Subject: Set Debian configuration defaults.
  
  # To enable logging to the system logger, just set 'syslog-enabled' to yes,
  # and optionally update the other syslog parameters to suit your needs.
-@@ -362,7 +362,7 @@
+@@ -441,7 +441,7 @@ rdb-del-sync-files no
  # The Append Only File will also be created inside this directory.
  #
  # Note that you must specify a directory here, not a file name.
@@ -73,7 +55,7 @@ Subject: Set Debian configuration defaults.
  #
  # protected-mode no
  
-@@ -25,15 +26,27 @@
+@@ -25,15 +26,27 @@ port 26379
  # daemonized.
  daemonize no
  
@@ -103,7 +85,7 @@ Subject: Set Debian configuration defaults.
  
  # sentinel announce-ip <ip>
  # sentinel announce-port <port>
-@@ -62,7 +75,7 @@
+@@ -62,7 +75,7 @@ logfile ""
  # For Redis Sentinel to chdir to /tmp at startup is the simplest thing
  # for the process to don't interfere with administrative tasks such as
  # unmounting filesystems.
