@@ -1,3 +1,9 @@
+redis (6:6.2.1-4rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Fix issue with services not starting on SysV-Init systems.
+
+ -- Redis Labs <redis@redis.io>  Mon, 22 Mar 2021 22:41:22 +0200
+
 redis (6:6.2.1-3rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip more tests, PPA build might be flaky.

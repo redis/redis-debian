@@ -9,6 +9,15 @@ Subject: Set Debian configuration defaults.
 
 --- a/redis.conf
 +++ b/redis.conf
+@@ -244,7 +244,7 @@ tcp-keepalive 300
+ # By default Redis does not run as a daemon. Use 'yes' if you need it.
+ # Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
+ # When Redis is supervised by upstart or systemd, this parameter has no impact.
+-daemonize no
++daemonize yes
+ 
+ # If you run Redis from upstart or systemd, Redis can interact with your
+ # supervision tree. Options:
 @@ -262,7 +262,7 @@ daemonize no
  # The default is "no". To run under upstart/systemd, you can simply uncomment
  # the line below:
@@ -55,10 +64,13 @@ Subject: Set Debian configuration defaults.
  #
  # protected-mode no
  
-@@ -25,15 +26,27 @@ port 26379
+@@ -23,17 +24,29 @@ port 26379
+ # By default Redis Sentinel does not run as a daemon. Use 'yes' if you need it.
+ # Note that Redis will write a pid file in /var/run/redis-sentinel.pid when
  # daemonized.
- daemonize no
- 
+-daemonize no
++daemonize yes
++
 +# If you run Redis Sentinel from upstart or systemd, Redis can interact with your
 +# supervision tree. Options:
 +#   supervised no      - no supervision interaction
@@ -70,7 +82,7 @@ Subject: Set Debian configuration defaults.
 +# Note: these supervision methods only signal "process is ready."
 +#       They do not enable continuous pings back to your supervisor.
 +supervised auto
-+
+ 
  # When running daemonized, Redis Sentinel writes a pid file in
  # /var/run/redis-sentinel.pid by default. You can specify a custom pid file
  # location here.
