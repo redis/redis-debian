@@ -30,7 +30,7 @@ jobs:
               dpkg-buildpackage -S ;\
           done
       env:
-        RELEASES: "xenial bionic focal"
+        RELEASES: "xenial bionic focal groovy"
     - name: Upload source packages
       run: |
           dput ppa:redislabs/redis ../*.changes
