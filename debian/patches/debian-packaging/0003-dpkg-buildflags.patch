@@ -11,8 +11,8 @@
  linenoise.o: linenoise.h linenoise.c
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -256,7 +256,7 @@ endif
- 	FINAL_LIBS += ../deps/hiredis/libhiredis_ssl.a $(LIBSSL_LIBS) $(LIBCRYPTO_LIBS)
+@@ -267,7 +267,7 @@ else
+     endef
  endif
  
 -REDIS_CC=$(QUIET_CC)$(CC) $(FINAL_CFLAGS)
