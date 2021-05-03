@@ -1,3 +1,23 @@
+redis (6:6.2.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  [ Security fixes ]
+  * [CVE-2021-29477] Fix integer overflow in STRALGO LCS.
+  * [CVE-2021-29478] Fix integer overflow in COPY command for large intsets.
+
+  [ Bug fixes that are only applicable to previous releases of Redis 6.2 ]
+  * Fix memory leak in moduleDefragGlobals (#8853)
+  * Fix memory leak when doing lazy freeing client tracking table (#8822)
+  * Block abusive replicas from sending command that could assert and crash redis (#8868)
+
+  [ Other bug fixes ]
+  * Use a monotonic clock to check for Lua script timeout (#8812)
+  * redis-cli: Do not use unix socket when we got redirected in cluster mode (#8870)
+
+  [ Modules ]
+  * Fix RM_GetClusterNodeInfo() to correctly populate master id (#8846)
+
+ -- Redis Labs <redis@redis.io>  Mon, 03 May 2021 23:37:50 +0300
+
 redis (6:6.2.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Bug fixes for regressions in previous releases of Redis 6.2 ]
