@@ -1,3 +1,4 @@
 0001-fix-ftbfs-on-kfreebsd.patch
 debian-packaging/0003-dpkg-buildflags.patch
 debian-packaging/0007-Set-Debian-configuration-defaults.patch
+jemalloc_crosscompile.diff

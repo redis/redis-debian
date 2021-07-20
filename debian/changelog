@@ -1,3 +1,24 @@
+redis (6:6.0.14-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  [ Security fixes ]
+  * [CVE-2021-32625, CVE-2021-29477] Fix integer overflow in STRALGO LCS.
+  * [CVE-2021-29478] Fix integer overflow in COPY command for large intsets.
+
+  [ Other fixes ]
+  * Fix crash in UNLINK on a stream key with deleted consumer groups (#8932)
+  * SINTERSTORE: Add missing keyspace del event when none of the sources exist (#8949)
+  * Cluster: Skip unnecessary check which may prevent failure detection (#8585)
+  * Fix not starting on alpine/libmusl without IPv6 (#8655)
+  * Fix compilation error on non-glibc systems if jemalloc is not used (#8533)
+
+  [ Improvements ]
+  * Fix performance regression in BRPOP on Redis 6.0 (#8689)
+
+  [ Modules ]
+  * Fix edge-case when a module client is unblocked (#8618)
+
+ -- Redis Labs <redis@redis.io>  Tue, 1 Jul 2021 12:00:00 +0200
+
 redis (6:6.0.11-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * [CVE-2021-21309] Avoid 32-bit overflows when proto-max-bulk-len is set high (#8522)
