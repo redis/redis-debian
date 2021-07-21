@@ -1,3 +1,31 @@
+redis (6:6.0.15-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  [ Security fixes ]
+  * [CVE-2021-32761] Fix integer overflow in BITFIELD on 32-bit versions.
+
+  [ Bug fixes that involve behavior changes ]
+  * Change reply type for ZPOPMAX/MIN with count in RESP3 to nested array (#8981).
+    Was using a flat array like in RESP2 instead of a nested array like ZRANGE does.
+
+  [ Other bug fixes ]
+  * Fail EXEC command in case a watched key is expired (#9194)
+  * Fix SMOVE not to invalidate dest key (WATCH and tracking) when member already exists (#9244)
+  * Fix SINTERSTORE not to delete dest key when getting a wrong type error (#9032)
+  * Fix overflows on 32-bit versions in GETBIT, SETBIT, BITCOUNT, BITPOS, and BITFIELD (#9191)
+  * Set TCP keepalive on inbound cluster bus connections (#9230)
+  * Fix ziplist length updates on big-endian platforms (#2080)
+  * Fix diskless replica loading to recover from RDB short read on module AUX data (#9199)
+  * Fix race in client side tracking (#9116)
+  * If diskless repl child is killed, make sure to reap the child pid (#7742)
+  * Add a timeout mechanism for replicas stuck in fullsync (#8762)
+
+  [ CLI tools ]
+  * redis-cli cluster import support source and target that require auth (#7994)
+  * redis-cli cluster import command may issue wrong MIGRATE command, sending COPY instead of REPLACE (#8945)
+  * redis-cli support for RESP3 set type in CSV and RAW output (#7338)
+
+ -- Redis Labs <redis@redis.io>  Wed, 21 Jul 2021 22:40:40 +0300
+
 redis (6:6.0.14-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Security fixes ]
