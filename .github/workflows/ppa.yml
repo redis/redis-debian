@@ -1,0 +1,42 @@
+name: Create source package and upload to Launchpad
+
+on:
+  push:
+    branches:
+    - ppa
+
+jobs:
+  build-and-upload:
+    name: Create source package and upload to Lauchpad
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+          sudo apt-get update && sudo apt-get install debhelper dput tcl-tls libsystemd-dev pkg-config
+    - name: Setup GPG key
+      run: |
+          mkdir -m 0700 -p ~/.gnupg
+          echo "$GPG_SIGNING_KEY" | gpg --import
+      env:
+        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+    - name: Get upstream source tarball
+      run: |
+          VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
+    - name: Build source package
+      run: |
+          for release in $RELEASES; do \
+              mkdir -p ${release} ;\
+              cp redis_${VERSION}.orig.tar.gz ${release} ;\
+              ( cd ${release} && tar xfz redis_${VERSION}.orig.tar.gz ) ;\
+              cp -pr debian ${release}/redis-${VERSION} ;\
+              sed -i "s/@RELEASE@/$release/g" ${release}/redis-${VERSION}/debian/changelog ;\
+              ( cd ${release}/redis-${VERSION} && dpkg-buildpackage -S ) ;\
+          done
+      env:
+        RELEASES: "xenial bionic focal"
+    - name: Upload source packages
+      run: |
+          dput ppa:redislabs/redis */*.changes
