@@ -1,16 +1,16 @@
 #!/usr/bin/make -f
 
+include /usr/share/dpkg/architecture.mk
 include /usr/share/dpkg/buildflags.mk
 
-#LUA_LIBS_DEBIAN = cjson bitop
-#LUA_LIBS_BUNDLED = struct cmsgpack
-#
-#LUA_OBJECTS = $(addprefix lua_,$(addsuffix .o,$(LUA_LIBS_BUNDLED)))
-#LUA_LDFLAGS = $(addprefix -llua5.1-,$(LUA_LIBS_DEBIAN)) $(addprefix ../deps/lua/src/,$(LUA_OBJECTS))
+ifneq ($(DEB_HOST_GNU_TYPE),)
+CC = $(DEB_HOST_GNU_TYPE)-gcc
+endif
 
-export CFLAGS CPPFLAGS LDFLAGS
+export CC CFLAGS CPPFLAGS LDFLAGS
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic $(LUA_LDFLAGS)
+export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic
+DEB_BUILD_OPTIONS = nocheck
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -25,9 +25,7 @@ override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
 
 override_dh_auto_build:
-	make BUILD_TLS=yes
-#	make -C deps/lua/src $(LUA_OBJECTS)
-#	dh_auto_build --parallel -- V=1 USE_SYSTEM_JEMALLOC=yes USE_SYSTEM_LUA=yes USE_SYSTEM_HIREDIS=yes
+	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
