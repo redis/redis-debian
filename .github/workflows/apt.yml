@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [xenial, bionic, focal, hirsute, groovy, stretch, buster]
+        dist: [impish, xenial, bionic, focal, hirsute, groovy, stretch, buster]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [xenial, bionic, focal, hirsute, groovy, stretch, buster]
+        dist: [impish, xenial, bionic, focal, hirsute, groovy, stretch, buster]
         arch: [i386, amd64, arm64, armhf]
         exclude:
         - dist: focal
