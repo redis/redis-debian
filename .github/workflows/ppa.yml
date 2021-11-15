@@ -36,7 +36,7 @@ jobs:
               ( cd ${release}/redis-${VERSION} && dpkg-buildpackage -S ) ;\
           done
       env:
-        RELEASES: "xenial bionic focal groovy hirsute"
+        RELEASES: "impish xenial bionic focal groovy hirsute"
     - name: Upload source packages
       run: |
           dput ppa:redislabs/redis */*.changes
