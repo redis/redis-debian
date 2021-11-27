@@ -5,12 +5,19 @@ on:
     branches:
     - release/**
 
+# Notes about adding versions:
+# - Add to both build-source-package and build-binary-package
+# - Adding to build-binary-packages may need exceptions, espcialyl for
+#   Ubuntu releases that don't support i386
+# - Add new versions first, so --fail-if-exists will fail after uploading
+#   them.
+
 jobs:
   build-source-package:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [impish, xenial, bionic, focal, hirsute, groovy, stretch, buster]
+        dist: [bullseye, impish, xenial, bionic, focal, hirsute, groovy, stretch, buster]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -44,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [impish, xenial, bionic, focal, hirsute, groovy, stretch, buster]
+        dist: [bullseye, impish, xenial, bionic, focal, hirsute, groovy, stretch, buster]
         arch: [i386, amd64, arm64, armhf]
         exclude:
         - dist: focal
@@ -52,6 +59,8 @@ jobs:
         - dist: hirsute
           arch: i386
         - dist: groovy
+          arch: i386
+        - dist: impish
           arch: i386
     needs: build-source-package
     steps:
