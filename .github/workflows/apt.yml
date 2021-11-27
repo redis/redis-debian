@@ -7,7 +7,7 @@ on:
 
 # Notes about adding versions:
 # - Add to both build-source-package and build-binary-package
-# - Adding to build-binary-packages may need exceptions, espcialyl for
+# - Adding to build-binary-packages may need exceptions, especially for
 #   Ubuntu releases that don't support i386
 # - Add new versions first, so --fail-if-exists will fail after uploading
 #   them.
@@ -138,6 +138,7 @@ jobs:
                 --s3-region ${{ env.APT_S3_REGION }} \
                 --codename $dist \
                 --preserve-versions \
+                --fail-if-exists \
                 --sign \
                 --prefix deb \
                 $dir/*.deb ; \
