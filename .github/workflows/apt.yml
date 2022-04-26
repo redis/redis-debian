@@ -103,11 +103,36 @@ jobs:
         path: |
           *.deb
 
+  smoke-test-packages:
+    runs-on: ubuntu-latest
+    needs: build-binary-package
+    env:
+      ARCH: amd64
+    strategy:
+      matrix:
+        image: ["debian:buster", "debian:bullseye", "ubuntu:jammy", "ubuntu:focal", "ubuntu:bionic"]
+    container: ${{ matrix.image }}
+    steps:
+    - name: Get binary packages
+      uses: actions/download-artifact@v2
+    - name: Install packages
+      run: |
+        apt-get update
+        cd binary-$(echo ${{ matrix.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
+    - name: Run redis-server smoke test
+      run: |
+        service redis-server start
+        redis-benchmark -P 10
+    - name: Run redis-sentinel smoke test
+      run: |
+        service redis-sentinel start
+        echo ping | redis-cli -p 26379
+
   upload-packages:
     env:
       DEB_S3_VERSION: "0.11.3"
     runs-on: ubuntu-latest
-    needs: build-binary-package
+    needs: smoke-test-packages
     steps:
     - name: Setup APT Signing key
       run: |
