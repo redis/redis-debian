@@ -60,7 +60,7 @@ Subject: Set Debian configuration defaults.
  # For example you may use one of the following:
  #
  # bind 127.0.0.1 192.168.1.1
-+bind 127.0.0.1 ::1
++bind 127.0.0.1 -::1
  #
  # protected-mode no
  
