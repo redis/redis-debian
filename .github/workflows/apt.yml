@@ -60,6 +60,8 @@ jobs:
           arch: i386
         - dist: hirsute
           arch: i386
+        - dist: impish
+          arch: i386
     needs: build-source-package
     steps:
     - uses: actions/checkout@v2
