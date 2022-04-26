@@ -11,7 +11,7 @@
  linenoise.o: linenoise.h linenoise.c
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -263,7 +263,7 @@ else
+@@ -296,7 +296,7 @@ else
      endef
  endif
  
