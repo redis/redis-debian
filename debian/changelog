@@ -1,8 +1,12 @@
-redis (6:6.2.6-3rl1~@RELEASE@1) @RELEASE@; urgency=low
+redis (6:6.2.7-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
-  * Add Ubuntu impish.
+  [ Redis 6.2.7 updates ]
+  * Release notes: https://github.com/redis/redis/releases/tag/6.2.7
 
- -- Redis Team <redis@redis.io>  Tue, 16 Nov 2021 21:10:32 +0200
+  [ Package updates ]
+  * Default Sentinel configuration fixed to handle non-IPv6 hosts.
+
+ -- Redis Team <redis@redis.io>  Wed, 27 Apr 2022 12:00:00 +0300
 
 redis (6:6.2.6-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
