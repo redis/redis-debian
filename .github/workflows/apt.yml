@@ -156,6 +156,8 @@ jobs:
           gem install deb-s3-${{ env.DEB_S3_VERSION }}.gem
     - name: Upload packages
       run: |
+        # Quick hack to deal with duplicate _all packages
+        rm -f binary-*-i386/*_all.deb
         for dir in binary-*; do \
             dist=$(echo $dir | cut -d- -f 2) ; \
             deb-s3 upload \
