@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [jammy, bullseye, xenial, bionic, focal, stretch, buster]
+        dist: [bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [jammy, bullseye, xenial, bionic, focal, stretch, buster]
+        dist: [bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
         arch: [i386, amd64, arm64, armhf]
         exclude:
         - dist: focal
@@ -141,7 +141,7 @@ jobs:
     - name: Get binary packages
       uses: actions/download-artifact@v2
     - name: Setup ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
           ruby-version: "2.7"
     - name: Install deb-s3
