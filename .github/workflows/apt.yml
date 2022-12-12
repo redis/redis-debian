@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [bookworm, jammy, bullseye, impish, xenial, bionic, focal, stretch, buster]
+        dist: [bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -51,16 +51,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [bookworm, jammy, bullseye, impish, xenial, bionic, focal, stretch, buster]
+        dist: [bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
         arch: [i386, amd64, arm64, armhf]
         exclude:
         - dist: focal
           arch: i386
         - dist: jammy
-          arch: i386
-        - dist: impish
-          arch: i386
-        - dist: impish
           arch: i386
     needs: build-source-package
     steps:
