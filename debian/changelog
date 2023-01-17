@@ -1,3 +1,9 @@
+redis (6:6.0.17-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 6.0.17: https://github.com/redis/redis/releases/tag/6.0.17
+
+ -- Redis Team <redis@redis.io>  Tue, 17 Jan 2023 15:42:37 +0200
+
 redis (6:6.0.16-3rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Add Ubuntu impish.
