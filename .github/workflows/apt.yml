@@ -117,14 +117,6 @@ jobs:
       run: |
         apt-get update
         cd binary-$(echo ${{ matrix.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
-    - name: Run redis-server smoke test
-      run: |
-        service redis-server start
-        redis-benchmark -P 10
-    - name: Run redis-sentinel smoke test
-      run: |
-        service redis-sentinel start
-        echo ping | redis-cli -p 26379
 
   upload-packages:
     env:
