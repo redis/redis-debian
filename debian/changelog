@@ -1,4 +1,4 @@
-redis (6:6.2.10-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+redis (6:6.2.11-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Redis 6.2.11 updates ]
   * Release notes: https://github.com/redis/redis/releases/tag/6.2.11
