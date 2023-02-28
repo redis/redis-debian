@@ -1,5 +1,12 @@
 redis (6:6.2.10-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
+  [ Redis 6.2.11 updates ]
+  * Release notes: https://github.com/redis/redis/releases/tag/6.2.11
+
+ -- Redis Team <redis@redis.io>  Tue, 28 Feb 2023 20:36:00 +0200
+
+redis (6:6.2.10-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
   [ Redis 6.2.10 updates ]
   * Release notes: https://github.com/redis/redis/releases/tag/6.2.10
 
