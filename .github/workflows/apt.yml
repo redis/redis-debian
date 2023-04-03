@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
+        dist: [kinetic, bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -51,12 +51,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
+        dist: [kinetic, bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
         arch: [i386, amd64, arm64, armhf]
         exclude:
         - dist: focal
           arch: i386
         - dist: jammy
+          arch: i386
+        - dist: kinetic
           arch: i386
     needs: build-source-package
     steps:
@@ -108,7 +110,7 @@ jobs:
       ARCH: amd64
     strategy:
       matrix:
-        image: ["debian:buster", "debian:bullseye", "ubuntu:jammy", "ubuntu:focal", "ubuntu:bionic"]
+        image: ["ubuntu:kinetic", "debian:buster", "debian:bullseye", "ubuntu:jammy", "ubuntu:focal", "ubuntu:bionic"]
     container: ${{ matrix.image }}
     steps:
     - name: Get binary packages
