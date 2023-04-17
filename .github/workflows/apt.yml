@@ -9,15 +9,13 @@ on:
 # - Add to both build-source-package and build-binary-package
 # - Adding to build-binary-packages may need exceptions, especially for
 #   Ubuntu releases that don't support i386
-# - Add new versions first, so --fail-if-exists will fail after uploading
-#   them.
 
 jobs:
   build-source-package:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [kinetic, bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
+        dist: [lunar, kinetic, bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -51,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dist: [kinetic, bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
+        dist: [lunar, kinetic, bookworm, jammy, bullseye, xenial, bionic, focal, stretch, buster]
         arch: [i386, amd64, arm64, armhf]
         exclude:
         - dist: focal
@@ -59,6 +57,8 @@ jobs:
         - dist: jammy
           arch: i386
         - dist: kinetic
+          arch: i386
+        - dist: lunar
           arch: i386
     needs: build-source-package
     steps:
@@ -110,7 +110,7 @@ jobs:
       ARCH: amd64
     strategy:
       matrix:
-        image: ["ubuntu:kinetic", "debian:buster", "debian:bullseye", "ubuntu:jammy", "ubuntu:focal", "ubuntu:bionic"]
+        image: ["ubuntu:lunar", "ubuntu:kinetic", "debian:buster", "debian:bullseye", "ubuntu:jammy", "ubuntu:focal", "ubuntu:bionic"]
     container: ${{ matrix.image }}
     steps:
     - name: Get binary packages
