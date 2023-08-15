@@ -9,7 +9,7 @@ Subject: Set Debian configuration defaults.
 
 --- a/redis.conf
 +++ b/redis.conf
-@@ -306,7 +306,7 @@ tcp-keepalive 300
+@@ -306,7 +306,7 @@
  # By default Redis does not run as a daemon. Use 'yes' if you need it.
  # Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
  # When Redis is supervised by upstart or systemd, this parameter has no impact.
@@ -18,7 +18,7 @@ Subject: Set Debian configuration defaults.
  
  # If you run Redis from upstart or systemd, Redis can interact with your
  # supervision tree. Options:
-@@ -324,7 +324,7 @@ daemonize no
+@@ -324,7 +324,7 @@
  # The default is "no". To run under upstart/systemd, you can simply uncomment
  # the line below:
  #
@@ -27,7 +27,7 @@ Subject: Set Debian configuration defaults.
  
  # If a pid file is specified, Redis writes it where specified at startup
  # and removes it at exit.
-@@ -338,7 +338,7 @@ daemonize no
+@@ -338,7 +338,7 @@
  #
  # Note that on modern Linux systems "/run/redis.pid" is more conforming
  # and should be used instead.
@@ -36,7 +36,7 @@ Subject: Set Debian configuration defaults.
  
  # Specify the server verbosity level.
  # This can be one of:
-@@ -351,7 +351,7 @@ loglevel notice
+@@ -352,7 +352,7 @@
  # Specify the log file name. Also the empty string can be used to force
  # Redis to log on the standard output. Note that if you use standard
  # output for logging but daemonize, logs will be sent to /dev/null
@@ -45,7 +45,7 @@ Subject: Set Debian configuration defaults.
  
  # To enable logging to the system logger, just set 'syslog-enabled' to yes,
  # and optionally update the other syslog parameters to suit your needs.
-@@ -501,7 +501,7 @@ rdb-del-sync-files no
+@@ -507,7 +507,7 @@
  # The Append Only File will also be created inside this directory.
  #
  # Note that you must specify a directory here, not a file name.
@@ -67,7 +67,7 @@ Subject: Set Debian configuration defaults.
  
  # port <sentinel-port>
  # The port that this sentinel instance will run on
-@@ -12,17 +14,29 @@ port 26379
+@@ -12,12 +14,24 @@
  # By default Redis Sentinel does not run as a daemon. Use 'yes' if you need it.
  # Note that Redis will write a pid file in /var/run/redis-sentinel.pid when
  # daemonized.
@@ -92,15 +92,18 @@ Subject: Set Debian configuration defaults.
 -pidfile /var/run/redis-sentinel.pid
 +pidfile /run/sentinel/redis-sentinel.pid
  
+ # Specify the server verbosity level.
+ # This can be one of:
+@@ -31,7 +45,7 @@
  # Specify the log file name. Also the empty string can be used to force
  # Sentinel to log on the standard output. Note that if you use standard
  # output for logging but daemonize, logs will be sent to /dev/null
 -logfile ""
 +logfile /var/log/redis/redis-sentinel.log
  
- # sentinel announce-ip <ip>
- # sentinel announce-port <port>
-@@ -51,7 +65,7 @@ logfile ""
+ # To enable logging to the system logger, just set 'syslog-enabled' to yes,
+ # and optionally update the other syslog parameters to suit your needs.
+@@ -70,7 +84,7 @@
  # For Redis Sentinel to chdir to /tmp at startup is the simplest thing
  # for the process to don't interfere with administrative tasks such as
  # unmounting filesystems.
