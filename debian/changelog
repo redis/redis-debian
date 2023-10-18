@@ -1,3 +1,10 @@
+redis (6:6.2.14-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  [ Redis 6.2.14 updates ]
+  * Release notes: https://github.com/redis/redis/releases/tag/6.2.14
+
+ -- Redis Team <redis@redis.io>  Wed, 18 Oct 2023 13:29:33 +0300
+
 redis (6:6.2.13-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Redis 6.2.13 updates ]
