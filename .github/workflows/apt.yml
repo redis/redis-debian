@@ -147,7 +147,10 @@ jobs:
                 --bucket ${{ env.APT_S3_BUCKET }} \
                 --s3-region ${{ env.APT_S3_REGION }} \
                 --codename $dist \
+                --suite $dist \
+                --origin packages.redis.io \
                 --preserve-versions \
+                --lock \
                 --fail-if-exists \
                 --sign \
                 --prefix deb \
