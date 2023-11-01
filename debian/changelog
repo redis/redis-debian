@@ -1,3 +1,9 @@
+redis (6:7.2.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.3: https://github.com/redis/redis/releases/tag/7.2.3
+
+ -- Redis Labs <redis@redis.io> Wed, 01 Nov 2023 15:29:47 +0200
+
 redis (6:7.2.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Redis 7.2.2: https://github.com/redis/redis/releases/tag/7.2.2
