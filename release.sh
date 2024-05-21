@@ -16,7 +16,7 @@ fi
 AUTHOR=$(grep -m 1 '^ --' debian/changelog | sed 's/^ -- \(.*>\)  *.*$/\1/')
 
 sed -i "1i \
-redis (6:$VERSION-1rl1~@RELEASE@1) @RELEASE; urgency=low\n\
+redis (6:$VERSION-1rl1~@RELEASE@1) @RELEASE@; urgency=low\n\
 \n\
   * Redis $VERSION: https://github.com/redis/redis/releases/tag/$VERSION\n\
 \n\
