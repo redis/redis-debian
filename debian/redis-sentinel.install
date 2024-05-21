@@ -1,2 +1,1 @@
-debian/redis-sentinel.service /lib/systemd/system
 sentinel.conf	/etc/redis
