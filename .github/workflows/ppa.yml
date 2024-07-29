@@ -36,7 +36,7 @@ jobs:
               ( cd ${release}/redis-${VERSION} && dpkg-buildpackage -S ) ;\
           done
       env:
-        RELEASES: "jammy bionic focal noble"
+        RELEASES: "jammy focal noble"
     - name: Upload source packages
       run: |
           dput ppa:redislabs/redis */*.changes
