@@ -1,1 +1,2 @@
 sentinel.conf	/etc/redis
+usr/local/bin/redis-sentinel	/usr/bin

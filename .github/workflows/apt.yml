@@ -5,6 +5,10 @@ on:
     branches:
     - release/**
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-source-package:
     runs-on: ubuntu-latest
@@ -17,28 +21,21 @@ jobs:
       run: |
           sudo apt-get update && \
           sudo apt-get install \
-            debhelper dput tcl-tls libsystemd-dev pkg-config
-    - name: Determine version
-      run: |
-          VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-    - name: Get source tarball
-      run: |
-          curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
+            debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang
     - name: Build source package
       run: |
-          tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz
-          cp -pr debian redis-${VERSION}
-          sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
-          ( cd redis-${VERSION} && dpkg-buildpackage -S )
+          sed -i "s/@RELEASE@/${{ matrix.dist }}/g" debian/changelog
+          dpkg-buildpackage -S
+    - name: Workaround for upload-artifact not handling relative paths
+      run: |
+        echo "artifact_path=$(realpath ..)" >> $GITHUB_ENV
     - name: Upload source package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: source-${{ matrix.dist }}
         path: |
-            *.debian.tar.*
-            *.dsc
-            redis_*.orig.tar.gz
+            ${{ env.artifact_path }}/redis_*.tar.*
+            ${{ env.artifact_path }}/*.dsc
 
   build-binary-package:
     runs-on: ubuntu-latest
@@ -73,13 +70,14 @@ jobs:
     - name: Prepare sbuild environment
       run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
     - name: Get source package
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: source-${{ matrix.dist }}
     - name: Build binary package
       run: |
           sudo sbuild \
             --nolog \
+            --no-run-lintian \
             --host ${{ matrix.arch }} \
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} *.dsc
@@ -108,11 +106,13 @@ jobs:
         cd binary-$(echo ${{ matrix.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
     - name: Run redis-server smoke test
       run: |
-        service redis-server start
+        /usr/bin/redis-server /etc/redis/redis.conf
+        sleep 3
         redis-benchmark -P 10
     - name: Run redis-sentinel smoke test
       run: |
-        service redis-sentinel start
+        /usr/bin/redis-sentinel /etc/redis/sentinel.conf
+        sleep 3
         echo ping | redis-cli -p 26379
 
   upload-packages:

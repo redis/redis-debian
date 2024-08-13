@@ -21,8 +21,16 @@ endif
 %:
 	dh $@
 
+# BUILD_WITH_MODULES is needed by override_dh_auto_build as well as override_dh_auto_install,
+# so we export it here instead of passing 
+export BUILD_WITH_MODULES=yes
+export INSTALL_RUST_TOOLCHAIN=yes
+export INSTALL_RUST_VERSION=1.27.1
+
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
+	debian/bin/adjust-config-files
+	dh_auto_install
 
 override_dh_auto_build:
 	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
@@ -57,3 +65,7 @@ override_dh_compress:
 
 override_dh_installchangelogs:
 	dh_installchangelogs --keep 00-RELEASENOTES
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 0755 debian/redis-server/usr/lib/redis/modules/*.so
