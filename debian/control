@@ -1,13 +1,28 @@
 Source: redis
 Section: database
 Priority: optional
-Maintainer: Redis Core Team <redis@redis.io>
+Maintainer: Redis Ltd. <redis@redis.io>
 Build-Depends:
  debhelper (>= 9~),
  dpkg-dev (>= 1.17.5),
  libssl-dev,
  libsystemd-dev,
- pkg-config,
+ pkgconf,
+ autoconf,
+ automake,
+ libtool,
+ cmake,
+ python3,
+ python3-pip,
+ python3-venv,
+ python3-dev,
+ unzip,
+ rsync,
+ git,
+ wget,
+ curl,
+ g++,
+ clang,
  procps <!nocheck>,
  tcl <!nocheck>,
  tcl-tls <!nocheck>
@@ -31,8 +46,8 @@ Description: Persistent key-value database with network interface (metapackage)
 
 Package: redis-sentinel
 Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
 Depends:
- lsb-base (>= 3.2-14),
  redis-tools (= ${binary:Version}),
  ${misc:Depends},
 Description: Persistent key-value database with network interface (monitoring)
@@ -44,8 +59,8 @@ Description: Persistent key-value database with network interface (monitoring)
 
 Package: redis-server
 Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
 Depends:
- lsb-base (>= 3.2-14),
  redis-tools (= ${binary:Version}),
  ${misc:Depends},
 Description: Persistent key-value database with network interface
@@ -61,8 +76,6 @@ Depends:
  adduser,
  ${misc:Depends},
  ${shlibs:Depends},
-Suggests:
- ruby-redis,
 Replaces:
  redis-server (<< 2:2.6.16-1),
 Breaks:

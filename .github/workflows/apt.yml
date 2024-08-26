@@ -4,6 +4,11 @@ on:
   push:
     branches:
     - release/**
+    - rc/8.0
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-source-package:
@@ -12,33 +17,34 @@ jobs:
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
           sudo apt-get update && \
           sudo apt-get install \
-            debhelper dput tcl-tls libsystemd-dev pkg-config
+            debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang
     - name: Determine version
       run: |
           VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: Get source tarball
       run: |
-          curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
+          curl --silent -L "https://paltform-eng-staging-dskfn24rfm.s3.eu-west-1.amazonaws.com/ce-dists-poc/redis-dist-poc.tar.gz" -o redis_${VERSION}.orig.tar.gz
     - name: Build source package
       run: |
-          tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz
-          cp -pr debian redis-${VERSION}
-          sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
-          ( cd redis-${VERSION} && dpkg-buildpackage -S )
+        mkdir -p redis-${VERSION}
+        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz -C redis-${VERSION}
+        cp -pr debian redis-${VERSION}
+        sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
+        ( cd redis-${VERSION} && dpkg-buildpackage -S )
     - name: Upload source package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: source-${{ matrix.dist }}
         path: |
-            *.debian.tar.*
-            *.dsc
-            redis_*.orig.tar.gz
+          redis_*.tar.xz
+          redis_*.dsc
+          redis_*.orig.tar.gz
 
   build-binary-package:
     runs-on: ubuntu-latest
@@ -49,7 +55,7 @@ jobs:
         exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
     needs: build-source-package
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Determine build architecture
       run: |
           if [ ${{ matrix.arch }} = "i386" ]; then
@@ -73,13 +79,14 @@ jobs:
     - name: Prepare sbuild environment
       run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
     - name: Get source package
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: source-${{ matrix.dist }}
     - name: Build binary package
       run: |
           sudo sbuild \
             --nolog \
+            --no-run-lintian \
             --host ${{ matrix.arch }} \
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} *.dsc
@@ -108,36 +115,46 @@ jobs:
         cd binary-$(echo ${{ matrix.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
     - name: Run redis-server smoke test
       run: |
-        service redis-server start
+        /usr/bin/redis-server /etc/redis/redis.conf
+        sleep 3
         redis-benchmark -P 10
     - name: Run redis-sentinel smoke test
       run: |
-        service redis-sentinel start
+        /usr/bin/redis-sentinel /etc/redis/sentinel.conf
+        sleep 3
         echo ping | redis-cli -p 26379
 
   upload-packages:
-    env:
-      DEB_S3_VERSION: "0.11.3"
     runs-on: ubuntu-latest
     needs: smoke-test-packages
     steps:
     - name: Setup APT Signing key
-      run: |
-          mkdir -m 0700 -p ~/.gnupg
-          echo "$APT_SIGNING_KEY" | gpg --import
       env:
-        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}  
+      run: |
+        mkdir -m 0700 -p ~/.gnupg
+        echo "$APT_SIGNING_KEY" | gpg --import
     - name: Get binary packages
       uses: actions/download-artifact@v2
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
-          ruby-version: "2.7"
+        ruby-version: "2.7"
     - name: Install deb-s3
+      env:
+        DEB_S3_VERSION: "0.11.3"
       run: |
           curl -sLO https://github.com/deb-s3/deb-s3/releases/download/${{ env.DEB_S3_VERSION }}/deb-s3-${{ env.DEB_S3_VERSION }}.gem
           gem install deb-s3-${{ env.DEB_S3_VERSION }}.gem
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ secrets.APT_S3_REGION }}
+        role-to-assume: ${{ secrets.APT_S3_IAM_ARN }}
     - name: Upload packages
+      env:
+        APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
+        APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
       run: |
         # Quick hack to deal with duplicate _all packages
         rm -f binary-*-i386/*_all.deb
@@ -156,8 +173,4 @@ jobs:
                 --prefix deb \
                 $dir/*.deb ; \
         done
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.APT_S3_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.APT_S3_SECRET_ACCESS_KEY }}
-        APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
-        APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
+
