@@ -91,7 +91,7 @@ jobs:
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} *.dsc
     - name: Upload binary package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: binary-${{ matrix.dist }}-${{ matrix.arch }}
         path: |
