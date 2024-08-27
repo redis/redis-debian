@@ -23,8 +23,18 @@ endif
 
 # BUILD_WITH_MODULES is needed by override_dh_auto_build as well as override_dh_auto_install,
 # so we export it here instead of passing 
-export BUILD_WITH_MODULES=yes
-export INSTALL_RUST_TOOLCHAIN=yes
+
+ARCH := $(shell uname -m)
+
+ifeq ($(ARCH), x86_64)
+	export BUILD_WITH_MODULES=yes
+	export INSTALL_RUST_TOOLCHAIN=yes
+else ifeq ($(ARCH), aarch64)
+    export BUILD_WITH_MODULES=yes
+		export INSTALL_RUST_TOOLCHAIN=yes
+else
+    $(warning Unsupported architecture: '$(ARCH)')
+endif
 
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
