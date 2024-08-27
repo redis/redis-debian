@@ -170,6 +170,7 @@ jobs:
                 --fail-if-exists \
                 --sign \
                 --prefix deb \
+                --visibility=nil \
                 $dir/*.deb ; \
         done
 
