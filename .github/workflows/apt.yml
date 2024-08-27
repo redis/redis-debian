@@ -6,10 +6,6 @@ on:
     - release/**
     - rc/8.0
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   build-source-package:
     runs-on: ubuntu-latest
@@ -126,6 +122,9 @@ jobs:
 
   upload-packages:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     needs: smoke-test-packages
     steps:
     - name: Setup APT Signing key
