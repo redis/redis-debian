@@ -108,7 +108,7 @@ jobs:
     container: ${{ matrix.image }}
     steps:
     - name: Get binary packages
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
     - name: Install packages
       run: |
         apt-get update
@@ -135,7 +135,7 @@ jobs:
         mkdir -m 0700 -p ~/.gnupg
         echo "$APT_SIGNING_KEY" | gpg --import
     - name: Get binary packages
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
