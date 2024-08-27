@@ -25,7 +25,6 @@ endif
 # so we export it here instead of passing 
 export BUILD_WITH_MODULES=yes
 export INSTALL_RUST_TOOLCHAIN=yes
-export INSTALL_RUST_VERSION=1.27.1
 
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
