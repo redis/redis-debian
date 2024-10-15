@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-source-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
@@ -18,18 +18,19 @@ jobs:
       run: |
           sudo apt-get update && \
           sudo apt-get install \
-            debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang
+           debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev python3-pip python3-venv python3-dev unzip rsync git wget tcl curl build-essential gcc-11 g++-11
     - name: Determine version
       run: |
           VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: Get source tarball
       run: |
-          curl --silent -L "https://paltform-eng-staging-dskfn24rfm.s3.eu-west-1.amazonaws.com/ce-dists-poc/redis-dist-poc.tar.gz" -o redis_${VERSION}.orig.tar.gz
+          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m01.tar.gz" -o redis_${VERSION}.orig.tar.gz
     - name: Build source package
       run: |
         mkdir -p redis-${VERSION}
-        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz -C redis-${VERSION}
+        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}  
+        sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
         cp -pr debian redis-${VERSION}
         sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
         ( cd redis-${VERSION} && dpkg-buildpackage -S )
@@ -43,7 +44,7 @@ jobs:
           redis_*.orig.tar.gz
 
   build-binary-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
@@ -69,8 +70,10 @@ jobs:
     - name: Install dependencies
       run: |
           sudo apt-get update && \
-          sudo apt-get install \
-            sbuild debhelper
+          sudo apt-get install -y \
+            sbuild debhelper \
+            wget make cmake clang-format gcc python3 python3-venv python3-pip lcov git openssl libssl-dev unzip rsync build-essential gcc-11 g++-11 pkg-config
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
           sudo sbuild-adduser $USER
     - name: Prepare sbuild environment
       run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
@@ -81,6 +84,7 @@ jobs:
     - name: Build binary package
       run: |
           sudo sbuild \
+            --chroot-setup-commands "apt-get update && apt-get install -y python3-pip systemd" \
             --nolog \
             --no-run-lintian \
             --host ${{ matrix.arch }} \

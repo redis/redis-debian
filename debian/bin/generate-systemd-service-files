@@ -2,7 +2,7 @@
 
 SYSTEMD_VER=$(systemctl --version | head -1 | cut -d' ' -f2)
 
-if [ ${SYSTEMD_VER} -lt 237 ]
+if [ "${SYSTEMD_VER}" -lt 237 ]
 then
     SYSTEMD_EXTRA=""
 else

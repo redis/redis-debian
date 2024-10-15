@@ -10,6 +10,7 @@ endif
 export CC CFLAGS CPPFLAGS LDFLAGS
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic
+export REDIS_CFLAGS='-Wno-error=uninitialized'
 DEB_BUILD_OPTIONS = nocheck
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -28,6 +29,7 @@ ARCH := $(shell uname -m)
 
 ifeq ($(ARCH), x86_64)
 	export BUILD_WITH_MODULES=yes
+	export DISABLE_WERRORS=yes
 	export INSTALL_RUST_TOOLCHAIN=yes
 else ifeq ($(ARCH), aarch64)
     export BUILD_WITH_MODULES=yes
