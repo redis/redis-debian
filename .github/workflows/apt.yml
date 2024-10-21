@@ -12,13 +12,15 @@ jobs:
     strategy:
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
+        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
+        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
           sudo apt-get update && \
           sudo apt-get install \
-           debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev python3-pip python3-venv python3-dev unzip rsync git wget tcl curl build-essential gcc-11 g++-11
+           debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev
     - name: Determine version
       run: |
           VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
@@ -37,14 +39,14 @@ jobs:
     - name: Upload source package artifact
       uses: actions/upload-artifact@v4
       with:
-        name: source-${{ matrix.dist }}
+        name: source-${{ matrix.dist }}-${{ matrix.arch }}
         path: |
           redis_*.tar.xz
           redis_*.dsc
           redis_*.orig.tar.gz
 
   build-binary-package:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu24-arm64-4-16' || 'ubuntu-22.04' }}
     strategy:
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
@@ -55,11 +57,18 @@ jobs:
     - uses: actions/checkout@v4
     - name: Determine build architecture
       run: |
-          if [ ${{ matrix.arch }} = "i386" ]; then
-              BUILD_ARCH=i386
-          else
-              BUILD_ARCH=amd64
-          fi
+          case ${{ matrix.arch }} in
+            i386)
+                BUILD_ARCH=i386
+                ;;
+            arm64)
+                BUILD_ARCH=arm64
+                ;;
+            *) 
+                BUILD_ARCH=amd64
+                ;;
+          esac
+        
           echo "BUILD_ARCH=${BUILD_ARCH}" >> $GITHUB_ENV
     - name: Setup APT Signing key
       run: |
@@ -72,19 +81,17 @@ jobs:
           sudo apt-get update && \
           sudo apt-get install -y \
             sbuild debhelper \
-            wget make cmake clang-format gcc python3 python3-venv python3-pip lcov git openssl libssl-dev unzip rsync build-essential gcc-11 g++-11 pkg-config
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+            wget make cmake clang-format lcov git openssl libssl-dev unzip rsync pkg-config
           sudo sbuild-adduser $USER
     - name: Prepare sbuild environment
       run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
     - name: Get source package
       uses: actions/download-artifact@v4
       with:
-        name: source-${{ matrix.dist }}
+        name: source-${{ matrix.dist }}-${{ matrix.arch }}
     - name: Build binary package
       run: |
           sudo sbuild \
-            --chroot-setup-commands "apt-get update && apt-get install -y python3-pip systemd" \
             --nolog \
             --no-run-lintian \
             --host ${{ matrix.arch }} \
@@ -173,7 +180,7 @@ jobs:
                 --lock \
                 --fail-if-exists \
                 --sign \
-                --prefix deb \
+                --prefix deba \
                 $dir/*.deb ; \
         done
 

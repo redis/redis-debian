@@ -23,6 +23,7 @@ Build-Depends:
  curl,
  g++,
  clang,
+ systemd,
  procps <!nocheck>,
  tcl <!nocheck>,
  tcl-tls <!nocheck>
