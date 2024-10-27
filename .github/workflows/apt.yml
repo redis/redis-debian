@@ -180,7 +180,7 @@ jobs:
                 --lock \
                 --fail-if-exists \
                 --sign \
-                --prefix deba \
+                --prefix deb \
                 $dir/*.deb ; \
         done
 

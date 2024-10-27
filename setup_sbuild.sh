@@ -12,6 +12,9 @@ else
     disttype="debian"
 fi
 
+if [ "$dist" = "focal" ]; then
+     ubuntu_ports="/ubuntu-ports"
+fi
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
     ubuntu)
@@ -44,8 +47,8 @@ if [ "$disttype" = "ubuntu" ]; then
     cat <<__END__ | schroot -c source:${dist}-${arch}-sbuild -d / -- tee /etc/apt/sources.list
 deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu ${dist} main universe
 deb [arch=amd64,i386] http://archive.ubuntu.com/ubuntu ${dist}-updates main universe
-deb [arch=armhf,arm64] http://ports.ubuntu.com ${dist} main universe
-deb [arch=armhf,arm64] http://ports.ubuntu.com ${dist}-updates main universe
+deb [arch=armhf,arm64] http://ports.ubuntu.com${ubuntu_ports} ${dist} main universe
+deb [arch=armhf,arm64] http://ports.ubuntu.com${ubuntu_ports} ${dist}-updates main universe
 __END__
 
 elif [ "$disttype" = "debian" ]; then
@@ -59,4 +62,9 @@ deb [arch=amd64,i386,armhf,arm64] http://deb.debian.org/debian ${dist} main cont
 deb [arch=amd64,i386,armhf,arm64] http://deb.debian.org/debian ${dist}-updates main contrib non-free non-free-firmware
 deb [arch=amd64,i386,armhf,arm64] http://deb.debian.org/debian-security ${dist}-security main contrib non-free non-free-firmware
 __END__
+fi
+if [ "$dist" = "focal" ]; then
+    # Install gcc-10 and g++-10 which are required in case of Ubuntu Focal to support Ranges library, introduced in C++20
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt update && apt remove -y gcc-9 g++-9 gcc-9-base && apt upgrade -yqq && apt install -y gcc build-essential gcc-10 g++-10 clang-format clang lcov openssl"
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "[ -f /usr/bin/gcc-10 ] && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10|| echo 'gcc-10 installation failed'"
 fi
