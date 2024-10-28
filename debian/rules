@@ -33,14 +33,24 @@ ifeq ($(ARCH), x86_64)
 	export INSTALL_RUST_TOOLCHAIN=yes
 else ifeq ($(ARCH), aarch64)
     export BUILD_WITH_MODULES=yes
-		export INSTALL_RUST_TOOLCHAIN=yes
+    export INSTALL_RUST_TOOLCHAIN=yes
+else ifeq ($(ARCH), i686)
+    export BUILD_WITH_MODULES=no
+	export INSTALL_RUST_TOOLCHAIN=yes
+else ifeq ($(ARCH), i386)
+    export BUILD_WITH_MODULES=no
+	export INSTALL_RUST_TOOLCHAIN=yes
 else
     $(warning Unsupported architecture: '$(ARCH)')
 endif
 
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
-	debian/bin/adjust-config-files
+	if [ "$(BUILD_WITH_MODULES)" = "yes" ]; then \
+		debian/bin/adjust-modules-config-files; \
+	else \
+		debian/bin/adjust-config-files; \
+	fi
 	dh_auto_install
 
 override_dh_auto_build:
@@ -76,7 +86,3 @@ override_dh_compress:
 
 override_dh_installchangelogs:
 	dh_installchangelogs --keep 00-RELEASENOTES
-
-override_dh_fixperms:
-	dh_fixperms
-	chmod 0755 debian/redis-server/usr/lib/redis/modules/*.so
