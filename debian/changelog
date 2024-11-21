@@ -1,10 +1,10 @@
-redis (6:8.0.0-1rl1~noble1) noble; urgency=low
+redis (6:8.0.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Testing.
 
  -- Redis Labs <redis@redis.io>  Tue, 01 Jun 2023 18:15:02 +0300
 
-redis (6:6.2.4-1rl1~noble1) noble; urgency=low
+redis (6:6.2.4-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Security fixes ]
   * [CVE-2021-32625] Fix integer overflow in STRALGO LCS.
@@ -24,7 +24,7 @@ redis (6:6.2.4-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Tue, 01 Jun 2021 18:15:02 +0300
 
-redis (6:6.2.3-1rl1~noble1) noble; urgency=low
+redis (6:6.2.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Security fixes ]
   * [CVE-2021-29477] Fix integer overflow in STRALGO LCS.
@@ -44,7 +44,7 @@ redis (6:6.2.3-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Mon, 03 May 2021 23:37:50 +0300
 
-redis (6:6.2.2-1rl1~noble1) noble; urgency=low
+redis (6:6.2.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   [ Bug fixes for regressions in previous releases of Redis 6.2 ]
   * Fix BGSAVE, AOFRW, and replication slowdown due to child reporting CoW (#8645)
@@ -115,32 +115,32 @@ redis (6:6.2.2-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Tue, 20 Apr 2021 09:41:43 +0300
 
-redis (6:6.2.1-4rl1~noble1) noble; urgency=low
+redis (6:6.2.1-4rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix issue with services not starting on SysV-Init systems.
 
  -- Redis Labs <redis@redis.io>  Mon, 22 Mar 2021 22:41:22 +0200
 
-redis (6:6.2.1-3rl1~noble1) noble; urgency=low
+redis (6:6.2.1-3rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip more tests, PPA build might be flaky.
 
  -- Redis Labs <redis@redis.io>  Tue, 02 Mar 2021 14:04:11 +0200
 
-redis (6:6.2.1-2rl1~noble1) noble; urgency=low
+redis (6:6.2.1-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip flaky tests.
 
  -- Redis Labs <redis@redis.io>  Tue, 02 Mar 2021 12:23:20 +0200
 
-redis (6:6.2.1-1rl1~noble1) noble; urgency=low
+redis (6:6.2.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * New upstream Redis release:
     https://raw.githubusercontent.com/redis/redis/6.2/00-RELEASENOTES
 
  -- Redis Labs <redis@redis.io>  Tue, 02 Mar 2021 09:37:23 +0200
 
-redis (6:6.0.11-1rl1~noble1) noble; urgency=low
+redis (6:6.0.11-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * [CVE-2021-21309] Avoid 32-bit overflows when proto-max-bulk-len is set high (#8522)
   * Fix handling of threaded IO and CLIENT PAUSE (failover), could lead to data loss or a crash (#8520)
@@ -155,7 +155,7 @@ redis (6:6.0.11-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Tue, 23 Feb 2021 11:08:20 +0200
 
-redis (6:6.0.10-1rl1~noble1) noble; urgency=low
+redis (6:6.0.10-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * SWAPDB invalidates WATCHed keys (#8239)
   * SORT command behaves differently when used on a writable replica (#8283)
@@ -209,19 +209,19 @@ redis (6:6.0.10-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Tue, 12 Jan 2021 19:48:51 +0200
 
-redis (6:6.0.9-3rl1~noble1) noble; urgency=low
+redis (6:6.0.9-3rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip test that are still flaky on some platforms.
 
  -- Redis Labs <redis@redis.io>  Thu, 29 Oct 2020 09:11:33 +0200
 
-redis (6:6.0.9-2rl1~noble1) noble; urgency=low
+redis (6:6.0.9-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix build to support systemd.
 
  -- Redis Labs <redis@redis.io>  Wed, 28 Oct 2020 16:26:25 +0200
 
-redis (6:6.0.9-1rl1~noble1) noble; urgency=low
+redis (6:6.0.9-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Memory reporting of clients argv (#7874)
   * Add redis-cli control on raw format line delimiter (#7841)
@@ -251,32 +251,32 @@ redis (6:6.0.9-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Tue, 27 Oct 2020 09:50:41 +0200
 
-redis (6:6.0.8-5rl1~noble1) noble; urgency=low
+redis (6:6.0.8-5rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Final(?) changes to fix build on all PPA builders.
 
  -- Redis Labs <redis@redis.io>  Wed, 21 Oct 2020 14:56:02 +0300
 
-redis (6:6.0.8-4rl1~noble1) noble; urgency=low
+redis (6:6.0.8-4rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * More skipped tests.
 
  -- Redis Labs <redis@redis.io>  Wed, 21 Oct 2020 13:54:44 +0300
 
-redis (6:6.0.8-3rl1~noble1) noble; urgency=low
+redis (6:6.0.8-3rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Skip tests that fail on slower/emulated arm platforms.
 
  -- Redis Labs <redis@redis.io>  Tue, 20 Oct 2020 12:49:16 +0300
 
-redis (6:6.0.8-2rl1~noble1) noble; urgency=low
+redis (6:6.0.8-2rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix crashes when AOF or RDB write errors occur, due to a bad packaging
     patch.
 
  -- Redis Labs <redis@redis.io>  Tue, 20 Oct 2020 10:56:01 +0300
 
-redis (6:6.0.8-1rl1~noble1) noble; urgency=low
+redis (6:6.0.8-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * CONFIG REWRITE after setting oom-score-adj-values either via CONFIG SET or
     loading it from a config file, will generate a corrupt config file that will
@@ -291,7 +291,7 @@ redis (6:6.0.8-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Thu, 10 Sep 2020 15:28:11 +0300
 
-redis (6:6.0.7-1rl1~noble1) noble; urgency=low
+redis (6:6.0.7-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Fix crash when enabling CLIENT TRACKING with prefix
   * EXEC always fails with EXECABORT and multi-state is cleared
@@ -311,7 +311,7 @@ redis (6:6.0.7-1rl1~noble1) noble; urgency=low
 
  -- Redis Labs <redis@redis.io>  Tue, 01 Sep 2020 10:10:48 +0300
 
-redis (6:6.0.6-1rl1~noble1) noble; urgency=low
+redis (6:6.0.6-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Bump epoch for new PPA.
 

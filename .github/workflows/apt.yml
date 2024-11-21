@@ -105,21 +105,30 @@ jobs:
           *.deb
 
   smoke-test-packages:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu24-arm64-4-16' || 'ubuntu-latest' }}
     needs: build-binary-package
-    env:
-      ARCH: amd64
     strategy:
       matrix:
         image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
+        arch: [amd64, arm64]
     container: ${{ matrix.image }}
     steps:
+    - name: Extract distribution from image
+      id: extract_dist
+      run: |
+        IMAGE="${{ matrix.image }}"
+        DIST=$(echo "$IMAGE" | cut -d':' -f2)
+        echo "distribution=$DIST" >> $GITHUB_OUTPUT
     - name: Get binary packages
       uses: actions/download-artifact@v4
+      with:
+        name: binary-${{ steps.extract_dist.outputs.distribution }}-${{ matrix.arch }}
     - name: Install packages
       run: |
         apt-get update
-        cd binary-$(echo ${{ matrix.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
+        IMAGE=${{ matrix.image }}
+        dist=$(echo "$IMAGE" | cut -d':' -f2)
+        apt install --yes ./*.deb
     - name: Run redis-server smoke test
       run: |
         /usr/bin/redis-server /etc/redis/redis.conf
