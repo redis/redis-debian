@@ -10,6 +10,7 @@ jobs:
   build-source-package:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
         arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
@@ -27,7 +28,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: Get source tarball
       run: |
-          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m01.tar.gz" -o redis_${VERSION}.orig.tar.gz
+          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m02.tar.gz" -o redis_${VERSION}.orig.tar.gz
     - name: Build source package
       run: |
         mkdir -p redis-${VERSION}
@@ -48,6 +49,7 @@ jobs:
   build-binary-package:
     runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu24-arm64-4-16' || 'ubuntu-22.04' }}
     strategy:
+      fail-fast: false
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
         arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
@@ -108,6 +110,7 @@ jobs:
     runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu24-arm64-4-16' || 'ubuntu-latest' }}
     needs: build-binary-package
     strategy:
+      fail-fast: false
       matrix:
         image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
         arch: [amd64, arm64]
@@ -141,8 +144,9 @@ jobs:
         echo "Installed modules:"
         echo "$modules"
         missing_modules=()
+        module_output="$modules"
         for module in "bf" "search" "timeseries" "ReJSON"; do
-          if ! echo "$modules" | grep -q "$module"; then
+          if [[ ! "$module_output" =~ $module ]]; then
             missing_modules+=("$module")
           fi
         done
@@ -180,13 +184,17 @@ jobs:
         redis-cli TS.ADD redis:cpu:usage "*" 80
         redis-cli TS.ADD redis:cpu:usage "*" 65
         redis-cli TS.ADD redis:cpu:usage "*" 70
-        result=$(redis-cli TS.RANGE redis:cpu:usage - + COUNT 3)
-        if echo "$result" | grep -q "80" && echo "$result" | grep -q "65" && echo "$result" | grep -q "70"; then
-          echo "RedisTimeSeries test passed successfully"
-        else
-          echo "RedisTimeSeries test failed: expected values not found in time series"
-          exit 1
-        fi
+        values=$(redis-cli TS.RANGE redis:cpu:usage - + COUNT 3 | awk 'NR % 2 == 0')
+        echo "Extracted values:"
+        echo "$values"
+
+        for expected in 80 65 70; do
+          if ! echo "$values" | grep -q "^$expected\$"; then
+            echo "Value $expected not found in output"
+            exit 1
+          fi
+        done
+        echo "RedisTimeSeries test passed successfully"
     - name: Test ReJSON
       shell: bash
       run: |
@@ -257,4 +265,3 @@ jobs:
                 --prefix deb \
                 $dir/*.deb ; \
         done
-
