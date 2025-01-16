@@ -15,7 +15,7 @@ jobs:
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
           sudo apt-get update && \
@@ -35,7 +35,7 @@ jobs:
           sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
           ( cd redis-${VERSION} && dpkg-buildpackage -S )
     - name: Upload source package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: source-${{ matrix.dist }}
         path: |
@@ -52,7 +52,7 @@ jobs:
         exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
     needs: build-source-package
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Determine build architecture
       run: |
           if [ ${{ matrix.arch }} = "i386" ]; then
@@ -76,7 +76,7 @@ jobs:
     - name: Prepare sbuild environment
       run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
     - name: Get source package
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: source-${{ matrix.dist }}
     - name: Build binary package
@@ -87,7 +87,7 @@ jobs:
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} *.dsc
     - name: Upload binary package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: binary-${{ matrix.dist }}-${{ matrix.arch }}
         path: |
@@ -104,7 +104,7 @@ jobs:
     container: ${{ matrix.image }}
     steps:
     - name: Get binary packages
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
     - name: Install packages
       run: |
         apt-get update
@@ -132,7 +132,7 @@ jobs:
       env:
         APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
     - name: Get binary packages
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
