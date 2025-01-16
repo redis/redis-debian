@@ -12,6 +12,7 @@ jobs:
   build-source-package:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
     steps:
@@ -46,6 +47,7 @@ jobs:
   build-binary-package:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         dist: ${{ fromJSON(vars.BUILD_DISTS) }}
         arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
@@ -99,6 +101,7 @@ jobs:
     env:
       ARCH: amd64
     strategy:
+      fail-fast: false
       matrix:
         image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
     container: ${{ matrix.image }}
