@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - release/**
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build-source-package:
@@ -17,7 +20,7 @@ jobs:
       run: |
           sudo apt-get update && \
           sudo apt-get install \
-            debhelper dput tcl-tls libsystemd-dev pkg-config
+            debhelper dput tcl-tls libsystemd-dev pkg-config build-essential
     - name: Determine version
       run: |
           VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
@@ -116,6 +119,7 @@ jobs:
         echo ping | redis-cli -p 26379
 
   upload-packages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/*'
     env:
       DEB_S3_VERSION: "0.11.3"
     runs-on: ubuntu-latest
