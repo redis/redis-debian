@@ -1,3 +1,9 @@
+redis (6:7.4.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.4.2: https://github.com/redis/redis/releases/tag/7.4.2
+
+ -- Redis Team <redis@redis.io>  Mon, 06 Jan 2025 13:10:04 +0300
+
 redis (6:7.4.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Redis 7.4.1: https://github.com/redis/redis/releases/tag/7.4.1
