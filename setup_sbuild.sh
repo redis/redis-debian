@@ -18,7 +18,7 @@ fi
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
     ubuntu)
-        if [ "$arch" = "arm64" ]; then
+        if [ "$arch" = "arm64" ] || [ "$arch" = "armhf" ]; then
             url=http://ports.ubuntu.com/ubuntu-ports
         else
             url=http://archive.ubuntu.com/ubuntu
