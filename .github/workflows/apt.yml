@@ -45,7 +45,7 @@ jobs:
             redis_*.orig.tar.gz
 
   build-binary-package:
-    runs-on: ubuntu-latest
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -57,11 +57,21 @@ jobs:
     - uses: actions/checkout@v4
     - name: Determine build architecture
       run: |
-          if [ ${{ matrix.arch }} = "i386" ]; then
-              BUILD_ARCH=i386
-          else
-              BUILD_ARCH=amd64
-          fi
+          case ${{ matrix.arch }} in
+            i386)
+                BUILD_ARCH=i386
+                ;;
+            arm64)
+                BUILD_ARCH=arm64
+                ;;
+            armhf)
+                BUILD_ARCH=armhf
+                ;;
+            *) 
+                BUILD_ARCH=amd64
+                ;;
+          esac
+        
           echo "BUILD_ARCH=${BUILD_ARCH}" >> $GITHUB_ENV
     - name: Setup APT Signing key
       run: |
