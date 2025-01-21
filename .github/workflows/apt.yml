@@ -28,11 +28,11 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: Get source tarball
       run: |
-          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m02.tar.gz" -o redis_${VERSION}.orig.tar.gz
+          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m03.tar.gz" -o redis_${VERSION}.orig.tar.gz
     - name: Build source package
       run: |
         mkdir -p redis-${VERSION}
-        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}  
+        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
         sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
         cp -pr debian redis-${VERSION}
         sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
@@ -66,11 +66,11 @@ jobs:
             arm64)
                 BUILD_ARCH=arm64
                 ;;
-            *) 
+            *)
                 BUILD_ARCH=amd64
                 ;;
           esac
-        
+
           echo "BUILD_ARCH=${BUILD_ARCH}" >> $GITHUB_ENV
     - name: Setup APT Signing key
       run: |
@@ -222,7 +222,7 @@ jobs:
     steps:
     - name: Setup APT Signing key
       env:
-        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}  
+        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
       run: |
         mkdir -m 0700 -p ~/.gnupg
         echo "$APT_SIGNING_KEY" | gpg --import
