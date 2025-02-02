@@ -2,7 +2,7 @@
 
 ## Supported Debian Distributions
 
-We support Debian versions that are under [`Debian Security Support / stable versions`](https://wiki.debian.org/Status/Stable) that are official supported by Debian. [Updated support matrix](https://wiki.debian.org/LTS/).
+We support Debian versions that are under [`Debian Security Support / stable versions`](https://wiki.debian.org/Status/Stable) that are officially supported by Debian. [Updated support matrix](https://wiki.debian.org/LTS/).
 
 We encourage you to use the latest stable Debian version, and to consider that the 'LTS' versions of Debian are maintained by volunteers - not by the Debian security team.
 
