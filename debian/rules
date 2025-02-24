@@ -86,3 +86,8 @@ override_dh_compress:
 
 override_dh_installchangelogs:
 	dh_installchangelogs --keep 00-RELEASENOTES
+
+override_dh_fixperms:
+	# Do not allow dh_fixperms to "fix" modules so files perms as
+	# it removes their x bit
+	dh_fixperms -X/redis/modules
