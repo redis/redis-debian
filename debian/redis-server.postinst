@@ -14,8 +14,6 @@ then
 	fi
 fi
 
-chmod 0755 /usr/lib/redis/modules/*.so || true
-
 #DEBHELPER#
 
 if [ "$1" = "configure" ]
