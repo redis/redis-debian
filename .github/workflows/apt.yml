@@ -28,7 +28,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: Get source tarball
       run: |
-          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m03.tar.gz" -o redis_${VERSION}.orig.tar.gz
+          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m04.tar.gz" -o redis_${VERSION}.orig.tar.gz
     - name: Build source package
       run: |
         mkdir -p redis-${VERSION}
