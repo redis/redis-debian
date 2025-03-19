@@ -67,6 +67,13 @@ if [ "$dist" = "focal" ]; then
     # Install gcc-10 and g++-10 which are required in case of Ubuntu Focal to support Ranges library, introduced in C++20
     schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt update && apt remove -y gcc-9 g++-9 gcc-9-base && apt upgrade -yqq && apt install -y gcc build-essential gcc-10 g++-10 clang-format clang lcov openssl"
     schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "[ -f /usr/bin/gcc-10 ] && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10|| echo 'gcc-10 installation failed'"
+    
+    # Install latest CMake version using pip for amd64 and arm64 architectures
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt install -y python3-pip && \
+        pip3 install cmake && \
+        ln -sf /usr/local/bin/cmake /usr/bin/cmake && \
+        cmake --version"
+
     # Install newer version of debhelper
     # Required because of a bug: https://bugs-devel.debian.org/cgi-bin/bugreport.cgi?bug=959731
     INSTALL_DEBHELPER_FROM_BULLSEYE="apt install -y wget \
