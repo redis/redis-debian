@@ -32,24 +32,26 @@ ifeq ($(ARCH), x86_64)
 	export DISABLE_WERRORS=yes
 	export INSTALL_RUST_TOOLCHAIN=yes
 else ifeq ($(ARCH), aarch64)
-    export BUILD_WITH_MODULES=yes
-    export INSTALL_RUST_TOOLCHAIN=yes
+	export BUILD_WITH_MODULES=yes
+	export INSTALL_RUST_TOOLCHAIN=yes
 else ifeq ($(ARCH), i686)
-    export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=yes
+	export BUILD_WITH_MODULES=no
+	export INSTALL_RUST_TOOLCHAIN=no
 else ifeq ($(ARCH), i386)
-    export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=yes
+	export BUILD_WITH_MODULES=no
+	export INSTALL_RUST_TOOLCHAIN=no
 else
     $(warning Unsupported architecture: '$(ARCH)')
 endif
 
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
+	cp debian/conf-dist/sentinel.conf ./sentinel.conf
 	if [ "$(BUILD_WITH_MODULES)" = "yes" ]; then \
-		debian/bin/adjust-modules-config-files; \
+		cp debian/conf-dist/redis_with_modules.conf ./redis.conf; \
 	else \
-		debian/bin/adjust-config-files; \
+		sed -i '/usr\/local\/lib\/redis\/modules\/\*\.so/d' debian/redis-server.install; \
+		cp debian/conf-dist/redis.conf ./redis.conf; \
 	fi
 	dh_auto_install
 
