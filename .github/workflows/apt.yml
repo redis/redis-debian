@@ -5,6 +5,7 @@ on:
     branches:
     - release/**
     - rc/8.0
+    - RED-153660_modules_conf
 
 jobs:
   build-source-package:
