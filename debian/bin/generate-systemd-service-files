@@ -110,7 +110,7 @@ ReadWriteDirectories=-/var/log/redis
 ReadWriteDirectories=-/run/${NAMESPACED}
 
 NoNewPrivileges=true
-CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE${SYSTEMD_EXTRA}
+CapabilityBoundingSet=CAP_SYS_RESOURCE${SYSTEMD_EXTRA}
 
 # ${BINARY} can write to its own config file when in cluster mode so we
 # permit writing there by default. If you are not using this feature, it is
