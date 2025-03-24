@@ -92,8 +92,6 @@ Documentation=http://redis.io/documentation, man:${BINARY}(1)
 [Service]
 Type=notify
 ExecStart=/usr/bin/${BINARY} /etc/redis/${NAMESPACED}.conf
-ExecStop=/bin/kill -s TERM \$MAINPID
-PIDFile=/run/${NAMESPACED}/${BINARY}.pid
 TimeoutStopSec=0
 Restart=always
 User=redis
