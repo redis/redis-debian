@@ -134,7 +134,7 @@ jobs:
         apt install --yes ./*.deb
     - name: Run redis-server smoke test
       run: |
-        /usr/bin/redis-server /etc/redis/redis.conf
+        /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes
         sleep 3
         redis-benchmark -P 10
     - name: Verify installed modules
@@ -209,7 +209,7 @@ jobs:
         fi
     - name: Run redis-sentinel smoke test
       run: |
-        /usr/bin/redis-sentinel /etc/redis/sentinel.conf
+        /usr/bin/redis-sentinel /etc/redis/sentinel.conf --daemonize yes
         sleep 3
         echo ping | redis-cli -p 26379
 

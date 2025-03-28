@@ -92,8 +92,6 @@ Documentation=http://redis.io/documentation, man:${BINARY}(1)
 [Service]
 Type=notify
 ExecStart=/usr/bin/${BINARY} /etc/redis/${NAMESPACED}.conf
-ExecStop=/bin/kill -s TERM \$MAINPID
-PIDFile=/run/${NAMESPACED}/${BINARY}.pid
 TimeoutStopSec=0
 Restart=always
 User=redis
@@ -112,7 +110,7 @@ ReadWriteDirectories=-/var/log/redis
 ReadWriteDirectories=-/run/${NAMESPACED}
 
 NoNewPrivileges=true
-CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE${SYSTEMD_EXTRA}
+CapabilityBoundingSet=CAP_SYS_RESOURCE${SYSTEMD_EXTRA}
 
 # ${BINARY} can write to its own config file when in cluster mode so we
 # permit writing there by default. If you are not using this feature, it is
