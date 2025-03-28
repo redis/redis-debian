@@ -70,7 +70,7 @@ if [ "$dist" = "focal" ]; then
     
     # Install latest CMake version using pip for amd64 and arm64 architectures
     schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt install -y python3-pip && \
-        pip3 install cmake && \
+        pip3 install cmake==3.31.6 && \
         ln -sf /usr/local/bin/cmake /usr/bin/cmake && \
         cmake --version"
 
