@@ -1,6 +1,9 @@
 name: Build and Publish to APT
 
 on:
+  pull_request:
+    branches:
+      - rc/8.0
   push:
     branches:
     - release/**
@@ -28,7 +31,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: Get source tarball
       run: |
-          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-m04.tar.gz" -o redis_${VERSION}.orig.tar.gz
+          curl --silent -L "https://github.com/redis/redis/archive/refs/tags/8.0-rc1.tar.gz" -o redis_${VERSION}.orig.tar.gz
     - name: Build source package
       run: |
         mkdir -p redis-${VERSION}
@@ -244,6 +247,7 @@ jobs:
         aws-region: ${{ secrets.APT_S3_REGION }}
         role-to-assume: ${{ secrets.APT_S3_IAM_ARN }}
     - name: Upload packages
+      if: github.ref == 'refs/heads/rc/8.0'
       env:
         APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
         APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
