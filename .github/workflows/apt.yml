@@ -102,7 +102,7 @@ jobs:
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} \
             --build-dep-resolver=apt \
-            --chroot-setup-commands="apt-get update && apt-get install -y build-essential python3 python3-pip python3-venv python3-dev g++ clang" \
+            --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
             *.dsc
     - name: Upload binary package artifact
       uses: actions/upload-artifact@v4
