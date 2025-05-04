@@ -52,6 +52,7 @@ else ifeq ($(ARCH), i386)
 else ifeq ($(ARCH), armhf)
 	export BUILD_WITH_MODULES=no
 	export INSTALL_RUST_TOOLCHAIN=no
+	export AR = arm-linux-gnueabihf-ar
 else
     $(warning Unsupported architecture: '$(ARCH)')
 endif
