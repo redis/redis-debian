@@ -23,7 +23,7 @@ endif
 	dh $@
 
 # BUILD_WITH_MODULES is needed by override_dh_auto_build as well as override_dh_auto_install,
-# so we export it here instead of passing 
+# so we export it here instead of passing it to override_dh_auto_build
 
 ARCH := $(shell uname -m)
 
@@ -38,6 +38,9 @@ else ifeq ($(ARCH), i686)
 	export BUILD_WITH_MODULES=no
 	export INSTALL_RUST_TOOLCHAIN=no
 else ifeq ($(ARCH), i386)
+	export BUILD_WITH_MODULES=no
+	export INSTALL_RUST_TOOLCHAIN=no
+else ifeq ($(ARCH), armv7l)
 	export BUILD_WITH_MODULES=no
 	export INSTALL_RUST_TOOLCHAIN=no
 else
