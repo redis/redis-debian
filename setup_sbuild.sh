@@ -18,7 +18,7 @@ fi
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
     ubuntu)
-        if [ "$arch" = "arm64" ]; then
+        if [ "$arch" = "arm64" ] || [ "$arch" = "armhf" ]; then
             url=http://ports.ubuntu.com/ubuntu-ports
         else
             url=http://archive.ubuntu.com/ubuntu
@@ -32,14 +32,27 @@ case "$disttype" in
         exit 1
 esac
 
-sbuild-createchroot \
-    --arch ${arch} --make-sbuild-tarball=/var/lib/sbuild/${dist}-${arch}.tar.gz \
-    ${dist} `mktemp -d` ${url}
+# Create a temporary file for the sbuild configuration
+SBUILD_CONF=$(mktemp)
+cat > "$SBUILD_CONF" << EOF
+$build_arch $arch $dist $url
+EOF
+
+# Create the sbuild chroot with the configuration
+sbuild-createchroot --arch=${arch} --make-sbuild-tarball=/var/lib/sbuild/${dist}-${arch}.tar.gz ${dist} $(mktemp -d) ${url}
+
+# For cross-compilation, install the necessary packages
+if [ "$arch" != "$(dpkg --print-architecture)" ]; then
+    # Install cross-compilation tools in the chroot
+    schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
+    schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y crossbuild-essential-${arch}
+fi
 
 # Ubuntu has the main and ports repositories on different URLs, so we need to
 # properly set up /etc/apt/sources.list to make cross compilation work
 # and enable multi-architecture support inside a chroot environment
 if [ "$disttype" = "ubuntu" ]; then
+    # Enable multiarch but don't try to install Python and other build tools for target arch
     schroot -c source:${dist}-${arch}-sbuild -d / -- dpkg --add-architecture i386
     schroot -c source:${dist}-${arch}-sbuild -d / -- dpkg --add-architecture armhf
     schroot -c source:${dist}-${arch}-sbuild -d / -- dpkg --add-architecture arm64
@@ -63,6 +76,11 @@ deb [arch=amd64,i386,armhf,arm64] http://deb.debian.org/debian ${dist}-updates m
 deb [arch=amd64,i386,armhf,arm64] http://deb.debian.org/debian-security ${dist}-security main contrib non-free non-free-firmware
 __END__
 fi
+
+# Install native build tools in the chroot
+schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
+schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y build-essential python3 python3-pip python3-venv python3-dev g++ clang
+
 if [ "$dist" = "focal" ]; then
     # Install gcc-10 and g++-10 which are required in case of Ubuntu Focal to support Ranges library, introduced in C++20
     schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt update && apt remove -y gcc-9 g++-9 gcc-9-base && apt upgrade -yqq && apt install -y gcc build-essential gcc-10 g++-10 clang-format clang lcov openssl"
