@@ -8,7 +8,7 @@ CC = $(DEB_HOST_GNU_TYPE)-gcc
 endif
 
 export CC CFLAGS CPPFLAGS LDFLAGS
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all,-format
 export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic
 export REDIS_CFLAGS='-Wno-error=uninitialized'
 DEB_BUILD_OPTIONS = nocheck

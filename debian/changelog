@@ -1,28 +1,149 @@
-redis (6:8.0.0-4rl1~@RELEASE@1) @RELEASE@; urgency=low
-
-  * Redis CE 8.0 RC1
-
- -- Redis Labs <redis@redis.io> Mon, 7 Apr 2025 13:39:38 +0200
-
-redis (6:8.0.0-3rl1~@RELEASE@1) @RELEASE@; urgency=low
-
-  * Configuration and ACL description for redis modules in redis.conf
-  * Systemd: unnecessary capabilities and redundant directives are removed
-  * Building without modules is fixed
-
- -- Redis Labs <redis@redis.io> Tue, 25 Mar 2025 14:18:38 +0200
-
-redis (6:8.0.0-2rl1~@RELEASE@1) @RELEASE@; urgency=low
-
-  * New milestone 4
-
- -- Redis Labs <redis@redis.io>  Tue, 17 Mar 2024 18:15:02 +0300
-
 redis (6:8.0.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
-  * Testing.
+  * Redis 8.0.0: https://github.com/redis/redis/releases/tag/8.0.0
 
- -- Redis Labs <redis@redis.io>  Tue, 01 Jun 2023 18:15:02 +0300
+ -- Redis Team <redis@redis.io>  Sun, 04 May 2025 10:10:05 +0300
+
+redis (6:7.4.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.4.3: https://github.com/redis/redis/releases/tag/7.4.3
+
+ -- Redis Team <redis@redis.io>  Thu, 24 Apr 2025 17:10:05 +0300
+
+redis (6:7.4.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.4.2: https://github.com/redis/redis/releases/tag/7.4.2
+
+ -- Redis Team <redis@redis.io>  Mon, 06 Jan 2025 13:10:04 +0300
+
+redis (6:7.4.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.4.1: https://github.com/redis/redis/releases/tag/7.4.1
+
+ -- Redis Team <redis@redis.io>  Wed, 02 Oct 2024 22:09:22 +0300
+
+redis (6:7.4.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.4.0: https://github.com/redis/redis/releases/tag/7.4.0
+
+ -- Redis Team <redis@redis.io>  Mon, 29 Jul 2024 12:34:56 +0300
+
+redis (6:7.2.5-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.5: https://github.com/redis/redis/releases/tag/7.2.5
+
+ -- Redis Team <redis@redis.io>  Tue, 21 May 2024 14:30:55 +0300
+
+redis (6:7.2.4-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.4: https://github.com/redis/redis/releases/tag/7.2.4
+
+ -- Redis Team <redis@redis.io>  Tue, 09 Jan 2024 14:02:22 +0200
+
+redis (6:7.2.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.3: https://github.com/redis/redis/releases/tag/7.2.3
+
+ -- Redis Team <redis@redis.io>  Wed, 01 Nov 2023 15:29:12 +0200
+
+redis (6:7.2.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.2: https://github.com/redis/redis/releases/tag/7.2.2
+
+ -- Redis Team <redis@redis.io>  Wed, 18 Oct 2023 13:19:32 +0300
+
+redis (6:7.2.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.1: https://github.com/redis/redis/releases/tag/7.2.1
+
+ -- Redis Team <redis@redis.io>  Wed, 06 Sep 2023 21:03:36 +0300
+
+redis (6:7.2.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.0: https://github.com/redis/redis/releases/tag/7.2.0
+
+ -- Redis Team <redis@redis.io>  Tue, 15 Aug 2023 13:27:16 +0300
+
+redis (6:7.0.12-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.12: https://github.com/redis/redis/releases/tag/7.0.12
+
+ -- Redis Team <redis@redis.io>  Mon, 10 Jul 2023 14:53:04 +0300
+
+redis (6:7.0.11-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.11: https://github.com/redis/redis/releases/tag/7.0.11
+
+ -- Redis Team <redis@redis.io>  Mon, 17 Apr 2023 18:08:01 +0300
+
+redis (6:7.0.10-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.10: https://github.com/redis/redis/releases/tag/7.0.10
+
+ -- Redis Team <redis@redis.io>  Mon, 20 Mar 2023 19:36:37 +0200
+
+redis (6:7.0.9-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.9: https://github.com/redis/redis/releases/tag/7.0.9
+
+ -- Redis Team <redis@redis.io>  Tue, 28 Feb 2023 20:36:00 +0200
+
+redis (6:7.0.8-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.8: https://github.com/redis/redis/releases/tag/7.0.8
+
+ -- Redis Team <redis@redis.io>  Tue, 17 Jan 2023 13:51:28 +0200
+
+redis (6:7.0.7-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.7: https://github.com/redis/redis/releases/tag/7.0.7
+
+ -- Redis Team <redis@redis.io>  Fri, 16 Dec 2022 12:00:00 +0200
+
+redis (6:7.0.6-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.6: https://github.com/redis/redis/releases/tag/7.0.6
+
+ -- Redis Team <redis@redis.io>  Mon, 12 Dec 2022 12:00:00 +0200
+
+redis (6:7.0.5-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.5: https://github.com/redis/redis/releases/tag/7.0.5
+
+ -- Redis Team <redis@redis.io>  Thu, 22 Sep 2022 08:00:00 +0300
+
+redis (6:7.0.4-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.4: https://github.com/redis/redis/releases/tag/7.0.4
+
+ -- Redis Team <redis@redis.io>  Mon, 18 Jul 2022 12:00:00 +0300
+
+redis (6:7.0.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.3: https://github.com/redis/redis/releases/tag/7.0.3
+
+ -- Redis Team <redis@redis.io>  Mon, 11 Jul 2022 12:00:00 +0300
+
+redis (6:7.0.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.2: https://github.com/redis/redis/releases/tag/7.0.2
+
+ -- Redis Team <redis@redis.io>  Sun, 12 Jun 2022 12:00:00 +0300
+
+redis (6:7.0.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.1: https://github.com/redis/redis/releases/tag/7.0.1
+
+ -- Redis Team <redis@redis.io>  Wed, 8 Jun 2022 12:00:00 +0300
+
+redis (6:7.0.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.0.0: https://github.com/redis/redis/releases/tag/7.0.0
+  * Redis 7.0-rc3: https://github.com/redis/redis/releases/tag/7.0-rc3
+  * Redis 7.0-rc2: https://github.com/redis/redis/releases/tag/7.0-rc2
+  * Redis 7.0-rc1: https://github.com/redis/redis/releases/tag/7.0-rc1
+
+ -- Redis Team <redis@redis.io>  Wed, 27 Apr 2022 12:00:00 +0300
 
 redis (6:6.2.4-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
