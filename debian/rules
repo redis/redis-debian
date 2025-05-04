@@ -49,7 +49,7 @@ else ifeq ($(ARCH), i686)
 else ifeq ($(ARCH), i386)
 	export BUILD_WITH_MODULES=no
 	export INSTALL_RUST_TOOLCHAIN=no
-else ifeq ($(ARCH), armv7l)
+else ifeq ($(ARCH), armhf)
 	export BUILD_WITH_MODULES=no
 	export INSTALL_RUST_TOOLCHAIN=no
 else
