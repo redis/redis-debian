@@ -6,6 +6,10 @@ fi
 
 dist="$1"
 arch="$2"
+host_arch=$(dpkg --print-architecture)
+
+echo "Setting up sbuild environment for distribution: $dist, architecture: $arch (host: $host_arch)"
+
 if ubuntu-distro-info --all | grep -Fqx "$dist"; then
     disttype="ubuntu"
 else
@@ -35,17 +39,28 @@ esac
 # Create a temporary file for the sbuild configuration
 SBUILD_CONF=$(mktemp)
 cat > "$SBUILD_CONF" << EOF
-$build_arch $arch $dist $url
+$host_arch $arch $dist $url
 EOF
 
 # Create the sbuild chroot with the configuration
 sbuild-createchroot --arch=${arch} --make-sbuild-tarball=/var/lib/sbuild/${dist}-${arch}.tar.gz ${dist} $(mktemp -d) ${url}
 
 # For cross-compilation, install the necessary packages
-if [ "$arch" != "$(dpkg --print-architecture)" ]; then
+if [ "$arch" != "$host_arch" ]; then
+    echo "Setting up cross-compilation environment from $host_arch to $arch"
+    
     # Install cross-compilation tools in the chroot
     schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
     schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y crossbuild-essential-${arch}
+    
+    # Create a file to tell sbuild this is a cross-compilation environment
+    schroot -c source:${dist}-${arch}-sbuild -d / -- touch /etc/sbuild-cross-building
+    
+    # Create a custom dpkg configuration for cross-compilation
+    cat <<__END__ | schroot -c source:${dist}-${arch}-sbuild -d / -- tee /etc/dpkg/dpkg.cfg.d/cross-compile
+# Don't install recommended packages automatically for cross-compilation
+no-install-recommends
+__END__
 fi
 
 # Ubuntu has the main and ports repositories on different URLs, so we need to

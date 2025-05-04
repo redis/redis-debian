@@ -26,12 +26,21 @@ endif
 # so we export it here instead of passing it to override_dh_auto_build
 
 ARCH := $(shell dpkg --print-architecture)
-$(info Architecture: $(ARCH))
-ifeq ($(ARCH), x86_64)
+$(info Host Architecture: $(ARCH))
+TARGET_ARCH := $(DEB_HOST_ARCH)
+$(info Target Architecture: $(TARGET_ARCH))
+
+# Use TARGET_ARCH if we're in a cross-compilation environment
+ifneq ($(ARCH),$(TARGET_ARCH))
+    $(info Cross-compilation detected: $(ARCH) -> $(TARGET_ARCH))
+    ARCH := $(TARGET_ARCH)
+endif
+
+ifeq ($(ARCH), amd64)
 	export BUILD_WITH_MODULES=yes
 	export DISABLE_WERRORS=yes
 	export INSTALL_RUST_TOOLCHAIN=yes
-else ifeq ($(ARCH), aarch64)
+else ifeq ($(ARCH), arm64)
 	export BUILD_WITH_MODULES=yes
 	export INSTALL_RUST_TOOLCHAIN=yes
 else ifeq ($(ARCH), i686)
