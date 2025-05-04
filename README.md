@@ -2,11 +2,33 @@ This repository holds the `debian/` package configuration and handles automation
 
 The Debian package is derived from work done by [Chris Lea](https://github.com/chrislea).
 
-## Redis Community Edition - Install using Debian Advanced Package Tool (APT)
+## Redis Open Source - Install using Debian Advanced Package Tool (APT)
 
-To install the latest version of Redis Community Edition using the Debian Advanced Package Tool (APT), please use the following command:
+Run the following commands:
+```sh
+sudo apt-get update
+sudo apt-get install lsb-release curl gpg
+curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+sudo apt-get update
+sudo apt-get install redis
+```
 
--- TODO
+> [!TIP]
+> Redis will not start automatically, nor will it start at boot time. To do this, run the following commands.
+> ```sh
+> sudo systemctl enable redis-server
+> sudo systemctl start redis-server
+> ```
+
+> [!TIP]
+> To install an earlier version, say `7.4.2`, run the following command:
+> ```sh
+> sudo apt-get install redis=6:7.4.2-1rl1~jammy1
+> ```
+>
+> You could view the available versions by running `apt policy redis`.
 
 ## Supported Operating Systems
 
