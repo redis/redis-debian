@@ -55,12 +55,6 @@ if [ "$arch" != "$host_arch" ]; then
     
     # Create a file to tell sbuild this is a cross-compilation environment
     schroot -c source:${dist}-${arch}-sbuild -d / -- touch /etc/sbuild-cross-building
-    
-    # Create a custom dpkg configuration for cross-compilation
-    cat <<__END__ | schroot -c source:${dist}-${arch}-sbuild -d / -- tee /etc/dpkg/dpkg.cfg.d/cross-compile
-# Don't install recommended packages automatically for cross-compilation
-no-install-recommends
-__END__
 fi
 
 # Ubuntu has the main and ports repositories on different URLs, so we need to
