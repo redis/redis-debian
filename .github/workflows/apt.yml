@@ -3,11 +3,10 @@ name: Build and Publish to APT
 on:
   pull_request:
     branches:
-      - rc/8.0
+      - release/8.0
   push:
     branches:
-    - release/**
-    - rc/8.0
+    - release/8.0
 
 jobs:
   build-source-package:
@@ -247,7 +246,7 @@ jobs:
         aws-region: ${{ secrets.APT_S3_REGION }}
         role-to-assume: ${{ secrets.APT_S3_IAM_ARN }}
     - name: Upload packages
-      if: github.ref == 'refs/heads/rc/8.0'
+      if: github.ref == 'refs/heads/release/8.0'
       env:
         APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
         APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
