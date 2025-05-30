@@ -49,7 +49,7 @@ jobs:
           redis_*.orig.tar.gz
 
   build-binary-package:
-    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu24-arm64-4-16' || 'ubuntu-22.04' }}
+    runs-on: ${{ (matrix.arch == 'arm64' || matrix.arch == 'armhf') && 'ubuntu24-arm64-4-16' || 'ubuntu-22.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -67,6 +67,9 @@ jobs:
                 ;;
             arm64)
                 BUILD_ARCH=arm64
+                ;;
+            armhf)
+                BUILD_ARCH=armhf
                 ;;
             *)
                 BUILD_ARCH=amd64
