@@ -246,14 +246,11 @@ jobs:
       run: |
           curl -sLO https://github.com/deb-s3/deb-s3/releases/download/${{ env.DEB_S3_VERSION }}/deb-s3-${{ env.DEB_S3_VERSION }}.gem
           gem install deb-s3-${{ env.DEB_S3_VERSION }}.gem
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: ${{ secrets.APT_S3_REGION }}
-        role-to-assume: ${{ secrets.APT_S3_IAM_ARN }}
     - name: Upload packages
       if: github.ref == 'refs/heads/release/8.0'
       env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.APT_S3_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.APT_S3_SECRET_ACCESS_KEY }}
         APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
         APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
       run: |
