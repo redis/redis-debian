@@ -1,3 +1,9 @@
+redis (6:7.2.9-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 7.2.9: https://github.com/redis/redis/releases/tag/7.2.9
+
+ -- Redis Team <redis@redis.io>  Fri, 30 May 2025 12:12:04 +0300
+
 redis (6:7.2.8-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Redis 7.2.8: https://github.com/redis/redis/releases/tag/7.2.8
