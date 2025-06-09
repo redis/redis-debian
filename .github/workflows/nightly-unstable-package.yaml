@@ -1,0 +1,10 @@
+name: Nightly Unstable Build and Package
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # Run at 1:00 AM UTC every day
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  call-unstable-build:
+    uses: redis/redis-debian/.github/workflows/apt.yml@unstable
