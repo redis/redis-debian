@@ -36,6 +36,5 @@ Redis officially tests the latest version of this distribution against the follo
 
 - Ubuntu 24.04 (Noble Numbat)
 - Ubuntu 22.04 (Jammy Jellyfish)
-- Ubuntu 20.04 (Focal Fossa)
 - Debian 12 (Bookworm)
 - Debian 11 (Bullseye)
