@@ -16,9 +16,6 @@ else
     disttype="debian"
 fi
 
-if [ "$dist" = "focal" ]; then
-     ubuntu_ports="/ubuntu-ports"
-fi
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
     ubuntu)
