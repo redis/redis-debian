@@ -8,6 +8,8 @@ Build-Depends:
  libssl-dev,
  libsystemd-dev,
  pkg-config,
+ llvm,
+ libclang-dev,
  procps <!nocheck>,
  tcl <!nocheck>,
  tcl-tls <!nocheck>
