@@ -26,7 +26,7 @@ jobs:
       run: |
           sudo apt-get update && \
           sudo apt-get install \
-           debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev
+           debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev llvm libclang-dev
     - name: Determine version
       run: |
           VERSION="unstable"
