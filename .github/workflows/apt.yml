@@ -15,13 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
+        dist: ${{ fromJSON(inputs.dists || vars.BUILD_DISTS || '["bookworm","jammy","noble"]') }}
+        arch: ${{ fromJSON(inputs.archs || vars.BUILD_ARCHS || '["amd64","arm64"]') }}
+        exclude: ${{ fromJSON(inputs.exclude || vars.BUILD_EXCLUDE || '[]') }}
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: unstable
+        ref: ${{ inputs.ref || github.ref }}
     - name: Install dependencies
       run: |
           sudo apt-get update && \
@@ -72,14 +72,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
+        dist: ${{ fromJSON(inputs.dists || vars.BUILD_DISTS || '["bookworm","jammy","noble"]') }}
+        arch: ${{ fromJSON(inputs.archs || vars.BUILD_ARCHS || '["amd64","arm64"]') }}
+        exclude: ${{ fromJSON(inputs.exclude || vars.BUILD_EXCLUDE || '[]') }}
     needs: build-source-package
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: unstable
+        ref: ${{ inputs.ref || github.ref }}
     - name: Determine build architecture
       run: |
           case ${{ matrix.arch }} in
@@ -135,7 +135,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
+        image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES || '["ubuntu:22.04"]') }}
         arch: [amd64, arm64]
     container: ${{ matrix.image }}
     steps:
