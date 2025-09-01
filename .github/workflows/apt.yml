@@ -120,8 +120,7 @@ jobs:
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} \
             --build-dep-resolver=apt \
-            --build-envvar=IGNORE_MISSING_DEPS=1 \
-            --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
+            --chroot-setup-commands="apt-get update && apt-get install -y build-essential curl ca-certificates && sh -c 'curl -LsSf https://astral.sh/uv/install.sh | sh' && install -m 0755 -D /root/.local/bin/uv /usr/local/bin/uv" \
             *.dsc
     - name: Upload binary package artifact
       uses: actions/upload-artifact@v4
