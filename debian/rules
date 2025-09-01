@@ -69,7 +69,7 @@ override_dh_auto_install:
 	dh_auto_install
 
 override_dh_auto_build:
-	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
+	dh_auto_build --parallel -- V=1 BUILD_TLS=yes IGNORE_MISSING_DEPS=1
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
