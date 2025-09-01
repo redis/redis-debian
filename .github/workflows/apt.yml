@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: unstable
+        ref: ${{ inputs.ref || github.ref }}
     - name: Install dependencies
       run: |
           sudo apt-get update && \
@@ -79,7 +79,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: unstable
+        ref: ${{ inputs.ref || github.ref }}
     - name: Determine build architecture
       run: |
           case ${{ matrix.arch }} in
