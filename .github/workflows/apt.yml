@@ -120,6 +120,7 @@ jobs:
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ matrix.dist }} \
             --build-dep-resolver=apt \
+            --build-envvar=IGNORE_MISSING_DEPS=1 \
             --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
             *.dsc
     - name: Upload binary package artifact
