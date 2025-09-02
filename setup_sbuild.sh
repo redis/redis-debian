@@ -39,8 +39,8 @@ cat > "$SBUILD_CONF" << EOF
 $host_arch $arch $dist $url
 EOF
 
-# Create the sbuild chroot with the configuration
-sbuild-createchroot --arch=${arch} --make-sbuild-tarball=/var/lib/sbuild/${dist}-${arch}.tar.gz ${dist} $(mktemp -d) ${url}
+# Create the sbuild chroot with the configuration (use directory chroot so installed tools persist into build clones)
+sbuild-createchroot --arch=${arch} ${dist} /var/lib/sbuild/chroots/${dist}-${arch} ${url}
 
 # For cross-compilation, install the necessary packages
 if [ "$arch" != "$host_arch" ]; then
@@ -91,8 +91,8 @@ schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y build-essent
 schroot -c source:${dist}-${arch}-sbuild -d / -- bash -lc "set -e; curl --proto '=https' --tlsv1.2 -LsSf https://astral.sh/uv/install.sh | sh"
 # Make uv available system-wide in chroot PATH
 schroot -c source:${dist}-${arch}-sbuild -d / -- bash -lc "install -m 0755 \"$HOME/.local/bin/uv\" /usr/local/bin/uv || cp -f \"$HOME/.local/bin/uv\" /usr/local/bin/uv"
-# Verify uv installed
-schroot -c source:${dist}-${arch}-sbuild -d / -- uv -V
+# Verify uv installed and ensure it's in PATH via /usr/bin
+schroot -c source:${dist}-${arch}-sbuild -d / -- bash -lc "ln -sf /usr/local/bin/uv /usr/bin/uv && /usr/bin/uv -V"
 
 # Install latest CMake version for Jammy and Bullseye
 if [ "$dist" = "jammy" ] || [ "$dist" = "bullseye" ]; then

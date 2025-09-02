@@ -9,15 +9,16 @@ on:
     - unstable
   workflow_call:
 
+
 jobs:
   build-source-package:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
+        dist: ${{ fromJSON(vars.BUILD_DISTS || '["bookworm"]') }}
+        arch: ${{ fromJSON(vars.BUILD_ARCHS || '["amd64"]') }}
+        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE || '[]') }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -39,22 +40,22 @@ jobs:
         mkdir -p redis-${VERSION}
         tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
         sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
-        
+
         echo "===== Updating all Redis module versions to 'master' ====="
         find redis-${VERSION}/modules -name "Makefile" -type f | while read -r makefile; do
           echo "Processing $makefile"
           echo "  Before change:"
           grep "MODULE_VERSION" "$makefile" || echo "  No MODULE_VERSION found"
-          
+
           # Update the MODULE_VERSION to 'master'
           sed -i 's/MODULE_VERSION = .*/MODULE_VERSION = master/g' "$makefile"
-          
+
           echo "  After change:"
           grep "MODULE_VERSION" "$makefile" || echo "  No MODULE_VERSION found after update"
           echo "-----------------------------------"
         done
         echo "===== Module version updates completed ====="
-        
+
         cp -pr debian redis-${VERSION}
         sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
         ( cd redis-${VERSION} && dpkg-buildpackage -S )
@@ -72,9 +73,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
+        dist: ${{ fromJSON(vars.BUILD_DISTS || '["bookworm"]') }}
+        arch: ${{ fromJSON(vars.BUILD_ARCHS || '["amd64"]') }}
+        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE || '[]') }}
     needs: build-source-package
     steps:
     - uses: actions/checkout@v4
@@ -121,6 +122,8 @@ jobs:
             --dist ${{ matrix.dist }} \
             --build-dep-resolver=apt \
             --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
+
+
             *.dsc
     - name: Upload binary package artifact
       uses: actions/upload-artifact@v4
@@ -135,8 +138,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
-        arch: [amd64, arm64]
+        image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES || '["debian:bookworm"]') }}
+        arch: ${{ fromJSON(vars.BUILD_ARCHS || '["amd64","arm64"]') }}
     container: ${{ matrix.image }}
     steps:
     - name: Extract distribution from image
