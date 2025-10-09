@@ -16,19 +16,30 @@ sudo apt-get install redis
 ```
 
 > [!TIP]
-> Redis will not start automatically, nor will it start at boot time. To do this, run the following commands.
-> ```sh
-> sudo systemctl enable redis-server
-> sudo systemctl start redis-server
-> ```
-
-> [!TIP]
 > To install an earlier version, say `7.4.2`, run the following command:
 > ```sh
 > sudo apt-get install redis=6:7.4.2-1rl1~jammy1
 > ```
 >
 > You could view the available versions by running `apt policy redis`.
+
+## Starting Redis
+
+To start the `redis-server`:
+```sh
+redis-server /etc/redis/redis.conf &
+```
+
+Note that `redis-server` output is redirected to `/var/log/redis/redis-server.log`.
+
+> [!TIP]
+> Redis will not start automatically, nor will it start at boot time. To do this, run the following commands.
+> ```sh
+> sudo systemctl enable redis-server
+> sudo systemctl start redis-server
+> ```
+
+This will start `redis-server` with `/etc/redis/redis.conf`.
 
 ## Supported Operating Systems
 
