@@ -64,4 +64,5 @@ jobs:
     - uses: ./.github/actions/run-smoke-tests
       with:
         image: ${{ matrix.image }}
+        arch: ${{ matrix.arch }}
         run_id: ${{ github.run_id }}
