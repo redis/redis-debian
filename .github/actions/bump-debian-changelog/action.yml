@@ -32,5 +32,5 @@ runs:
       uses: iarekylew00t/verified-bot-commit@v1
       with:
         message: ${{ inputs.release_tag }}
-        files: ${{ steps.apply-version.outputs.changed_files }}
+        files: ${{ steps.bump-version.outputs.changed_files }}
         ref: ${{ inputs.release_version_branch }}
