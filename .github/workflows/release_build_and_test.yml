@@ -1,6 +1,6 @@
 on:
-  push:
-    branches:
+  # push:
+  #   branches:
   workflow_dispatch:
     inputs:
       release_tag:
