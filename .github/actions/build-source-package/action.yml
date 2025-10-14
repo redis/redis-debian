@@ -10,18 +10,22 @@ runs:
   steps:
   - uses: actions/checkout@v4
   - name: Install dependencies
+    shell: bash
     run: |
         sudo apt-get update && \
         sudo apt-get install \
           debhelper dput tcl-tls libsystemd-dev pkg-config build-essential
   - name: Determine version
+    shell: bash
     run: |
         VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
   - name: Get source tarball
+    shell: bash
     run: |
         curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
   - name: Build source package
+    shell: bash
     run: |
         tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz
         cp -pr debian redis-${VERSION}
