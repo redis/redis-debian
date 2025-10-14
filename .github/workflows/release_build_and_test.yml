@@ -1,4 +1,5 @@
-name: Build and Publish to APT
+# This workflow is part of release automation process
+name: Release Build and Test
 
 on:
   push:
