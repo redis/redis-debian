@@ -1,0 +1,29 @@
+name: "Run smoke tests"
+inputs:
+  run_id:
+    description: "Run ID to download artifacts from"
+    required: true
+  image:
+    description: "Docker image to run smoke tests in"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Get binary packages
+    uses: actions/download-artifact@v4
+  - name: Install packages
+    shell: bash
+    run: |
+      apt-get update
+      cd binary-$(echo ${{ inputs.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
+  - name: Run redis-server smoke test
+    shell: bash
+    run: |
+      service redis-server start
+      redis-benchmark -P 10
+  - name: Run redis-sentinel smoke test
+    shell: bash
+    run: |
+      service redis-sentinel start
+      echo ping | redis-cli -p 26379

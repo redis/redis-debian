@@ -1,0 +1,71 @@
+name: "Build binary package"
+inputs:
+  run_id:
+    description: "Run ID to download artifacts from"
+    required: true
+  dist:
+    description: "Distribution to build for"
+    required: true
+  arch:
+    description: "Architecture to build for"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v4
+  - name: Determine build architecture
+    shell: bash
+    run: |
+        case ${{ inputs.arch }} in
+          i386)
+              BUILD_ARCH=i386
+              ;;
+          arm64)
+              BUILD_ARCH=arm64
+              ;;
+          armhf)
+              BUILD_ARCH=armhf
+              ;;
+          *)
+              BUILD_ARCH=amd64
+              ;;
+        esac
+
+        echo "BUILD_ARCH=${BUILD_ARCH}" >> $GITHUB_ENV
+  - name: Setup APT Signing key
+    shell: bash
+    run: |
+        mkdir -m 0700 -p ~/.gnupg
+        echo "$APT_SIGNING_KEY" | gpg --import
+    env:
+      APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+  - name: Install dependencies
+    shell: bash
+    run: |
+        sudo apt-get update && \
+        sudo apt-get install \
+          sbuild debhelper
+        sudo sbuild-adduser $USER
+  - name: Prepare sbuild environment
+    shell: bash
+    run: sudo ./setup_sbuild.sh ${{ inputs.dist }} ${{ env.BUILD_ARCH }}
+  - name: Get source package
+    uses: actions/download-artifact@v4
+    with:
+      name: source-${{ inputs.dist }}
+      run-id: ${{ inputs.run_id }}
+  - name: Build binary package
+    shell: bash
+    run: |
+        sudo sbuild \
+          --nolog \
+          --host ${{ inputs.arch }} \
+          --build ${{ env.BUILD_ARCH }} \
+          --dist ${{ inputs.dist }} *.dsc
+  - name: Upload binary package artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: binary-${{ inputs.dist }}-${{ inputs.arch }}
+      path: |
+        *.deb

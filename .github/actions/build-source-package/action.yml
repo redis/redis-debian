@@ -1,0 +1,37 @@
+name: "Build source package"
+
+inputs:
+  dist:
+    description: "Distribution to build for"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v4
+  - name: Install dependencies
+    run: |
+        sudo apt-get update && \
+        sudo apt-get install \
+          debhelper dput tcl-tls libsystemd-dev pkg-config build-essential
+  - name: Determine version
+    run: |
+        VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+  - name: Get source tarball
+    run: |
+        curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
+  - name: Build source package
+    run: |
+        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz
+        cp -pr debian redis-${VERSION}
+        sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
+        ( cd redis-${VERSION} && dpkg-buildpackage -S )
+  - name: Upload source package artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: source-${{ inputs.dist }}
+      path: |
+          *.debian.tar.*
+          *.dsc
+          redis_*.orig.tar.gz

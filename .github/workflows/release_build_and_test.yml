@@ -1,0 +1,14 @@
+name: Build and Publish to APT
+
+on:
+  push:
+    branches:
+
+jobs:
+  build-n-test:
+    uses: ./.github/workflows/build-n-test-all-distros.yml
+    with:
+      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
