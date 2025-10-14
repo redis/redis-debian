@@ -14,6 +14,31 @@ on:
 run-name: "Release Build and Test${{ github.event.inputs.workflow_uuid && format(': {0}', github.event.inputs.workflow_uuid) || '' }}"
 
 jobs:
+  prepare-release:
+    runs-on: ["ubuntu-latest"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Redis Release Archive
+        uses: redis-developer/redis-oss-release-automation/.github/actions/validate-redis-release-archive@main
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+
+      - name: Ensure Release Branch
+        id: ensure-branch
+        uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+          allow_modify: true
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump Debian Changelog
+        id: bump-changelog
+        uses: ./.github/actions/bump-debian-changelog
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+          release_version_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
   build-n-test:
     uses: ./.github/workflows/build-n-test-all-distros.yml
     with:
