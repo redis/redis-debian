@@ -27,11 +27,6 @@ runs:
       run: |
         ${{ github.action_path }}/bump-debian-changelog.sh ${{ inputs.release_tag }}
 
-    - name: Print changed files
-      run: |
-        echo "Changed files:  files: ${{ steps.bump-version.outputs.changed_files }}"
-        git diff
-
     - name: Create verified commit
       if: steps.bump-version.outputs.changed_files != ''
       uses: iarekylew00t/verified-bot-commit@v1
