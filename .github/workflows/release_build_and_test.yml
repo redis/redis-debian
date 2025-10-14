@@ -40,6 +40,7 @@ jobs:
           release_tag: ${{ github.event.inputs.release_tag }}
           release_version_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
   build-n-test:
+    needs: prepare-release
     uses: ./.github/workflows/build-n-test-all-distros.yml
     with:
       BUILD_DISTS: ${{ vars.BUILD_DISTS }}

@@ -4,6 +4,9 @@ inputs:
   dist:
     description: "Distribution to build for"
     required: true
+  arch:
+    description: "Architecture to build for"
+    required: true
 
 runs:
   using: "composite"
@@ -31,12 +34,12 @@ runs:
       tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
       sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
       cp -pr debian redis-${VERSION}
-      sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
+      sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
       ( cd redis-${VERSION} && dpkg-buildpackage -S )
   - name: Upload source package artifact
     uses: actions/upload-artifact@v4
     with:
-      name: source-${{ matrix.dist }}-${{ matrix.arch }}
+      name: source-${{ inputs.dist }}-${{ inputs.arch }}
       path: |
         redis_*.tar.xz
         redis_*.dsc
