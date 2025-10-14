@@ -1,9 +1,17 @@
-# This workflow is part of release automation process
-name: Release Build and Test
-
 on:
   push:
     branches:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to build'
+        required: true
+      workflow_uuid:
+        description: 'Optional UUID to identify this workflow run'
+        required: false
+
+# UUID is used to help automation to identify workflow run in the list of workflow runs.
+run-name: "Release Build and Test${{ github.event.inputs.workflow_uuid && format(': {0}', github.event.inputs.workflow_uuid) || '' }}"
 
 jobs:
   build-n-test:

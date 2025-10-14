@@ -16,7 +16,7 @@ on:
 
 jobs:
   build-source-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -29,7 +29,7 @@ jobs:
         dist: ${{ matrix.dist }}
 
   build-binary-package:
-    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-latest' }}
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-22.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +47,7 @@ jobs:
         run_id: ${{ github.run_id }}
 
   smoke-test-packages:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build-binary-package
     strategy:
       fail-fast: false
