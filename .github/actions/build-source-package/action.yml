@@ -12,30 +12,32 @@ runs:
   - name: Install dependencies
     shell: bash
     run: |
-        sudo apt-get update && \
-        sudo apt-get install \
-          debhelper dput tcl-tls libsystemd-dev pkg-config build-essential
+      sudo apt-get update && \
+      sudo apt-get install \
+      debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev
   - name: Determine version
     shell: bash
     run: |
-        VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
-        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
+      echo "VERSION=${VERSION}" >> $GITHUB_ENV
   - name: Get source tarball
     shell: bash
     run: |
-        curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
+      curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
   - name: Build source package
     shell: bash
     run: |
-        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz
-        cp -pr debian redis-${VERSION}
-        sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
-        ( cd redis-${VERSION} && dpkg-buildpackage -S )
+      mkdir -p redis-${VERSION}
+      tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
+      sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
+      cp -pr debian redis-${VERSION}
+      sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
+      ( cd redis-${VERSION} && dpkg-buildpackage -S )
   - name: Upload source package artifact
     uses: actions/upload-artifact@v4
     with:
-      name: source-${{ inputs.dist }}
+      name: source-${{ matrix.dist }}-${{ matrix.arch }}
       path: |
-          *.debian.tar.*
-          *.dsc
-          redis_*.orig.tar.gz
+        redis_*.tar.xz
+        redis_*.dsc
+        redis_*.orig.tar.gz

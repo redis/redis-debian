@@ -49,12 +49,11 @@ jobs:
   smoke-test-packages:
     runs-on: ubuntu-latest
     needs: build-binary-package
-    env:
-      ARCH: amd64
     strategy:
       fail-fast: false
       matrix:
         image: ${{ fromJSON(inputs.SMOKE_TEST_IMAGES) }}
+        arch: [amd64, arm64]
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code
