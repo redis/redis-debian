@@ -1,12 +1,10 @@
-name: Build and Publish to APT
+name: Build Pull Request
 
 on:
-  push:
-    branches:
-    - release/**
   pull_request:
     branches:
     - master
+    - release/*
 
 jobs:
   build-n-test:
@@ -16,20 +14,3 @@ jobs:
       BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
       BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
       SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
-
-  upload-packages:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
-    runs-on: ubuntu-latest
-    needs: build-n-test
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Upload
-      uses: ./.github/actions/upload
-      with:
-        run_id: ${{ github.run_id }}
-        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
-        APT_S3_ACCESS_KEY_ID: ${{ secrets.APT_S3_ACCESS_KEY_ID }}
-        APT_S3_SECRET_ACCESS_KEY: ${{ secrets.APT_S3_SECRET_ACCESS_KEY }}
-        APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
-        APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
