@@ -9,12 +9,16 @@ on:
       workflow_uuid:
         description: 'Optional UUID to identify this workflow run'
         required: false
+      run_id:
+        description: 'Run ID to download artifacts from'
+        required: true
 
 
 jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
+      # to configure-aws-credentials with a role
       id-token: write
       contents: read
 
@@ -22,25 +26,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
+      - name: Upload staging packages
+        uses: ./.github/actions/upload-packages
         with:
-          role-to-assume: ${{ secrets.APT_S3_IAM_ARN_STAGING }}
-          aws-region: us-east-1
-
-      - name: Test S3 bucket access
-        shell: bash
-        run: |
-          aws s3 ls s3://redis-test-package-repository/
-
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
-        with:
-          role-to-assume: ${{ secrets.APT_S3_IAM_ARN }}
-          aws-region: us-east-1
-
-      - name: Test S3 bucket access
-        shell: bash
-        run: |
-          aws s3 ls s3://redislabs-dev-apt-repository/
+          run_id: ${{ github.event.inputs.run_id }}
+          release_type: internal
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET_STAGING }}
+          APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
