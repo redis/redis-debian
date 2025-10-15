@@ -32,6 +32,7 @@ jobs:
         with:
           run_id: ${{ github.event.inputs.run_id }}
           release_type: internal
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
           APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET_STAGING }}
           APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
