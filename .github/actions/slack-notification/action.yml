@@ -19,6 +19,7 @@ runs:
   using: "composite"
   steps:
     - name: Send Slack notification
+      shell: bash
       run: |
         workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         footer="Repository: ${{ github.repository }} | Commit: \`${{ github.sha }}\` | View: <$workflow_url|workflow run>"

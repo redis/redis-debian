@@ -15,7 +15,7 @@ on:
 
 
 jobs:
-  test:
+  upload-packages:
     runs-on: ubuntu-latest
     permissions:
       # to configure-aws-credentials with a role
