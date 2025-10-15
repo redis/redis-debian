@@ -17,3 +17,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Print arn
+        run: echo ${{ secrets.APT_S3_IAM_ARN }} | base64
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: ${{ vars.AWS_STAGING_IAM_ROLE_ARN }}
+          aws-region: us-east-1
