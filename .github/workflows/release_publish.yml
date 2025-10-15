@@ -34,3 +34,4 @@ jobs:
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
           APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET_STAGING }}
           APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
+          APT_S3_IAM_ARN: ${{ secrets.APT_S3_IAM_ARN_STAGING }}

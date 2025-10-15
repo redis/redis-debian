@@ -10,6 +10,9 @@ inputs:
   APT_SIGNING_KEY:
     description: "APT Signing key"
     required: true
+  APT_S3_IAM_ARN:
+    description: "IAM ARN to assume for internal release"
+    required: false
   APT_S3_ACCESS_KEY_ID:
     description: "AWS Access Key ID"
     required: false
@@ -41,6 +44,11 @@ runs:
           echo "Missing aws credentials for public release"
           exit 1
         fi
+      elif [ "${{ inputs.release_type }}" = "internal" ]; then
+        if [ -z "${{ inputs.APT_S3_IAM_ARN }}" ]; then
+          echo "Missing required inputs for internal release"
+          exit 1
+        fi
       fi
       if  [ -z "${{ inputs.APT_S3_BUCKET }}" ] || [ -z "${{ inputs.APT_S3_REGION }}" ]; then
         echo "Missing required inputs for S3 bucket and region"
@@ -51,7 +59,7 @@ runs:
     if: ${{ inputs.release_type == 'internal' }}
     uses: aws-actions/configure-aws-credentials@v1.7.0
     with:
-      role-to-assume: ${{ secrets.APT_S3_IAM_ARN_STAGING }}
+      role-to-assume: ${{ inputs.APT_S3_IAM_ARN }}
       aws-region: us-east-1
 
   - name: Configure aws auth env for public release
