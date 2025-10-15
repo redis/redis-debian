@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Create Release Handle
         shell: bash
-        runs: |
+        run: |
           cat <<RELEASE_HANDLE >release_handle.json
           {
             "release_tag": "${{ github.event.inputs.release_tag }}",
