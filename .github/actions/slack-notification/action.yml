@@ -1,0 +1,30 @@
+inputs:
+  release_tag:
+    description: 'Release tag to build'
+    required: true
+  url_prefix:
+    description: 'Prefix to add to package URLs'
+    required: true
+  env:
+    description: 'Packages target s3 environment'
+    required: true
+  packages_json:
+    description: 'JSON structure of uploaded packages by distribution and architecture'
+    required: true
+  SLACK_WEB_HOOK_URL:
+    description: 'Slack web hook URL'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Send Slack notification
+      run: |
+        workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        footer="Repository: ${{ github.repository }} | Commit: \`${{ github.sha }}\` | View: <$workflow_url|workflow run>"
+
+        . ${{ github.action_path }}/../common/slack.sh
+
+        echo "${{ inputs.packages_json }}" | slack_format_success_message \
+         "${{ inputs.release_tag }}" "${{ inputs.url_prefix }}" "$footer" \
+        | curl -s --fail-with-body -d@- "${{ inputs.SLACK_WEB_HOOK_URL }}"

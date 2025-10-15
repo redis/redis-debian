@@ -27,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Upload staging packages
+        id: upload
         uses: ./.github/actions/upload-packages
         with:
           run_id: ${{ github.event.inputs.run_id }}
@@ -35,3 +36,12 @@ jobs:
           APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET_STAGING }}
           APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
           APT_S3_IAM_ARN: ${{ secrets.APT_S3_IAM_ARN_STAGING }}
+
+      - name: Send Slack notification
+        uses: ./.github/actions/slack-notification
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+          url_prefix: https://redis-test-package-repository.s3.us-east-2.amazonaws.com/deb/pool
+          env: staging
+          packages_json: ${{ steps.upload.outputs.packages_json }}
+          SLACK_WEB_HOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL }}
