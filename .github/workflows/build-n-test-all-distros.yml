@@ -62,7 +62,7 @@ jobs:
 
   smoke-test-packages:
     runs-on: ubuntu-22.04
-    if: fromJSON(needs.smoke-test-matrix.outputs.archs) != []
+    if: needs.smoke-test-matrix.outputs.archs != '[]'
     needs:
       - build-binary-package
       - smoke-test-archs
