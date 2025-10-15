@@ -49,14 +49,27 @@ jobs:
         arch: ${{ matrix.arch }}
         run_id: ${{ github.run_id }}
 
+  smoke-test-archs:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Filter archs for smoke tests
+      id: filter-archs
+      run: |
+        build_archs='${{ inputs.BUILD_ARCHS }}'
+        # Filter to only include amd64 and arm64 if they exist in BUILD_ARCHS
+        filtered_archs=$(echo "$build_archs" | jq '[.[] | select(. == "amd64" or . == "arm64")]')
+        echo "archs=$filtered_archs" >> $GITHUB_OUTPUT
+
   smoke-test-packages:
     runs-on: ubuntu-22.04
-    needs: build-binary-package
+    needs:
+      - build-binary-package
+      - smoke-test-archs
     strategy:
       fail-fast: false
       matrix:
         image: ${{ fromJSON(inputs.SMOKE_TEST_IMAGES) }}
-        arch: [amd64, arm64]
+        arch: ${{ fromJSON(needs.smoke-test-matrix.outputs.archs) }}
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code
