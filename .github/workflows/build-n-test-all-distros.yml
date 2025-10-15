@@ -32,7 +32,7 @@ jobs:
         arch: ${{ matrix.arch }}
 
   build-binary-package:
-    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-22.04' }}
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +50,9 @@ jobs:
         run_id: ${{ github.run_id }}
 
   smoke-test-archs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    outputs:
+      archs: ${{ steps.filter-archs.outputs.archs }}
     steps:
     - name: Filter archs for smoke tests
       id: filter-archs
@@ -58,10 +60,11 @@ jobs:
         build_archs='${{ inputs.BUILD_ARCHS }}'
         # Filter to only include amd64 and arm64 if they exist in BUILD_ARCHS
         filtered_archs=$(echo "$build_archs" | jq -c 'map(select(. == "amd64" or . == "arm64"))')
+        echo "archs=$filtered_archs"
         echo "archs=$filtered_archs" >> $GITHUB_OUTPUT
 
   smoke-test-packages:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
       - build-binary-package
       - smoke-test-archs
