@@ -35,7 +35,7 @@ inputs:
 outputs:
   packages_json:
     description: "JSON structure of uploaded packages by distribution and architecture"
-    value: ${{ steps.upload.outputs.packages_json }}
+    value: ${{ steps.upload-packages.outputs.packages_json }}
 
 
 runs:
@@ -104,6 +104,7 @@ runs:
         gem install deb-s3-${{ inputs.DEB_S3_VERSION }}.gem
 
   - name: Upload packages
+    id: upload-packages
     shell: bash
     run: |
       if [ "${{ inputs.release_type }}" = "public" ]; then
