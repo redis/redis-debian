@@ -62,7 +62,6 @@ jobs:
 
   smoke-test-packages:
     runs-on: ubuntu-22.04
-    if: needs.smoke-test-matrix.outputs.archs != '[]'
     needs:
       - build-binary-package
       - smoke-test-archs
@@ -70,7 +69,7 @@ jobs:
       fail-fast: false
       matrix:
         image: ${{ fromJSON(inputs.SMOKE_TEST_IMAGES) }}
-        arch: ${{ fromJSON(needs.smoke-test-matrix.outputs.archs) }}
+        arch: ${{ fromJSON(needs.smoke-test-archs.outputs.archs) }}
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code

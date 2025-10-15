@@ -39,6 +39,7 @@ jobs:
         with:
           release_tag: ${{ github.event.inputs.release_tag }}
           release_version_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
+
   build-n-test:
     needs: prepare-release
     uses: ./.github/workflows/build-n-test-all-distros.yml
@@ -47,3 +48,25 @@ jobs:
       BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
       BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
       SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+
+  create-release-handle:
+    needs: build-n-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release Handle
+        shell: bash
+        runs: |
+          cat <<RELEASE_HANDLE >release_handle.json
+          {
+            "release_tag": "${{ github.event.inputs.release_tag }}",
+            "run_id": ${{ github.run_id }},
+            "workflow_uuid": "${{ github.event.inputs.workflow_uuid }}"
+          }
+          RELEASE_HANDLE
+
+      - name: Upload release handle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_handle
+          path: release_handle.json
+          retention-days: 400
