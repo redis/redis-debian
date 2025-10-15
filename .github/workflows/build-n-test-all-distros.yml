@@ -57,11 +57,12 @@ jobs:
       run: |
         build_archs='${{ inputs.BUILD_ARCHS }}'
         # Filter to only include amd64 and arm64 if they exist in BUILD_ARCHS
-        filtered_archs=$(echo "$build_archs" | jq '[.[] | select(. == "amd64" or . == "arm64")]')
+        filtered_archs=$(echo "$build_archs" | jq -c 'map(select(. == "amd64" or . == "arm64"))')
         echo "archs=$filtered_archs" >> $GITHUB_OUTPUT
 
   smoke-test-packages:
     runs-on: ubuntu-22.04
+    if: fromJSON(needs.smoke-test-matrix.outputs.archs) != []
     needs:
       - build-binary-package
       - smoke-test-archs
