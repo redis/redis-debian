@@ -33,3 +33,14 @@ jobs:
         shell: bash
         run: |
           aws s3 ls s3://redis-test-package-repository/
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: ${{ secrets.APT_S3_IAM_ARN }}
+          aws-region: us-east-1
+
+      - name: Test S3 bucket access
+        shell: bash
+        run: |
+          aws s3 ls s3://redislabs-dev-apt-repository/
