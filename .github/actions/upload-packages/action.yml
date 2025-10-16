@@ -64,6 +64,7 @@ runs:
         exit 1
       fi
 
+  # For internal release we have an IAM role that we need to assume
   - name: Configure aws credentials for internal release
     if: ${{ inputs.release_type == 'internal' }}
     uses: aws-actions/configure-aws-credentials@v1.7.0
@@ -71,6 +72,7 @@ runs:
       role-to-assume: ${{ inputs.APT_S3_IAM_ARN }}
       aws-region: us-east-1
 
+  # For public release we don't have an IAM role, so we need to use the access key and secret
   - name: Configure aws auth env for public release
     shell: bash
     if: ${{ inputs.release_type == 'public' }}
