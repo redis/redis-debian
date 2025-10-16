@@ -9,6 +9,9 @@ on:
       workflow_uuid:
         description: 'Optional UUID to identify this workflow run'
         required: false
+      release_type:
+        description: 'Type of release to upload (public, internal)'
+        required: true
 
 # UUID is used to help automation to identify workflow run in the list of workflow runs.
 run-name: "Release Build and Test${{ github.event.inputs.workflow_uuid && format(': {0}', github.event.inputs.workflow_uuid) || '' }}"
@@ -39,6 +42,7 @@ jobs:
         with:
           release_tag: ${{ github.event.inputs.release_tag }}
           release_version_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
+          release_type: ${{ github.event.inputs.release_type }}
 
   build-n-test:
     needs: prepare-release
@@ -62,6 +66,7 @@ jobs:
             "release_tag": "${{ github.event.inputs.release_tag }}",
             "run_id": ${{ github.run_id }},
             "workflow_uuid": "${{ github.event.inputs.workflow_uuid }}"
+            "release_type": "${{ github.event.inputs.release_type }}"
           }
           RELEASE_HANDLE
 
