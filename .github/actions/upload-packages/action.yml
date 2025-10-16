@@ -133,7 +133,7 @@ runs:
           packages_json=$(echo $packages_json \
           | jq --arg dist "$dist" \
           --arg arch "$arch" \
-          --arg packages "$(ls $dir/*.deb)" \
+          --arg packages "$(ls $dir/*.deb | xargs -L1 basename)" \
           '.[$dist][$arch] += ($packages | split("\n") | map(select(length > 0)))')
       done
 
