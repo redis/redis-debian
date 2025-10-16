@@ -7,6 +7,9 @@ inputs:
   release_type:
     description: "Type of release to upload (public, internal)"
     required: true
+  gh_token:
+    description: "GitHub token"
+    required: true
   APT_SIGNING_KEY:
     description: "APT Signing key"
     required: true
@@ -28,6 +31,12 @@ inputs:
   DEB_S3_VERSION:
     description: "deb-s3 version to use"
     default: "0.11.3"
+
+outputs:
+  packages_json:
+    description: "JSON structure of uploaded packages by distribution and architecture"
+    value: ${{ steps.upload-packages.outputs.packages_json }}
+
 
 runs:
   using: "composite"
@@ -81,6 +90,7 @@ runs:
     uses: actions/download-artifact@v4
     with:
       run-id: ${{ inputs.run_id }}
+      github-token: ${{ inputs.gh_token }}
 
   - name: Setup ruby
     uses: ruby/setup-ruby@v1
@@ -94,6 +104,7 @@ runs:
         gem install deb-s3-${{ inputs.DEB_S3_VERSION }}.gem
 
   - name: Upload packages
+    id: upload-packages
     shell: bash
     run: |
       if [ "${{ inputs.release_type }}" = "public" ]; then
@@ -122,6 +133,10 @@ runs:
           packages_json=$(echo $packages_json \
           | jq --arg dist "$dist" \
           --arg arch "$arch" \
-          --arg packages "$(ls $dir/*.deb)" \
+          --arg packages "$(ls $dir/*.deb | xargs -L1 basename)" \
           '.[$dist][$arch] += ($packages | split("\n") | map(select(length > 0)))')
       done
+
+      echo "packages_json<<EOF" >> $GITHUB_OUTPUT
+      echo "$packages_json" >> $GITHUB_OUTPUT
+      echo "EOF" >> $GITHUB_OUTPUT
