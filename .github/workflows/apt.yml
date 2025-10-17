@@ -27,4 +27,5 @@ jobs:
         || github.event_name == 'workflow_dispatch'
         || github.event_name == 'workflow_call')
         && 'unstable'
+        || ''
         }}
