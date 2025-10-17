@@ -26,7 +26,8 @@ jobs:
     permissions:
       # to configure-aws-credentials with a role
       id-token: write
-      contents: read
+      # to merge changes into release
+      contents: write
 
     steps:
       - name: Checkout code
