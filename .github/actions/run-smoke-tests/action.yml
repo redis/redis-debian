@@ -37,6 +37,7 @@ runs:
     run: |
       /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes
       sleep 3
+      redis-cli ping || { cat /var/log/redis/redis-server.log ; exit 112; }
       redis-benchmark -P 10
   - name: Verify installed modules
     shell: bash
