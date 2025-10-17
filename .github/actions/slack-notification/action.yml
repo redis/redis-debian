@@ -51,8 +51,7 @@ runs:
           exit 1
         fi
 
-        . ${GITHUB_WORKSPACE}/.github/actions/common/func.sh
-
+        . ${{ github.action_path }}/../common/slack.sh
 
         slack_format_failure_message "$msg for Redis: ${{ inputs.release_tag || 'unknown'}} (${{ inputs.env }})" "$workflow_url" "$footer" \
         | curl -s --fail-with-body -d@- "${{ secrets.SLACK_WEB_HOOK_URL }}"
