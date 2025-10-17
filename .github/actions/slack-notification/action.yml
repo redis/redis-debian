@@ -46,7 +46,7 @@ runs:
         workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         footer="Repository: ${{ github.repository }} | Commit: \`${{ github.sha }}\`"
 
-        msg = ${{ inputs.message }}
+        msg=${{ inputs.message }}
         if [ -z "$msg" ]; then
           echo "Error: message is required"
           exit 1
