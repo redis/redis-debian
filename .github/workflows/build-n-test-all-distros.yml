@@ -27,7 +27,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Ensure Release Branch
-      if: github.event.inputs.release_tag != ''
+      if: github.event.inputs.release_tag != '' && github.event.inputs.release_tag != 'unstable'
       id: ensure-branch
       uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
       with:
@@ -51,7 +51,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Ensure Release Branch
-      if: github.event.inputs.release_tag != ''
+      if: github.event.inputs.release_tag != '' && github.event.inputs.release_tag != 'unstable'
       id: ensure-branch
       uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
       with:

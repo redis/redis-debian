@@ -5,6 +5,14 @@ on:
     branches:
     - master
     - release/*
+    - unstable
+  push:
+    branches:
+    - master
+    - release/*
+    - unstable
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   build-n-test:
@@ -14,3 +22,9 @@ jobs:
       BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
       BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
       SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      release_tag: >-
+        ${{ (github.ref_name == 'unstable'
+        || github.event_name == 'workflow_dispatch'
+        || github.event_name == 'workflow_call')
+        && 'unstable'
+        }}
