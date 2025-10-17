@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     - name: Send Slack notification
-      if: ${{ inputs.slack_func == 'slack_format_success_message' }}
+      if: inputs.slack_func == 'slack_format_success_message'
       shell: bash
       run: |
         workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -40,7 +40,8 @@ runs:
         JSON
 
     - name: Send Failure Slack notification
-      if: ${{ inputs.slack_func == 'slack_format_failure_message' }}
+      if: inputs.slack_func == 'slack_format_failure_message'
+      shell: bash
       run: |
         workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         footer="Repository: ${{ github.repository }} | Commit: \`${{ github.sha }}\`"
@@ -54,4 +55,4 @@ runs:
         . ${{ github.action_path }}/../common/slack.sh
 
         slack_format_failure_message "$msg for Redis: ${{ inputs.release_tag || 'unknown'}} (${{ inputs.env }})" "$workflow_url" "$footer" \
-        | curl -s --fail-with-body -d@- "${{ secrets.SLACK_WEB_HOOK_URL }}"
+        | curl -s --fail-with-body -d@- "${{ inputs.SLACK_WEB_HOOK_URL }}"
