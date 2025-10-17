@@ -27,7 +27,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Ensure Release Branch
-      if: github.event.inputs.release_tag != '' && github.event.inputs.release_tag != 'unstable'
+      if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
       uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
       with:
@@ -37,6 +37,7 @@ jobs:
     - uses: ./.github/actions/build-source-package
       with:
         dist: ${{ matrix.dist }}
+        release_tag: ${{ inputs.release_tag }}
 
   build-binary-package:
     runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
@@ -51,7 +52,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Ensure Release Branch
-      if: github.event.inputs.release_tag != '' && github.event.inputs.release_tag != 'unstable'
+      if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
       uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
       with:

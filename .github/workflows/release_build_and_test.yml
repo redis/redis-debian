@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release tag to build'
-        required: true
+        description: 'Release tag to build, may be "unstable" for latest unstable release'
+        required: false
       workflow_uuid:
         description: 'Optional UUID to identify this workflow run'
         required: false
