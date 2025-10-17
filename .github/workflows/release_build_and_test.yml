@@ -78,9 +78,9 @@ jobs:
           path: result.json
           retention-days: 90
 
-    # Notify only about build failures
-    # as publish workflow will notify about publish success or failure
-    slack-failure-notification:
+  # Notify only about build failures
+  # as publish workflow will notify about publish success or failure
+  slack-failure-notification:
     needs: build-n-test
     runs-on: ubuntu-latest
     if: failure()
