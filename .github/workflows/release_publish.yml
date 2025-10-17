@@ -13,9 +13,6 @@ on:
       workflow_uuid:
         description: 'Optional UUID to identify this workflow run'
         required: false
-      run_id:
-        description: 'Run ID to download artifacts from'
-        required: true
       release_handle:
         description: 'JSON string containing release handle information'
         required: true
