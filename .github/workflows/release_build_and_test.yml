@@ -61,7 +61,7 @@ jobs:
       - name: Create Release Handle
         shell: bash
         run: |
-          cat <<RELEASE_HANDLE >release_handle.json
+          cat <<RELEASE_HANDLE >result.json
           {
             "release_tag": "${{ github.event.inputs.release_tag }}",
             "run_id": ${{ github.run_id }},
@@ -74,5 +74,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release_handle
-          path: release_handle.json
+          path: result.json
           retention-days: 400

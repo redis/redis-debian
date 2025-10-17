@@ -5,6 +5,10 @@ inputs:
   release_version_branch:
     description: 'Release version branch to commit to'
     required: true
+  # release_type currently is not used, but we keep it for future use
+  release_type:
+    description: 'Type of release to upload (public, internal)'
+    required: true
 
 outputs:
   changed_files:
