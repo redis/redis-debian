@@ -54,3 +54,47 @@ def generate_repo_prefix(package_name):
   )
 }'
 }
+slack_format_failure_message() {
+    header=$1
+    workflow_url=$2
+    footer=$3
+    if [ -z "$header" ]; then
+        header=" "
+    fi
+    if [ -z "$footer" ]; then
+        footer=" "
+    fi
+
+# Create Slack message payload
+    cat << EOF
+{
+"icon_emoji": ":redis-circle:",
+"text": "$header",
+"blocks": [
+    {
+    "type": "header",
+    "text": {
+        "type": "plain_text",
+        "text": "❌  $header"
+    }
+    },
+    {
+    "type": "section",
+    "text": {
+        "type": "mrkdwn",
+        "text": "Workflow run: $workflow_url"
+    }
+    },
+    {
+    "type": "context",
+    "elements": [
+        {
+        "type": "mrkdwn",
+        "text": "$footer"
+        }
+    ]
+    }
+]
+}
+EOF
+}

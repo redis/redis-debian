@@ -1,3 +1,4 @@
+# This workflow is part of the Redis OSS release automation process.
 on:
   # push:
   #   branches:
@@ -75,4 +76,30 @@ jobs:
         with:
           name: release_handle
           path: result.json
-          retention-days: 400
+          retention-days: 90
+
+    # Notify only about build failures
+    # as publish workflow will notify about publish success or failure
+    slack-failure-notification:
+    needs: build-n-test
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Detect env name
+        id: detect-env
+        run: |
+          if [ "${{ inputs.release_type }}" = "public" ]; then
+            env_name="production"
+          elif [ "${{ inputs.release_type }}" = "internal" ]; then
+            env_name="staging"
+          fi
+          echo "env_name=$env_name" >> $GITHUB_OUTPUT
+      - name: Send Failure Slack notification
+        if: failure()
+        uses: ./.github/actions/slack-notification
+        with:
+          slack_func: slack_format_failure_message
+          release_tag: ${{ github.event.inputs.release_tag }}
+          env: ${{ steps.detect-env.outputs.env_name }}
+          message: ":debian: Debian package build failed"
+          SLACK_WEB_HOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL }}

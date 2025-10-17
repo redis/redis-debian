@@ -1,4 +1,7 @@
 inputs:
+  slack_func:
+    description: 'Slack message format function to use'
+    required:  true
   release_tag:
     description: 'Release tag to build'
     required: true
@@ -11,6 +14,9 @@ inputs:
   packages_json:
     description: 'JSON structure of uploaded packages by distribution and architecture'
     required: true
+  message:
+    description: 'Message to send in case of failure'
+    required: false
   SLACK_WEB_HOOK_URL:
     description: 'Slack web hook URL'
     required: true
@@ -19,6 +25,7 @@ runs:
   using: "composite"
   steps:
     - name: Send Slack notification
+      if: ${{ inputs.slack_func == 'slack_format_success_message' }}
       shell: bash
       run: |
         workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -31,3 +38,21 @@ runs:
         | curl -s --fail-with-body -d@- "${{ inputs.SLACK_WEB_HOOK_URL }}"
         ${{ inputs.packages_json }}
         JSON
+
+    - name: Send Failure Slack notification
+      if: ${{ inputs.slack_func == 'slack_format_failure_message' }}
+      run: |
+        workflow_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        footer="Repository: ${{ github.repository }} | Commit: \`${{ github.sha }}\`"
+
+        msg = ${{ inputs.message }}
+        if [ -z "$msg" ]; then
+          echo "Error: message is required"
+          exit 1
+        fi
+
+        . ${GITHUB_WORKSPACE}/.github/actions/common/func.sh
+
+
+        slack_format_failure_message "$msg for Redis: ${{ inputs.release_tag || 'unknown'}} (${{ inputs.env }})" "$workflow_url" "$footer" \
+        | curl -s --fail-with-body -d@- "${{ secrets.SLACK_WEB_HOOK_URL }}"
