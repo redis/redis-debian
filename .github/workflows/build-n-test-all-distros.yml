@@ -23,8 +23,6 @@ jobs:
       fail-fast: false
       matrix:
         dist: ${{ fromJSON(inputs.BUILD_DISTS) }}
-        arch: ${{ fromJSON(inputs.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(inputs.BUILD_EXCLUDE) }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
