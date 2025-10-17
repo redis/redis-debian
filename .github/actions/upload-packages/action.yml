@@ -63,7 +63,7 @@ runs:
         echo "Missing required inputs for S3 bucket and region"
         exit 1
       fi
-      if [ -z "${ inputs.run_id }" ]; then
+      if [ -z "${{ inputs.run_id }}" ]; then
         echo "Missing required inputs for run_id"
         exit 1
       fi
