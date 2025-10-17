@@ -4,9 +4,6 @@ inputs:
   dist:
     description: "Distribution to build for"
     required: true
-  arch:
-    description: "Architecture to build for"
-    required: true
 
 runs:
   using: "composite"
@@ -42,7 +39,7 @@ runs:
   - name: Upload source package artifact
     uses: actions/upload-artifact@v4
     with:
-      name: source-${{ inputs.dist }}-${{ inputs.arch }}
+      name: source-${{ inputs.dist }}
       path: |
         redis_*.tar.xz
         redis_*.dsc
