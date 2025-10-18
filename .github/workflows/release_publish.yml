@@ -41,11 +41,14 @@ jobs:
             exit 1
           fi
           if [ "${{ inputs.release_type }}" = "public" ]; then
+            url_prefix="https://packages.redis.io/deb/pool"
             env_name="production"
           else
+            url_prefix="https://redis-test-package-repository.s3.us-east-2.amazonaws.com/deb/pool"
             env_name="staging"
           fi
           echo "env_name=$env_name" >> $GITHUB_OUTPUT
+          echo "url_prefix=$url_prefix" >> $GITHUB_OUTPUT
 
       - name: Ensure Release Branch
         id: ensure-branch
@@ -108,7 +111,7 @@ jobs:
         with:
           slack_func: slack_format_success_message
           release_tag: ${{ github.event.inputs.release_tag }}
-          url_prefix: https://redis-test-package-repository.s3.us-east-2.amazonaws.com/deb/pool
+          url_prefix: ${{ steps.validate-inputs.outputs.url_prefix }}
           env: ${{ steps.validate-inputs.outputs.env_name }}
           packages_json: ${{ steps.upload.outputs.packages_json }}
           SLACK_WEB_HOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL }}

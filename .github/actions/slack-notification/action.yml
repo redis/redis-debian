@@ -34,7 +34,7 @@ runs:
         . ${{ github.action_path }}/../common/slack.sh
 
         cat <<'JSON' | slack_format_success_message \
-        "${{ inputs.release_tag }}" "${{ inputs.url_prefix }}" "$footer" \
+        "${{ inputs.release_tag }}" "${{ inputs.url_prefix }}" "$footer" "${{ inputs.env }}" \
         | curl -s --fail-with-body -d@- "${{ inputs.SLACK_WEB_HOOK_URL }}"
         ${{ inputs.packages_json }}
         JSON
