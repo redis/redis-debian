@@ -11,7 +11,7 @@ def generate_repo_prefix(package_name):
     [
       {
         "type": "header",
-        "text": { "type": "plain_text", "text": (":debian: Debian Packages Published for Release " + $release_tag) }
+        "text": { "type": "plain_text", "text": (":debian: Debian Packages Published for Release " + $release_tag + " (" + $env + ")") }
       },
       {
         "type": "section",

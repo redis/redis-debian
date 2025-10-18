@@ -84,6 +84,14 @@ jobs:
           to_branch: ${{ steps.ensure-branch.outputs.release_branch }}
           gh_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create version tag
+        uses: redis-developer/redis-oss-release-automation/.github/actions/create-tag-verified@main
+        if: steps.merge-back.outputs.merge_commit_sha != ''
+        with:
+          tag: v${{ inputs.release_tag }}
+          ref: ${{ steps.merge-back.outputs.merge_commit_sha }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release info
         shell: bash
         run: |
