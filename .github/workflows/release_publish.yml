@@ -1,0 +1,136 @@
+# This workflow is part of the Redis OSS release automation process.
+on:
+  # push:
+  #   branches:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to build'
+        required: true
+      release_type:
+        description: 'Type of release to upload (public, internal)'
+        required: true
+      workflow_uuid:
+        description: 'Optional UUID to identify this workflow run'
+        required: false
+      release_handle:
+        description: 'JSON string containing release handle information'
+        required: true
+
+# UUID is used to help automation to identify workflow run in the list of workflow runs.
+run-name: "Release Publish${{ github.event.inputs.workflow_uuid && format(': {0}', github.event.inputs.workflow_uuid) || '' }}"
+
+jobs:
+  upload-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      # to configure-aws-credentials with a role
+      id-token: write
+      # to merge changes into release
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate inputs
+        id: validate-inputs
+        run: |
+          if [ "${{ inputs.release_type }}" != "public" ] && [ "${{ inputs.release_type }}" != "internal" ]; then
+            echo "Invalid release_type: ${{ inputs.release_type }}"
+            exit 1
+          fi
+          if [ "${{ inputs.release_type }}" = "public" ]; then
+            url_prefix="https://packages.redis.io/deb/pool"
+            env_name="production"
+          else
+            url_prefix="https://redis-test-package-repository.s3.us-east-2.amazonaws.com/deb/pool"
+            env_name="staging"
+          fi
+          echo "env_name=$env_name" >> $GITHUB_OUTPUT
+          echo "url_prefix=$url_prefix" >> $GITHUB_OUTPUT
+
+      - name: Ensure Release Branch
+        id: ensure-branch
+        uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+          allow_modify: false
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse release handle
+        id: parse-handle
+        uses: ./.github/actions/parse-release-handle
+        with:
+          release_handle: ${{ github.event.inputs.release_handle }}
+
+      - name: Upload staging packages
+        id: upload
+        uses: ./.github/actions/upload-packages
+        with:
+          run_id: ${{ steps.parse-handle.outputs.run_id }}
+          release_type: ${{ github.event.inputs.release_type }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET_STAGING }}
+          APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
+          APT_S3_IAM_ARN: ${{ secrets.APT_S3_IAM_ARN_STAGING }}
+
+      - name: Merge back to release branch
+        id: merge-back
+        uses: redis-developer/redis-oss-release-automation/.github/actions/merge-branches-verified@main
+        with:
+          from_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
+          to_branch: ${{ steps.ensure-branch.outputs.release_branch }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create version tag
+        uses: redis-developer/redis-oss-release-automation/.github/actions/create-tag-verified@main
+        if: steps.merge-back.outputs.merge_commit_sha != ''
+        with:
+          tag: v${{ inputs.release_tag }}
+          ref: ${{ steps.merge-back.outputs.merge_commit_sha }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release info
+        shell: bash
+        run: |
+          cat <<JQ > jq
+          {
+            release_tag: "${{ github.event.inputs.release_tag }}",
+            release_type: "${{ github.event.inputs.release_type }}",
+            run_id: ${{ github.run_id }},
+            packages: .
+          }
+          JQ
+          cat <<RESULT | jq -f jq >result.json
+          ${{ steps.upload.outputs.packages_json }}
+          RESULT
+
+      - name: Upload publish result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_info
+          path: result.json
+          retention-days: 90
+
+      - name: Send Success Slack notification
+        uses: ./.github/actions/slack-notification
+        with:
+          slack_func: slack_format_success_message
+          release_tag: ${{ github.event.inputs.release_tag }}
+          url_prefix: ${{ steps.validate-inputs.outputs.url_prefix }}
+          env: ${{ steps.validate-inputs.outputs.env_name }}
+          packages_json: ${{ steps.upload.outputs.packages_json }}
+          SLACK_WEB_HOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL }}
+
+      - name: Send Failure Slack notification
+        if: failure()
+        uses: ./.github/actions/slack-notification
+        with:
+          slack_func: slack_format_failure_message
+          release_tag: ${{ github.event.inputs.release_tag }}
+          env: ${{ steps.validate-inputs.outputs.env_name }}
+          packages_json: ${{ steps.upload.outputs.packages_json }}
+          message: ":debian: Debian package upload failed"
+          SLACK_WEB_HOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL }}

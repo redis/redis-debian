@@ -1,0 +1,149 @@
+name: "Upload deb to S3"
+
+inputs:
+  run_id:
+    description: "Run ID to download artifacts from"
+    required: true
+  release_type:
+    description: "Type of release to upload (public, internal)"
+    required: true
+  gh_token:
+    description: "GitHub token"
+    required: true
+  APT_SIGNING_KEY:
+    description: "APT Signing key"
+    required: true
+  APT_S3_IAM_ARN:
+    description: "IAM ARN to assume for internal release"
+    required: false
+  APT_S3_ACCESS_KEY_ID:
+    description: "AWS Access Key ID"
+    required: false
+  APT_S3_SECRET_ACCESS_KEY:
+    description: "AWS Secret Access Key"
+    required: false
+  APT_S3_BUCKET:
+    description: "S3 bucket to upload to"
+    required: false
+  APT_S3_REGION:
+    description: "S3 region to upload to"
+    required: false
+  DEB_S3_VERSION:
+    description: "deb-s3 version to use"
+    default: "0.11.3"
+
+outputs:
+  packages_json:
+    description: "JSON structure of uploaded packages by distribution and architecture"
+    value: ${{ steps.upload-packages.outputs.packages_json }}
+
+
+runs:
+  using: "composite"
+  steps:
+  - name: Validate inputs
+    shell: bash
+    run: |
+      if [ "${{ inputs.release_type }}" != "public" ] && [ "${{ inputs.release_type }}" != "internal" ]; then
+        echo "Invalid release_type: ${{ inputs.release_type }}"
+        exit 1
+      fi
+      if [ "${{ inputs.release_type }}" = "public" ]; then
+        if [ -z "${{ inputs.APT_S3_ACCESS_KEY_ID }}" ] || [ -z "${{ inputs.APT_S3_SECRET_ACCESS_KEY }}" ]; then
+          echo "Missing aws credentials for public release"
+          exit 1
+        fi
+      elif [ "${{ inputs.release_type }}" = "internal" ]; then
+        if [ -z "${{ inputs.APT_S3_IAM_ARN }}" ]; then
+          echo "Missing required inputs for internal release"
+          exit 1
+        fi
+      fi
+      if  [ -z "${{ inputs.APT_S3_BUCKET }}" ] || [ -z "${{ inputs.APT_S3_REGION }}" ]; then
+        echo "Missing required inputs for S3 bucket and region"
+        exit 1
+      fi
+      if [ -z "${{ inputs.run_id }}" ]; then
+        echo "Missing required inputs for run_id"
+        exit 1
+      fi
+      echo "Will download artifacts from workflow wth Run ID: ${{ inputs.run_id }}"
+
+  # For internal release we have an IAM role that we need to assume
+  - name: Configure aws credentials for internal release
+    if: ${{ inputs.release_type == 'internal' }}
+    uses: aws-actions/configure-aws-credentials@v1.7.0
+    with:
+      role-to-assume: ${{ inputs.APT_S3_IAM_ARN }}
+      aws-region: us-east-1
+
+  # For public release we don't have an IAM role, so we need to use the access key and secret
+  - name: Configure aws auth env for public release
+    shell: bash
+    if: ${{ inputs.release_type == 'public' }}
+    run: |
+      echo "AWS_ACCESS_KEY_ID=${{ inputs.APT_S3_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+      echo "AWS_SECRET_ACCESS_KEY=${{ inputs.APT_S3_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+
+  - name: Setup APT Signing key
+    shell: bash
+    run: |
+        mkdir -m 0700 -p ~/.gnupg
+        echo "$APT_SIGNING_KEY" | gpg --import
+    env:
+      APT_SIGNING_KEY: ${{ inputs.APT_SIGNING_KEY }}
+
+  - name: Get binary packages
+    uses: actions/download-artifact@v4
+    with:
+      run-id: ${{ inputs.run_id }}
+      github-token: ${{ inputs.gh_token }}
+
+  - name: Setup ruby
+    uses: ruby/setup-ruby@v1
+    with:
+      ruby-version: "2.7"
+
+  - name: Install deb-s3
+    shell: bash
+    run: |
+        curl -sLO https://github.com/deb-s3/deb-s3/releases/download/${{ inputs.DEB_S3_VERSION }}/deb-s3-${{ inputs.DEB_S3_VERSION }}.gem
+        gem install deb-s3-${{ inputs.DEB_S3_VERSION }}.gem
+
+  - name: Upload packages
+    id: upload-packages
+    shell: bash
+    run: |
+      if [ "${{ inputs.release_type }}" = "public" ]; then
+        fail_if_exists="--fail-if-exists"
+      fi
+      # Quick hack to deal with duplicate _all packages
+      rm -f binary-*-i386/*_all.deb
+      packages_json='{}'
+      for dir in binary-*; do
+          dist=$(echo $dir | cut -d- -f 2) ;
+          arch=$(echo $dir | cut -d- -f 3) ;
+          deb-s3 upload  \
+              --bucket ${{ inputs.APT_S3_BUCKET }} \
+              --s3-region ${{ inputs.APT_S3_REGION }} \
+              --codename $dist \
+              --suite $dist \
+              --origin packages.redis.io \
+              --preserve-versions \
+              --lock \
+              $fail_if_exists \
+              --sign \
+              --prefix deb \
+              $dir/*.deb ;
+
+          # build json structure incrementally
+          packages_json=$(echo $packages_json \
+          | jq --arg dist "$dist" \
+          --arg arch "$arch" \
+          --arg packages "$(ls $dir/*.deb | xargs -L1 basename)" \
+          '.[$dist][$arch] += ($packages | split("\n") | map(select(length > 0)))')
+      done
+
+      echo "packages_json<<EOF" >> $GITHUB_OUTPUT
+      echo "$packages_json" >> $GITHUB_OUTPUT
+      echo "EOF" >> $GITHUB_OUTPUT
