@@ -24,8 +24,6 @@ Build-Depends:
  g++ <!cross>,
  clang <!cross>,
  systemd,
- llvm,
- libclang-dev,
  procps <!nocheck>,
  tcl <!nocheck>,
  tcl-tls <!nocheck>
