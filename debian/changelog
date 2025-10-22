@@ -1,3 +1,27 @@
+redis (6:8.2.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 8.2.2: https://github.com/redis/redis/releases/tag/8.2.2
+
+ -- Redis Team <redis@redis.io>  Fri, 03 Oct 2025 11:19:00 +0300
+
+redis (6:8.2.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 8.2.1: https://github.com/redis/redis/releases/tag/8.2.1
+
+ -- Redis Team <redis@redis.io>  Sun, 18 Aug 2025 12:00:00 +0300
+
+redis (6:8.2.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 8.2.0: https://github.com/redis/redis/releases/tag/8.2.0
+
+ -- Redis Team <redis@redis.io>  Mon, 04 Aug 2025 16:39:20 +0300
+
+redis (6:8.0.3-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 8.0.3: https://github.com/redis/redis/releases/tag/8.0.3
+
+ -- Redis Team <redis@redis.io>  Sun, 06 Jul 2025 12:00:00 +0300
+
 redis (6:8.0.2-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Redis 8.0.2: https://github.com/redis/redis/releases/tag/8.0.2

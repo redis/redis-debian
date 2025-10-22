@@ -1,237 +1,31 @@
-name: Build and Test APT unstable
+name: Build Pull Request
 
 on:
   pull_request:
     branches:
+    - master
+    - release/*
     - unstable
   push:
     branches:
+    - master
+    - release/*
     - unstable
+  workflow_dispatch:
   workflow_call:
 
 jobs:
-  build-source-package:
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: unstable
-    - name: Install dependencies
-      run: |
-          sudo apt-get update && \
-          sudo apt-get install \
-           debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev llvm libclang-dev
-    - name: Determine version
-      run: |
-          VERSION="unstable"
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-    - name: Get source tarball
-      run: |
-          curl --silent -L "https://github.com/redis/redis/archive/refs/heads/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
-    - name: Build source package
-      run: |
-        mkdir -p redis-${VERSION}
-        tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
-        sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
-        
-        echo "===== Updating all Redis module versions to 'master' ====="
-        find redis-${VERSION}/modules -name "Makefile" -type f | while read -r makefile; do
-          echo "Processing $makefile"
-          echo "  Before change:"
-          grep "MODULE_VERSION" "$makefile" || echo "  No MODULE_VERSION found"
-          
-          # Update the MODULE_VERSION to 'master'
-          sed -i 's/MODULE_VERSION = .*/MODULE_VERSION = master/g' "$makefile"
-          
-          echo "  After change:"
-          grep "MODULE_VERSION" "$makefile" || echo "  No MODULE_VERSION found after update"
-          echo "-----------------------------------"
-        done
-        echo "===== Module version updates completed ====="
-        
-        cp -pr debian redis-${VERSION}
-        sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
-        ( cd redis-${VERSION} && dpkg-buildpackage -S )
-    - name: Upload source package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: source-${{ matrix.dist }}-${{ matrix.arch }}
-        path: |
-          redis_*.tar.xz
-          redis_*.dsc
-          redis_*.orig.tar.gz
-
-  build-binary-package:
-    runs-on: ${{ (matrix.arch == 'arm64' || matrix.arch == 'armhf') && 'ubuntu24-arm64-4-16' || 'ubuntu-22.04' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
-    needs: build-source-package
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: unstable
-    - name: Determine build architecture
-      run: |
-          case ${{ matrix.arch }} in
-            i386)
-                BUILD_ARCH=i386
-                ;;
-            arm64)
-                BUILD_ARCH=arm64
-                ;;
-            armhf)
-                BUILD_ARCH=armhf
-                ;;
-            *)
-                BUILD_ARCH=amd64
-                ;;
-          esac
-
-          echo "BUILD_ARCH=${BUILD_ARCH}" >> $GITHUB_ENV
-    - name: Install dependencies
-      run: |
-          sudo apt-get update && \
-          sudo apt-get install -y \
-            sbuild debhelper \
-            wget make cmake clang-format lcov git openssl libssl-dev unzip rsync pkg-config
-          sudo sbuild-adduser $USER
-    - name: Prepare sbuild environment
-      run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
-    - name: Get source package
-      uses: actions/download-artifact@v4
-      with:
-        name: source-${{ matrix.dist }}-${{ matrix.arch }}
-    - name: Build binary package
-      run: |
-          sudo sbuild \
-            --nolog \
-            --no-run-lintian \
-            --host ${{ matrix.arch }} \
-            --build ${{ env.BUILD_ARCH }} \
-            --dist ${{ matrix.dist }} \
-            --build-dep-resolver=apt \
-            --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
-            *.dsc
-    - name: Upload binary package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: binary-${{ matrix.dist }}-${{ matrix.arch }}
-        path: |
-          *.deb
-
-  smoke-test-packages:
-    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu24-arm64-4-16' || 'ubuntu-latest' }}
-    needs: build-binary-package
-    strategy:
-      fail-fast: false
-      matrix:
-        image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
-        arch: [amd64, arm64]
-    container: ${{ matrix.image }}
-    steps:
-    - name: Extract distribution from image
-      id: extract_dist
-      run: |
-        IMAGE="${{ matrix.image }}"
-        DIST=$(echo "$IMAGE" | cut -d':' -f2)
-        echo "distribution=$DIST" >> $GITHUB_OUTPUT
-    - name: Get binary packages
-      uses: actions/download-artifact@v4
-      with:
-        name: binary-${{ steps.extract_dist.outputs.distribution }}-${{ matrix.arch }}
-    - name: Install packages
-      run: |
-        apt-get update
-        IMAGE=${{ matrix.image }}
-        dist=$(echo "$IMAGE" | cut -d':' -f2)
-        apt install --yes ./*.deb
-    - name: Run redis-server smoke test
-      run: |
-        /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes
-        sleep 3
-        redis-benchmark -P 10
-    - name: Verify installed modules
-      shell: bash
-      run: |
-        modules=$(redis-cli module list)
-        echo "Installed modules:"
-        echo "$modules"
-        missing_modules=()
-        module_output="$modules"
-        for module in "bf" "search" "timeseries" "ReJSON"; do
-          if [[ ! "$module_output" =~ $module ]]; then
-            missing_modules+=("$module")
-          fi
-        done
-        if [ ${#missing_modules[@]} -eq 0 ]; then
-          echo "All required modules are installed"
-        else
-          echo "The following modules are missing: ${missing_modules[*]}"
-          exit 1
-        fi
-    - name: Test RedisBloom
-      shell: bash
-      run: |
-        redis-cli BF.ADD popular_keys "redis:hash"
-        redis-cli BF.ADD popular_keys "redis:set"
-        [ "$(redis-cli BF.EXISTS popular_keys "redis:hash")" = "1" ] || { echo "RedisBloom test failed: 'redis:hash' not found"; exit 1; }
-        [ "$(redis-cli BF.EXISTS popular_keys "redis:list")" = "0" ] || { echo "RedisBloom test failed: 'redis:list' found unexpectedly"; exit 1; }
-        echo "RedisBloom test passed successfully"
-    - name: Test RediSearch
-      shell: bash
-      run: |
-        redis-cli FT.CREATE redis_commands ON HASH PREFIX 1 cmd: SCHEMA name TEXT SORTABLE description TEXT
-        redis-cli HSET cmd:set name "SET" description "Set the string value of a key"
-        redis-cli HSET cmd:get name "GET" description "Get the value of a key"
-        result=$(redis-cli FT.SEARCH redis_commands "value")
-        if echo "$result" | grep -q "Set the string value of a key" && echo "$result" | grep -q "Get the value of a key"; then
-          echo "RediSearch test passed successfully"
-        else
-          echo "RediSearch test failed: expected commands not found in search results"
-          exit 1
-        fi
-    - name: Test RedisTimeSeries
-      shell: bash
-      run: |
-        redis-cli TS.CREATE redis:cpu:usage RETENTION 86400
-        redis-cli TS.ADD redis:cpu:usage "*" 80
-        redis-cli TS.ADD redis:cpu:usage "*" 65
-        redis-cli TS.ADD redis:cpu:usage "*" 70
-        values=$(redis-cli TS.RANGE redis:cpu:usage - + COUNT 3 | awk 'NR % 2 == 0')
-        echo "Extracted values:"
-        echo "$values"
-
-        for expected in 80 65 70; do
-          if ! echo "$values" | grep -q "^$expected\$"; then
-            echo "Value $expected not found in output"
-            exit 1
-          fi
-        done
-        echo "RedisTimeSeries test passed successfully"
-    - name: Test ReJSON
-      shell: bash
-      run: |
-        redis-cli JSON.SET redis:config $ '{"maxmemory":"2gb","maxmemory-policy":"allkeys-lru"}'
-        result=$(redis-cli JSON.GET redis:config $.maxmemory-policy)
-        cleaned_result=$(echo $result | tr -d '[]"')
-        if [ "$cleaned_result" = "allkeys-lru" ]; then
-          echo "ReJSON test passed successfully"
-        else
-          echo "ReJSON test failed: expected 'allkeys-lru', got $result"
-          exit 1
-        fi
-    - name: Run redis-sentinel smoke test
-      run: |
-        /usr/bin/redis-sentinel /etc/redis/sentinel.conf --daemonize yes
-        sleep 3
-        echo ping | redis-cli -p 26379
+  build-n-test:
+    uses: ./.github/workflows/build-n-test-all-distros.yml
+    with:
+      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      release_tag: >-
+        ${{ (github.ref_name == 'unstable'
+        || github.event_name == 'workflow_dispatch'
+        || github.event_name == 'workflow_call')
+        && 'unstable'
+        || ''
+        }}

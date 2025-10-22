@@ -1,0 +1,40 @@
+inputs:
+  release_tag:
+    description: 'Release tag to build'
+    required: true
+  release_version_branch:
+    description: 'Release version branch to commit to'
+    required: true
+  # release_type currently is not used, but we keep it for future use
+  release_type:
+    description: 'Type of release to upload (public, internal)'
+    required: true
+
+outputs:
+  changed_files:
+    description: 'List of files that were modified'
+    value: ${{ steps.apply-version.outputs.changed_files }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout common functions
+      uses: actions/checkout@v4
+      with:
+        repository: redis-developer/redis-oss-release-automation
+        ref: main
+        path: redis-oss-release-automation
+
+    - name: Bump Debian Changelog
+      id: bump-version
+      shell: bash
+      run: |
+        ${{ github.action_path }}/bump-debian-changelog.sh ${{ inputs.release_tag }}
+
+    - name: Create verified commit
+      if: steps.bump-version.outputs.changed_files != ''
+      uses: iarekylew00t/verified-bot-commit@v1
+      with:
+        message: ${{ inputs.release_tag }}
+        files: ${{ steps.bump-version.outputs.changed_files }}
+        ref: ${{ inputs.release_version_branch }}
