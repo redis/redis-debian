@@ -1,3 +1,10 @@
+# This workflow runs on regular PR/push to branches
+# and is workflow_call'ed by nightly-unstable-package.yaml
+# schedule to build unstable release
+# The main purpose of the workflow to determine whether we need
+# to use "unstable" release_tag
+# The actual job dispatch is done by build-n-test-all-distros.yml
+
 name: Build
 
 on:

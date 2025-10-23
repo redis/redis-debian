@@ -1,4 +1,14 @@
 
+# This reusable workflow implements build and test workflow part and is for
+# calling from release automation and regular PR/push builds.
+#
+# It handles release_tag values, including empty one (empty means PR/push build)
+# and unstable.
+#
+# Unstable run requires explicit switching to unstable branch in each job and
+# action because the schedule is initiated from master branch but the target
+# branch should be unstable branch. This is also handled here.
+
 name: Build and Test All Distros
 
 on:
