@@ -18,7 +18,8 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-      ref: ${{ inputs.checkout_ref || '' }}
+      with:
+        ref: ${{ inputs.checkout_ref || '' }}
     - name: Determine build architecture
       shell: bash
       run: |

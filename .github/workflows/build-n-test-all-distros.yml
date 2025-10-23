@@ -29,7 +29,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      ref: ${{ inputs.checkout_ref || '' }}
+      with:
+        ref: ${{ inputs.checkout_ref || '' }}
     - name: Ensure Release Branch
       if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
@@ -55,8 +56,9 @@ jobs:
     needs: build-source-package
     steps:
     - name: Checkout code
-      ref: ${{ inputs.checkout_ref || '' }}
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.checkout_ref || '' }}
     - name: Ensure Release Branch
       if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
@@ -100,7 +102,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      ref: ${{ inputs.checkout_ref || '' }}
+      with:
+        ref: ${{ inputs.checkout_ref || '' }}
     - uses: ./.github/actions/run-smoke-tests
       with:
         image: ${{ matrix.image }}
