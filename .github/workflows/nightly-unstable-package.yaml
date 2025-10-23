@@ -7,4 +7,6 @@ on:
 
 jobs:
   call-unstable-build:
+    # avoid running in forks
+    if: github.repository == 'redis/redis-debian'
     uses: redis/redis-debian/.github/workflows/apt.yml@unstable
