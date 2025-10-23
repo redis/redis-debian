@@ -9,11 +9,17 @@ inputs:
   arch:
     description: "Architecture to build for"
     required: true
+  checkout_ref:
+    description: "Ref to checkout"
+    required: false
+    default: ''
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.checkout_ref || '' }}
     - name: Determine build architecture
       shell: bash
       run: |

@@ -78,6 +78,8 @@ jobs:
 
       - name: Merge back to release branch
         id: merge-back
+        # merge only public releases into mainline
+        if: inputs.release_type == 'public'
         uses: redis-developer/redis-oss-release-automation/.github/actions/merge-branches-verified@main
         with:
           from_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
