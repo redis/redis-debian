@@ -6,13 +6,5 @@ on:
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
-  trigger-unstable-build:
-    # avoid running in forks
-    if: github.repository == 'redis/redis-debian'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger apt.yml workflow on unstable branch
-        run: |
-          gh workflow run apt.yml --ref unstable
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  call-unstable-build:
+    uses: redis/redis-debian/.github/workflows/apt.yml@unstable
