@@ -14,6 +14,9 @@ on:
         type: string
       SMOKE_TEST_IMAGES:
         type: string
+      checkout_ref:
+        type: string
+        default: ''
 
 
 jobs:
@@ -26,6 +29,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      ref: ${{ inputs.checkout_ref || '' }}
     - name: Ensure Release Branch
       if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
@@ -38,6 +42,7 @@ jobs:
       with:
         dist: ${{ matrix.dist }}
         release_tag: ${{ inputs.release_tag }}
+        checkout_ref: ${{ inputs.checkout_ref || '' }}
 
   build-binary-package:
     runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
@@ -50,6 +55,7 @@ jobs:
     needs: build-source-package
     steps:
     - name: Checkout code
+      ref: ${{ inputs.checkout_ref || '' }}
       uses: actions/checkout@v4
     - name: Ensure Release Branch
       if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
@@ -64,6 +70,7 @@ jobs:
         dist: ${{ matrix.dist }}
         arch: ${{ matrix.arch }}
         run_id: ${{ github.run_id }}
+        checkout_ref: ${{ inputs.checkout_ref || '' }}
 
   smoke-test-archs:
     runs-on: ubuntu-latest
@@ -93,8 +100,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      ref: ${{ inputs.checkout_ref || '' }}
     - uses: ./.github/actions/run-smoke-tests
       with:
         image: ${{ matrix.image }}
         arch: ${{ matrix.arch }}
         run_id: ${{ github.run_id }}
+        checkout_ref: ${{ inputs.checkout_ref || '' }}
