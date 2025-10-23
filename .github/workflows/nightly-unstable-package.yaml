@@ -13,6 +13,6 @@ jobs:
     steps:
       - name: Trigger apt.yml workflow on unstable branch
         run: |
-          gh workflow run apt.yml --ref unstable
+          gh workflow run apt.yml -R redis/redis-debian --ref unstable
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
