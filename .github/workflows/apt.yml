@@ -1,4 +1,4 @@
-name: Build Pull Request
+name: Build
 
 on:
   pull_request:
@@ -14,6 +14,14 @@ on:
   workflow_dispatch:
   workflow_call:
 
+run-name: >-
+        ${{ (github.ref_name == 'unstable'
+        || github.event_name == 'workflow_dispatch'
+        || github.event_name == 'workflow_call')
+        && 'Build Unstable'
+        || format('Build on {0} to {1}', github.event_name, github.ref_name)
+        }}
+
 jobs:
   build-n-test:
     uses: ./.github/workflows/build-n-test-all-distros.yml
@@ -22,6 +30,10 @@ jobs:
       BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
       BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
       SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      # determine whether we should use special "unstable" release_tag
+      # Assume that for unstable branch and for any external call or dispatch
+      # we are building unstable release
+      # In other cases it's a regular PR/push build
       release_tag: >-
         ${{ (github.ref_name == 'unstable'
         || github.event_name == 'workflow_dispatch'
@@ -29,4 +41,3 @@ jobs:
         && 'unstable'
         || ''
         }}
-      checkout_ref: ${{ github.ref_name == 'unstable' && 'unstable' || '' }}
