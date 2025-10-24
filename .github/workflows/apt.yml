@@ -24,7 +24,8 @@ on:
 run-name: >-
         ${{ (github.ref_name == 'unstable'
         || github.event_name == 'workflow_dispatch'
-        || github.event_name == 'workflow_call')
+        || github.event_name == 'workflow_call'
+        || github.event_name == 'schedule')
         && 'Build Unstable'
         || format('Build on {0} to {1}', github.event_name, github.ref_name)
         }}
@@ -37,14 +38,15 @@ jobs:
       BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
       BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
       SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
-      # determine whether we should use special "unstable" release_tag
-      # Assume that for unstable branch and for any external call or dispatch
-      # we are building unstable release
-      # In other cases it's a regular PR/push build
+      # Determine whether we should use special "unstable" release_tag. Assume
+      # that for unstable branch and for any external call, dispatch or schedule
+      # we are building unstable release. In other cases it's a regular PR/push
+      # build without using specific release_tag.
       release_tag: >-
         ${{ (github.ref_name == 'unstable'
         || github.event_name == 'workflow_dispatch'
-        || github.event_name == 'workflow_call')
+        || github.event_name == 'workflow_call'
+        || github.event_name == 'schedule')
         && 'unstable'
         || ''
         }}
