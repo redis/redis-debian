@@ -1,0 +1,31 @@
+name: "Parse env file"
+description: "Parses .env environment file and extracts all available fields as outputs"
+
+outputs:
+  BUILD_ARCHS:
+    description: "The extracted BUILD_DISTS from .env file"
+    value: ${{ steps.parse.outputs.BUILD_ARCHS }}
+  BUILD_DISTS:
+    description: "The extracted BUILD_DISTS from .env file"
+    value: ${{ steps.parse.outputs.BUILD_DISTS }}
+  BUILD_EXCLUDE:
+    description: "The extracted BUILD_EXCLUDE from .env file"
+    value: ${{ steps.parse.outputs.BUILD_EXCLUDE }}
+  SMOKE_TEST_IMAGES:
+    description: "The extracted SMOKE_TEST_IMAGES from .env file"
+    value: ${{ steps.parse.outputs.SMOKE_TEST_IMAGES }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4  
+
+    - name: Parse release handle
+      id: parse
+      shell: bash
+      run: |
+        while IFS='=' read -r key value; do
+          [[ -z "$key" || "$key" =~ ^# ]] && continue
+          echo "$key=$value" >> "$GITHUB_OUTPUT"
+        done < .env
