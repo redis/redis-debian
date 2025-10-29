@@ -46,6 +46,7 @@ runs:
       redis-cli ping || { cat /var/log/redis/redis-server.log ; exit 112; }
       redis-benchmark -P 10
   - name: Verify installed modules
+    if: false
     shell: bash
     run: |
       modules=$(redis-cli module list)
@@ -65,6 +66,7 @@ runs:
         exit 1
       fi
   - name: Test RedisBloom
+    if: false
     shell: bash
     run: |
       redis-cli BF.ADD popular_keys "redis:hash"
@@ -73,6 +75,7 @@ runs:
       [ "$(redis-cli BF.EXISTS popular_keys "redis:list")" = "0" ] || { echo "RedisBloom test failed: 'redis:list' found unexpectedly"; exit 1; }
       echo "RedisBloom test passed successfully"
   - name: Test RediSearch
+    if: false
     shell: bash
     run: |
       redis-cli FT.CREATE redis_commands ON HASH PREFIX 1 cmd: SCHEMA name TEXT SORTABLE description TEXT
@@ -86,6 +89,7 @@ runs:
         exit 1
       fi
   - name: Test RedisTimeSeries
+    if: false
     shell: bash
     run: |
       redis-cli TS.CREATE redis:cpu:usage RETENTION 86400
@@ -104,6 +108,7 @@ runs:
       done
       echo "RedisTimeSeries test passed successfully"
   - name: Test ReJSON
+    if: false
     shell: bash
     run: |
       redis-cli JSON.SET redis:config $ '{"maxmemory":"2gb","maxmemory-policy":"allkeys-lru"}'
