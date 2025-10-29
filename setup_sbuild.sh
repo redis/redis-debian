@@ -16,6 +16,9 @@ else
     disttype="debian"
 fi
 
+if [ "$dist" = "focal" ]; then
+     ubuntu_ports="/ubuntu-ports"
+fi
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
     ubuntu)
@@ -87,8 +90,23 @@ fi
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y build-essential python3 python3-pip python3-venv python3-dev g++ clang
 
-# Install latest CMake version for Jammy and Bullseye
-if [ "$dist" = "jammy" ] || [ "$dist" = "bullseye" ]; then
+if [ "$dist" = "focal" ]; then
+    # Install gcc-10 and g++-10 which are required in case of Ubuntu Focal to support Ranges library, introduced in C++20
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt update && apt remove -y gcc-9 g++-9 gcc-9-base && apt upgrade -yqq && apt install -y gcc build-essential gcc-10 g++-10 clang-format clang lcov openssl"
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "[ -f /usr/bin/gcc-10 ] && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10|| echo 'gcc-10 installation failed'"
+
+    # Install newer version of debhelper
+    # Required because of a bug: https://bugs-devel.debian.org/cgi-bin/bugreport.cgi?bug=959731
+    INSTALL_DEBHELPER_FROM_BULLSEYE="apt install -y wget \
+      && wget http://ftp.de.debian.org/debian/pool/main/d/debhelper/libdebhelper-perl_13.3.4_all.deb \
+              http://ftp.de.debian.org/debian/pool/main/d/debhelper/debhelper_13.3.4_all.deb \
+      && dpkg -i libdebhelper-perl_13.3.4_all.deb debhelper_13.3.4_all.deb \
+      || apt-get -yf install"
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "$INSTALL_DEBHELPER_FROM_BULLSEYE"
+fi
+
+# Install latest CMake version for Focal, Jammy and Bullseye
+if [ "$dist" = "focal" ] || [ "$dist" = "jammy" ] || [ "$dist" = "bullseye" ]; then
     schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "apt install -y python3-pip && \
         python3 -m pip install --upgrade pip && \
         python3 -m pip install cmake==3.31.6 && \
