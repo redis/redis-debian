@@ -52,7 +52,7 @@ jobs:
         checkout_ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
 
   build-binary-package:
-    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu22-arm64-2-8' || 'ubuntu-22.04' }}
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
