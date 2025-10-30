@@ -1,0 +1,128 @@
+name: "Run smoke tests"
+inputs:
+  run_id:
+    description: "Run ID to download artifacts from"
+    required: true
+  image:
+    description: "Docker image to run smoke tests in"
+    required: true
+  arch:
+    description: "Architecture to run smoke tests for"
+    required: true
+  checkout_ref:
+    description: "Ref to checkout"
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v4
+    with:
+      ref: ${{ inputs.checkout_ref || '' }}
+  - name: Extract distribution from image
+    id: extract_dist
+    shell: bash
+    run: |
+      IMAGE="${{ inputs.image }}"
+      DIST=$(echo "$IMAGE" | cut -d':' -f2)
+      echo "distribution=$DIST" >> $GITHUB_OUTPUT
+  - name: Get binary packages
+    uses: actions/download-artifact@v4
+    with:
+      name: binary-${{ steps.extract_dist.outputs.distribution }}-${{ inputs.arch }}
+  - name: Install packages
+    shell: bash
+    run: |
+      apt-get update
+      IMAGE=${{ inputs.image }}
+      dist=$(echo "$IMAGE" | cut -d':' -f2)
+      apt install --yes ./*.deb
+  - name: Run redis-server smoke test
+    shell: bash
+    run: |
+      /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes
+      sleep 3
+      redis-cli ping || { cat /var/log/redis/redis-server.log ; exit 112; }
+      redis-benchmark -P 10
+  - name: Verify installed modules
+    if: false
+    shell: bash
+    run: |
+      modules=$(redis-cli module list)
+      echo "Installed modules:"
+      echo "$modules"
+      missing_modules=()
+      module_output="$modules"
+      for module in "bf" "search" "timeseries" "ReJSON"; do
+        if [[ ! "$module_output" =~ $module ]]; then
+          missing_modules+=("$module")
+        fi
+      done
+      if [ ${#missing_modules[@]} -eq 0 ]; then
+        echo "All required modules are installed"
+      else
+        echo "The following modules are missing: ${missing_modules[*]}"
+        exit 1
+      fi
+  - name: Test RedisBloom
+    if: false
+    shell: bash
+    run: |
+      redis-cli BF.ADD popular_keys "redis:hash"
+      redis-cli BF.ADD popular_keys "redis:set"
+      [ "$(redis-cli BF.EXISTS popular_keys "redis:hash")" = "1" ] || { echo "RedisBloom test failed: 'redis:hash' not found"; exit 1; }
+      [ "$(redis-cli BF.EXISTS popular_keys "redis:list")" = "0" ] || { echo "RedisBloom test failed: 'redis:list' found unexpectedly"; exit 1; }
+      echo "RedisBloom test passed successfully"
+  - name: Test RediSearch
+    if: false
+    shell: bash
+    run: |
+      redis-cli FT.CREATE redis_commands ON HASH PREFIX 1 cmd: SCHEMA name TEXT SORTABLE description TEXT
+      redis-cli HSET cmd:set name "SET" description "Set the string value of a key"
+      redis-cli HSET cmd:get name "GET" description "Get the value of a key"
+      result=$(redis-cli FT.SEARCH redis_commands "value")
+      if echo "$result" | grep -q "Set the string value of a key" && echo "$result" | grep -q "Get the value of a key"; then
+        echo "RediSearch test passed successfully"
+      else
+        echo "RediSearch test failed: expected commands not found in search results"
+        exit 1
+      fi
+  - name: Test RedisTimeSeries
+    if: false
+    shell: bash
+    run: |
+      redis-cli TS.CREATE redis:cpu:usage RETENTION 86400
+      redis-cli TS.ADD redis:cpu:usage "*" 80
+      redis-cli TS.ADD redis:cpu:usage "*" 65
+      redis-cli TS.ADD redis:cpu:usage "*" 70
+      values=$(redis-cli TS.RANGE redis:cpu:usage - + COUNT 3 | awk 'NR % 2 == 0')
+      echo "Extracted values:"
+      echo "$values"
+
+      for expected in 80 65 70; do
+        if ! echo "$values" | grep -q "^$expected\$"; then
+          echo "Value $expected not found in output"
+          exit 1
+        fi
+      done
+      echo "RedisTimeSeries test passed successfully"
+  - name: Test ReJSON
+    if: false
+    shell: bash
+    run: |
+      redis-cli JSON.SET redis:config $ '{"maxmemory":"2gb","maxmemory-policy":"allkeys-lru"}'
+      result=$(redis-cli JSON.GET redis:config $.maxmemory-policy)
+      cleaned_result=$(echo $result | tr -d '[]"')
+      if [ "$cleaned_result" = "allkeys-lru" ]; then
+        echo "ReJSON test passed successfully"
+      else
+        echo "ReJSON test failed: expected 'allkeys-lru', got $result"
+        exit 1
+      fi
+  - name: Run redis-sentinel smoke test
+    shell: bash
+    run: |
+      /usr/bin/redis-sentinel /etc/redis/sentinel.conf --daemonize yes
+      sleep 3
+      echo ping | redis-cli -p 26379

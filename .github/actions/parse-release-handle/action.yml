@@ -1,0 +1,71 @@
+name: "Parse release handle"
+description: "Parses a release_handle JSON input and extracts all available fields as outputs"
+
+inputs:
+  release_handle:
+    description: "JSON string containing release handle information"
+    required: true
+
+outputs:
+  run_id:
+    description: "The extracted run_id from the release_handle"
+    value: ${{ steps.parse.outputs.run_id }}
+  release_tag:
+    description: "The extracted release_tag from the release_handle"
+    value: ${{ steps.parse.outputs.release_tag }}
+  workflow_uuid:
+    description: "The extracted workflow_uuid from the release_handle"
+    value: ${{ steps.parse.outputs.workflow_uuid }}
+  release_type:
+    description: "The extracted release_type from the release_handle"
+    value: ${{ steps.parse.outputs.release_type }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Parse release handle
+      id: parse
+      shell: bash
+      run: |
+        release_handle='${{ inputs.release_handle }}'
+
+        # Validate that the input is valid JSON
+        if ! echo "$release_handle" | jq . >/dev/null 2>&1; then
+          echo "Error: release_handle is not valid JSON"
+          echo "Release handle content: $release_handle"
+          exit 1
+        fi
+
+        echo "Parsing release handle..."
+        echo "Available fields: $(echo "$release_handle" | jq -r 'keys | join(", ")')"
+
+        # Extract all known fields
+        run_id=$(echo "$release_handle" | jq -r '.run_id // empty')
+        release_tag=$(echo "$release_handle" | jq -r '.release_tag // empty')
+        workflow_uuid=$(echo "$release_handle" | jq -r '.workflow_uuid // empty')
+        release_type=$(echo "$release_handle" | jq -r '.release_type // empty')
+
+        # Validate that run_id exists and is a number (required field)
+        if [ -z "$run_id" ]; then
+          echo "Error: run_id not found in release_handle"
+          echo "Release handle content: $release_handle"
+          exit 1
+        fi
+
+        if ! [[ "$run_id" =~ ^[0-9]+$ ]]; then
+          echo "Error: run_id is not a valid number: $run_id"
+          exit 1
+        fi
+
+        # Output all extracted fields
+        echo "Extracted fields:"
+        echo "  run_id: $run_id"
+        echo "  release_tag: $release_tag"
+        echo "  workflow_uuid: $workflow_uuid"
+        echo "  release_type: $release_type"
+
+        # Set outputs
+        echo "run_id=$run_id" >> $GITHUB_OUTPUT
+        [ -n "$release_tag" ] && echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+        [ -n "$workflow_uuid" ] && echo "workflow_uuid=$workflow_uuid" >> $GITHUB_OUTPUT
+        [ -n "$release_type" ] && echo "release_type=$release_type" >> $GITHUB_OUTPUT
