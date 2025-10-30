@@ -48,6 +48,7 @@ jobs:
 
   build-n-test:
     uses: ./.github/workflows/build-n-test-all-distros.yml
+    needs: populate-env-vars
     with:
       BUILD_DISTS: ${{ needs.populate-env-vars.outputs.BUILD_DISTS }}
       BUILD_ARCHS: ${{ needs.populate-env-vars.outputs.BUILD_ARCHS }}

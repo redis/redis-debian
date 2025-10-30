@@ -1,6 +1,12 @@
 name: "Parse env file"
 description: "Parses .env environment file and extracts all available fields as outputs"
 
+inputs:
+  env_file_path:
+    description: ".env file path"
+    default: '.github/.env'
+    required: false
+
 outputs:
   BUILD_ARCHS:
     description: "The extracted BUILD_DISTS from .env file"
@@ -25,7 +31,7 @@ runs:
       id: parse
       shell: bash
       run: |
-        while IFS='=' read -r key value; do
-          [[ -z "$key" || "$key" =~ ^# ]] && continue
-          echo "$key=$value" >> "$GITHUB_OUTPUT"
-        done < .env
+        cat "${{ inputs.env_file_path }}" | while IFS= read -r line || [[ -n "$line" ]]; do
+          [[ -z "$line" || "$line" =~ ^# ]] && continue
+          echo "$line" >> "$GITHUB_OUTPUT"
+        done 
