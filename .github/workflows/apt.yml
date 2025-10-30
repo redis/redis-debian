@@ -1,180 +1,52 @@
-name: Build and Publish to APT
+# This workflow runs on regular PR/push to branches
+# and is workflow_call'ed by nightly-unstable-package.yaml
+# schedule to build unstable release
+# The main purpose of the workflow to determine whether we need
+# to use "unstable" release_tag
+# The actual job dispatch is done by build-n-test-all-distros.yml
+
+name: Build
 
 on:
-  push:
-    branches:
-    - release/**
   pull_request:
     branches:
     - master
+    - release/*
+    - unstable
+  push:
+    branches:
+    - master
+    - release/*
+    - unstable
+  workflow_dispatch:
+  workflow_call:
+
+run-name: >-
+        ${{ (github.ref_name == 'unstable'
+        || github.event_name == 'workflow_dispatch'
+        || github.event_name == 'workflow_call'
+        || github.event_name == 'schedule')
+        && 'Build Unstable'
+        || format('Build on {0} to {1}', github.event_name, github.ref_name)
+        }}
 
 jobs:
-  build-source-package:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install dependencies
-      run: |
-          sudo apt-get update && \
-          sudo apt-get install \
-            debhelper dput tcl-tls libsystemd-dev pkg-config build-essential
-    - name: Determine version
-      run: |
-          VERSION=$(head -1 debian/changelog | sed 's/^.*([0-9]*:*\([0-9.]*\)-.*$/\1/')
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-    - name: Get source tarball
-      run: |
-          curl --silent -L "https://github.com/redis/redis/archive/${VERSION}.tar.gz" -o redis_${VERSION}.orig.tar.gz
-    - name: Build source package
-      run: |
-          tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz
-          cp -pr debian redis-${VERSION}
-          sed -i "s/@RELEASE@/${{ matrix.dist }}/g" redis-${VERSION}/debian/changelog
-          ( cd redis-${VERSION} && dpkg-buildpackage -S )
-    - name: Upload source package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: source-${{ matrix.dist }}
-        path: |
-            *.debian.tar.*
-            *.dsc
-            redis_*.orig.tar.gz
-
-  build-binary-package:
-    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-latest' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        dist: ${{ fromJSON(vars.BUILD_DISTS) }}
-        arch: ${{ fromJSON(vars.BUILD_ARCHS) }}
-        exclude: ${{ fromJSON(vars.BUILD_EXCLUDE) }}
-    needs: build-source-package
-    steps:
-    - uses: actions/checkout@v4
-    - name: Determine build architecture
-      run: |
-          case ${{ matrix.arch }} in
-            i386)
-                BUILD_ARCH=i386
-                ;;
-            arm64)
-                BUILD_ARCH=arm64
-                ;;
-            armhf)
-                BUILD_ARCH=armhf
-                ;;
-            *) 
-                BUILD_ARCH=amd64
-                ;;
-          esac
-        
-          echo "BUILD_ARCH=${BUILD_ARCH}" >> $GITHUB_ENV
-    - name: Setup APT Signing key
-      run: |
-          mkdir -m 0700 -p ~/.gnupg
-          echo "$APT_SIGNING_KEY" | gpg --import
-      env:
-        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
-    - name: Install dependencies
-      run: |
-          sudo apt-get update && \
-          sudo apt-get install \
-            sbuild debhelper
-          sudo sbuild-adduser $USER
-    - name: Prepare sbuild environment
-      run: sudo ./setup_sbuild.sh ${{ matrix.dist }} ${{ env.BUILD_ARCH }}
-    - name: Get source package
-      uses: actions/download-artifact@v4
-      with:
-        name: source-${{ matrix.dist }}
-    - name: Build binary package
-      run: |
-          sudo sbuild \
-            --nolog \
-            --host ${{ matrix.arch }} \
-            --build ${{ env.BUILD_ARCH }} \
-            --dist ${{ matrix.dist }} *.dsc
-    - name: Upload binary package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: binary-${{ matrix.dist }}-${{ matrix.arch }}
-        path: |
-          *.deb
-
-  smoke-test-packages:
-    runs-on: ubuntu-latest
-    needs: build-binary-package
-    env:
-      ARCH: amd64
-    strategy:
-      fail-fast: false
-      matrix:
-        image: ${{ fromJSON(vars.SMOKE_TEST_IMAGES) }}
-    container: ${{ matrix.image }}
-    steps:
-    - name: Get binary packages
-      uses: actions/download-artifact@v4
-    - name: Install packages
-      run: |
-        apt-get update
-        cd binary-$(echo ${{ matrix.image }} | cut -d: -f2)-${{ env.ARCH }} && apt install --yes ./*.deb
-    - name: Run redis-server smoke test
-      run: |
-        service redis-server start
-        redis-benchmark -P 10
-    - name: Run redis-sentinel smoke test
-      run: |
-        service redis-sentinel start
-        echo ping | redis-cli -p 26379
-
-  upload-packages:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
-    env:
-      DEB_S3_VERSION: "0.11.3"
-    runs-on: ubuntu-latest
-    needs: smoke-test-packages
-    steps:
-    - name: Setup APT Signing key
-      run: |
-          mkdir -m 0700 -p ~/.gnupg
-          echo "$APT_SIGNING_KEY" | gpg --import
-      env:
-        APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
-    - name: Get binary packages
-      uses: actions/download-artifact@v4
-    - name: Setup ruby
-      uses: ruby/setup-ruby@v1
-      with:
-          ruby-version: "2.7"
-    - name: Install deb-s3
-      run: |
-          curl -sLO https://github.com/deb-s3/deb-s3/releases/download/${{ env.DEB_S3_VERSION }}/deb-s3-${{ env.DEB_S3_VERSION }}.gem
-          gem install deb-s3-${{ env.DEB_S3_VERSION }}.gem
-    - name: Upload packages
-      run: |
-        # Quick hack to deal with duplicate _all packages
-        rm -f binary-*-i386/*_all.deb
-        for dir in binary-*; do \
-            dist=$(echo $dir | cut -d- -f 2) ; \
-            deb-s3 upload \
-                --bucket ${{ env.APT_S3_BUCKET }} \
-                --s3-region ${{ env.APT_S3_REGION }} \
-                --codename $dist \
-                --suite $dist \
-                --origin packages.redis.io \
-                --preserve-versions \
-                --lock \
-                --fail-if-exists \
-                --sign \
-                --prefix deb \
-                $dir/*.deb ; \
-        done
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.APT_S3_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.APT_S3_SECRET_ACCESS_KEY }}
-        APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET }}
-        APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
+  build-n-test:
+    uses: ./.github/workflows/build-n-test-all-distros.yml
+    with:
+      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      # Determine whether we should use special "unstable" release_tag. Assume
+      # that for unstable branch and for any external call, dispatch or schedule
+      # we are building unstable release. In other cases it's a regular PR/push
+      # build without using specific release_tag.
+      release_tag: >-
+        ${{ (github.ref_name == 'unstable'
+        || github.event_name == 'workflow_dispatch'
+        || github.event_name == 'workflow_call'
+        || github.event_name == 'schedule')
+        && 'unstable'
+        || ''
+        }}

@@ -1,0 +1,105 @@
+# This workflow is part of the Redis OSS release automation process.
+on:
+  # push:
+  #   branches:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to build, may be "unstable" for latest unstable release'
+        required: false
+      workflow_uuid:
+        description: 'Optional UUID to identify this workflow run'
+        required: false
+      release_type:
+        description: 'Type of release to upload (public, internal)'
+        required: true
+
+# UUID is used to help automation to identify workflow run in the list of workflow runs.
+run-name: "Release Build and Test${{ github.event.inputs.workflow_uuid && format(': {0}', github.event.inputs.workflow_uuid) || '' }}"
+
+jobs:
+  prepare-release:
+    runs-on: ["ubuntu-latest"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Redis Release Archive
+        uses: redis-developer/redis-oss-release-automation/.github/actions/validate-redis-release-archive@main
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+
+      - name: Ensure Release Branch
+        id: ensure-branch
+        uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+          allow_modify: true
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump Debian Changelog
+        id: bump-changelog
+        uses: ./.github/actions/bump-debian-changelog
+        with:
+          release_tag: ${{ github.event.inputs.release_tag }}
+          release_version_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
+          release_type: ${{ github.event.inputs.release_type }}
+
+  build-n-test:
+    needs: prepare-release
+    uses: ./.github/workflows/build-n-test-all-distros.yml
+    with:
+      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      release_tag: ${{ inputs.release_tag }}
+
+  create-release-handle:
+    needs: build-n-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release Handle
+        shell: bash
+        run: |
+          cat <<RELEASE_HANDLE >result.json
+          {
+            "release_tag": "${{ github.event.inputs.release_tag }}",
+            "run_id": ${{ github.run_id }},
+            "workflow_uuid": "${{ github.event.inputs.workflow_uuid }}",
+            "release_type": "${{ github.event.inputs.release_type }}"
+          }
+          RELEASE_HANDLE
+
+      - name: Upload release handle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_handle
+          path: result.json
+          retention-days: 90
+
+  # Notify only about build failures
+  # as publish workflow will notify about publish success or failure
+  slack-failure-notification:
+    needs: build-n-test
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Detect env name
+        id: detect-env
+        run: |
+          if [ "${{ inputs.release_type }}" = "public" ]; then
+            env_name="production"
+          elif [ "${{ inputs.release_type }}" = "internal" ]; then
+            env_name="staging"
+          fi
+          echo "env_name=$env_name" >> $GITHUB_OUTPUT
+      - name: Send Failure Slack notification
+        if: failure()
+        uses: ./.github/actions/slack-notification
+        with:
+          slack_func: slack_format_failure_message
+          release_tag: ${{ github.event.inputs.release_tag }}
+          env: ${{ steps.detect-env.outputs.env_name }}
+          message: ":debian: Debian package build failed"
+          SLACK_WEB_HOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL }}

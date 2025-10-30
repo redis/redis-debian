@@ -1,0 +1,59 @@
+name: "Build source package"
+
+inputs:
+  dist:
+    description: "Distribution to build for"
+    required: true
+  release_tag:
+    description: "Release tag to build for (value 'unstable' is not supported)"
+    required: false
+  checkout_ref:
+    description: "Ref to checkout"
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v4
+    with:
+      ref: ${{ inputs.checkout_ref || '' }}
+  - name: Install dependencies
+    shell: bash
+    run: |
+      sudo apt-get update && \
+      sudo apt-get install \
+      debhelper dput tcl-tls libsystemd-dev pkg-config build-essential
+  - name: Determine version
+    id: determine-version
+    shell: bash
+    run: |
+      # Version format:
+      # https://www.debian.org/doc/debian-policy/ch-controlfields.html#version
+      VERSION=$(head -1 debian/changelog | awk '{print $2}' | sed 's/(\([0-9]\+:\)\?\(.*\)-[^-]\+)$/\2/g')
+      echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      URL="https://github.com/redis/redis/archive/${VERSION}.tar.gz"
+      echo "Determined version $VERSION"
+      echo "URL=${URL}"
+      echo "URL=${URL}" >> $GITHUB_OUTPUT
+  - name: Get source tarball
+    shell: bash
+    run: |
+      curl --silent -L ${{ steps.determine-version.outputs.URL }} -o redis_${VERSION}.orig.tar.gz
+  - name: Build source package
+    shell: bash
+    run: |
+      mkdir -p redis-${VERSION}
+      tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
+
+      cp -pr debian redis-${VERSION}
+      sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
+      ( cd redis-${VERSION} && dpkg-buildpackage -S )
+  - name: Upload source package artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: source-${{ inputs.dist }}
+      path: |
+        redis_*.tar.xz
+        redis_*.dsc
+        redis_*.orig.tar.gz
