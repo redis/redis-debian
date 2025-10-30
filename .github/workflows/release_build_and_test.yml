@@ -112,7 +112,6 @@ jobs:
           fi
           echo "env_name=$env_name" >> $GITHUB_OUTPUT
       - name: Send Failure Slack notification
-        if: failure()
         uses: ./.github/actions/slack-notification
         with:
           slack_func: slack_format_failure_message
