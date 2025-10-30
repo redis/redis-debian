@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout code
-      uses: actions/checkout@v4  
+      uses: actions/checkout@v4
 
     - name: Parse release handle
       id: parse
@@ -34,4 +34,4 @@ runs:
         cat "${{ inputs.env_file_path }}" | while IFS= read -r line || [[ -n "$line" ]]; do
           [[ -z "$line" || "$line" =~ ^# ]] && continue
           echo "$line" >> "$GITHUB_OUTPUT"
-        done 
+        done
