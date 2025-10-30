@@ -1,4 +1,11 @@
-name: Build Pull Request
+# This workflow runs on regular PR/push to branches
+# and is workflow_call'ed by nightly-unstable-package.yaml
+# schedule to build unstable release
+# The main purpose of the workflow to determine whether we need
+# to use "unstable" release_tag
+# The actual job dispatch is done by build-n-test-all-distros.yml
+
+name: Build
 
 on:
   pull_request:
@@ -14,19 +21,48 @@ on:
   workflow_dispatch:
   workflow_call:
 
+run-name: >-
+        ${{ (github.ref_name == 'unstable'
+        || github.event_name == 'workflow_dispatch'
+        || github.event_name == 'workflow_call'
+        || github.event_name == 'schedule')
+        && 'Build Unstable'
+        || format('Build on {0} to {1}', github.event_name, github.ref_name)
+        }}
+
 jobs:
+  populate-env-vars:
+    runs-on: ["ubuntu-latest"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Parse vars
+        id: parse
+        uses: ./.github/actions/parse-env-file
+    outputs:
+      BUILD_ARCHS: ${{ steps.parse.outputs.BUILD_ARCHS }}
+      BUILD_DISTS: ${{ steps.parse.outputs.BUILD_DISTS }}
+      BUILD_EXCLUDE: ${{ steps.parse.outputs.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ steps.parse.outputs.SMOKE_TEST_IMAGES }}
+
   build-n-test:
     uses: ./.github/workflows/build-n-test-all-distros.yml
+    needs: populate-env-vars
     with:
-      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
-      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
-      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
-      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      BUILD_DISTS: ${{ needs.populate-env-vars.outputs.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ needs.populate-env-vars.outputs.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ needs.populate-env-vars.outputs.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ needs.populate-env-vars.outputs.SMOKE_TEST_IMAGES }}
+      # Determine whether we should use special "unstable" release_tag. Assume
+      # that for unstable branch and for any external call, dispatch or schedule
+      # we are building unstable release. In other cases it's a regular PR/push
+      # build without using specific release_tag.
       release_tag: >-
         ${{ (github.ref_name == 'unstable'
         || github.event_name == 'workflow_dispatch'
-        || github.event_name == 'workflow_call')
+        || github.event_name == 'workflow_call'
+        || github.event_name == 'schedule')
         && 'unstable'
         || ''
         }}
-      checkout_ref: ${{ github.ref_name == 'unstable' && 'unstable' || '' }}

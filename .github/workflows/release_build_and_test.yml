@@ -45,14 +45,31 @@ jobs:
           release_version_branch: ${{ steps.ensure-branch.outputs.release_version_branch }}
           release_type: ${{ github.event.inputs.release_type }}
 
+  populate-env-vars:
+    runs-on: ["ubuntu-latest"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Parse vars
+        id: parse
+        uses: ./.github/actions/parse-env-file
+    outputs:
+      BUILD_ARCHS: ${{ steps.parse.outputs.BUILD_ARCHS }}
+      BUILD_DISTS: ${{ steps.parse.outputs.BUILD_DISTS }}
+      BUILD_EXCLUDE: ${{ steps.parse.outputs.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ steps.parse.outputs.SMOKE_TEST_IMAGES }}
+
   build-n-test:
-    needs: prepare-release
+    needs: 
+      - prepare-release
+      - populate-env-vars
     uses: ./.github/workflows/build-n-test-all-distros.yml
     with:
-      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
-      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
-      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
-      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      BUILD_DISTS: ${{ needs.populate-env-vars.outputs.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ needs.populate-env-vars.outputs.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ needs.populate-env-vars.outputs.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ needs.populate-env-vars.outputs.SMOKE_TEST_IMAGES }}
       release_tag: ${{ inputs.release_tag }}
 
   create-release-handle:
