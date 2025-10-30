@@ -31,13 +31,29 @@ run-name: >-
         }}
 
 jobs:
+  populate-env-vars:
+    runs-on: ["ubuntu-latest"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Parse vars
+        id: parse
+        uses: ./.github/actions/parse-env-file
+    outputs:
+      BUILD_ARCHS: ${{ steps.parse.outputs.BUILD_ARCHS }}
+      BUILD_DISTS: ${{ steps.parse.outputs.BUILD_DISTS }}
+      BUILD_EXCLUDE: ${{ steps.parse.outputs.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ steps.parse.outputs.SMOKE_TEST_IMAGES }}
+
   build-n-test:
     uses: ./.github/workflows/build-n-test-all-distros.yml
+    needs: populate-env-vars
     with:
-      BUILD_DISTS: ${{ vars.BUILD_DISTS }}
-      BUILD_ARCHS: ${{ vars.BUILD_ARCHS }}
-      BUILD_EXCLUDE: ${{ vars.BUILD_EXCLUDE }}
-      SMOKE_TEST_IMAGES: ${{ vars.SMOKE_TEST_IMAGES }}
+      BUILD_DISTS: ${{ needs.populate-env-vars.outputs.BUILD_DISTS }}
+      BUILD_ARCHS: ${{ needs.populate-env-vars.outputs.BUILD_ARCHS }}
+      BUILD_EXCLUDE: ${{ needs.populate-env-vars.outputs.BUILD_EXCLUDE }}
+      SMOKE_TEST_IMAGES: ${{ needs.populate-env-vars.outputs.SMOKE_TEST_IMAGES }}
       # Determine whether we should use special "unstable" release_tag. Assume
       # that for unstable branch and for any external call, dispatch or schedule
       # we are building unstable release. In other cases it's a regular PR/push
