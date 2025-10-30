@@ -60,12 +60,9 @@ runs:
       run: |
           sudo sbuild \
             --nolog \
-            --no-run-lintian \
             --host ${{ inputs.arch }} \
             --build ${{ env.BUILD_ARCH }} \
             --dist ${{ inputs.dist }} \
-            --build-dep-resolver=apt \
-            --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
             *.dsc
     - name: Upload binary package artifact
       uses: actions/upload-artifact@v4
