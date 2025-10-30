@@ -1,0 +1,118 @@
+
+# This reusable workflow implements build and test workflow part and is for
+# calling from release automation and regular PR/push builds.
+#
+# It handles release_tag values, including empty one (empty means PR/push build)
+# and unstable.
+#
+# Unstable run requires explicit switching to unstable branch in each job and
+# action because the schedule is initiated from master branch but the target
+# branch should be unstable branch. This is also handled here.
+
+name: Build and Test All Distros
+
+on:
+  workflow_call:
+    inputs:
+      release_tag:
+        type: string
+      BUILD_DISTS:
+        type: string
+      BUILD_ARCHS:
+        type: string
+      BUILD_EXCLUDE:
+        type: string
+      SMOKE_TEST_IMAGES:
+        type: string
+
+jobs:
+  build-source-package:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        dist: ${{ fromJSON(inputs.BUILD_DISTS) }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+    - name: Ensure Release Branch
+      if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
+      id: ensure-branch
+      uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
+      with:
+        release_tag: ${{ inputs.release_tag }}
+        allow_modify: false
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: ./.github/actions/build-source-package
+      with:
+        dist: ${{ matrix.dist }}
+        release_tag: ${{ inputs.release_tag }}
+        checkout_ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+
+  build-binary-package:
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        dist: ${{ fromJSON(inputs.BUILD_DISTS) }}
+        arch: ${{ fromJSON(inputs.BUILD_ARCHS) }}
+        exclude: ${{ fromJSON(inputs.BUILD_EXCLUDE) }}
+    needs: build-source-package
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+    - name: Ensure Release Branch
+      if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
+      id: ensure-branch
+      uses: redis-developer/redis-oss-release-automation/.github/actions/ensure-release-branch@main
+      with:
+        release_tag: ${{ inputs.release_tag }}
+        allow_modify: false
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: ./.github/actions/build-binary-package
+      with:
+        dist: ${{ matrix.dist }}
+        arch: ${{ matrix.arch }}
+        run_id: ${{ github.run_id }}
+        checkout_ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+
+  smoke-test-archs:
+    runs-on: ubuntu-latest
+    outputs:
+      archs: ${{ steps.filter-archs.outputs.archs }}
+    steps:
+    - name: Filter archs for smoke tests
+      id: filter-archs
+      run: |
+        build_archs='${{ inputs.BUILD_ARCHS }}'
+        # Filter to only include amd64 and arm64 if they exist in BUILD_ARCHS
+        filtered_archs=$(echo "$build_archs" | jq -c 'map(select(. == "amd64" or . == "arm64"))')
+        echo "archs=$filtered_archs"
+        echo "archs=$filtered_archs" >> $GITHUB_OUTPUT
+
+  smoke-test-packages:
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
+    needs:
+      - build-binary-package
+      - smoke-test-archs
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ${{ fromJSON(inputs.SMOKE_TEST_IMAGES) }}
+        arch: ${{ fromJSON(needs.smoke-test-archs.outputs.archs) }}
+    container: ${{ matrix.image }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+    - uses: ./.github/actions/run-smoke-tests
+      with:
+        image: ${{ matrix.image }}
+        arch: ${{ matrix.arch }}
+        run_id: ${{ github.run_id }}
+        checkout_ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
