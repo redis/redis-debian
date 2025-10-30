@@ -61,7 +61,9 @@ jobs:
       SMOKE_TEST_IMAGES: ${{ steps.parse.outputs.SMOKE_TEST_IMAGES }}
 
   build-n-test:
-    needs: prepare-release
+    needs: 
+      - prepare-release
+      - populate-env-vars
     uses: ./.github/workflows/build-n-test-all-distros.yml
     with:
       BUILD_DISTS: ${{ needs.populate-env-vars.outputs.BUILD_DISTS }}
