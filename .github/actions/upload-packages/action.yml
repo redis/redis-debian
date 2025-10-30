@@ -72,7 +72,7 @@ runs:
   # For internal release we have an IAM role that we need to assume
   - name: Configure aws credentials for internal release
     if: ${{ inputs.release_type == 'internal' }}
-    uses: aws-actions/configure-aws-credentials@v1.7.0
+    uses: aws-actions/configure-aws-credentials@v4.3.1
     with:
       role-to-assume: ${{ inputs.APT_S3_IAM_ARN }}
       aws-region: us-east-1
