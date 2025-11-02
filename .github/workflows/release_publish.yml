@@ -64,7 +64,7 @@ jobs:
         with:
           release_handle: ${{ github.event.inputs.release_handle }}
 
-      - name: Upload staging packages
+      - name: Upload packages
         id: upload
         uses: ./.github/actions/upload-packages
         with:
@@ -72,9 +72,11 @@ jobs:
           release_type: ${{ github.event.inputs.release_type }}
           gh_token: ${{ secrets.GITHUB_TOKEN }}
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
-          APT_S3_BUCKET: ${{ secrets.APT_S3_BUCKET_STAGING }}
           APT_S3_REGION: ${{ secrets.APT_S3_REGION }}
-          APT_S3_IAM_ARN: ${{ secrets.APT_S3_IAM_ARN_STAGING }}
+          APT_S3_BUCKET: ${{ github.event.inputs.release_type == 'public' && secrets.APT_S3_BUCKET || secrets.APT_S3_BUCKET_STAGING }}
+          APT_S3_IAM_ARN: ${{ github.event.inputs.release_type == 'internal' && secrets.APT_S3_IAM_ARN_STAGING || '' }}
+          APT_S3_ACCESS_KEY_ID: ${{ github.event.inputs.release_type == 'public' && secrets.APT_S3_ACCESS_KEY_ID || '' }}
+          APT_S3_SECRET_ACCESS_KEY: ${{ github.event.inputs.release_type == 'public' && secrets.APT_S3_SECRET_ACCESS_KEY || '' }}
 
       - name: Merge back to release branch
         id: merge-back
