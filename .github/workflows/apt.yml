@@ -36,6 +36,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: >-
+            ${{ (github.ref_name == 'unstable'
+            || github.event_name == 'workflow_dispatch'
+            || github.event_name == 'workflow_call'
+            || github.event_name == 'schedule')
+            && 'unstable'
+            || ''
+            }}
 
       - name: Parse vars
         id: parse
