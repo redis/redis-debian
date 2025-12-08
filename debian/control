@@ -3,7 +3,7 @@ Section: database
 Priority: optional
 Maintainer: Redis Ltd. <redis@redis.io>
 Build-Depends:
- debhelper (>= 9~),
+ debhelper (>= 13~),
  dpkg-dev (>= 1.17.5),
  libssl-dev,
  libsystemd-dev,
@@ -26,15 +26,19 @@ Build-Depends:
  systemd,
  procps <!nocheck>,
  tcl <!nocheck>,
- tcl-tls <!nocheck>
+ tcl-tls <!nocheck>,
+ jq <!cross>
 Standards-Version: 4.2.1
 Homepage: https://redis.io/
 
 Package: redis
-Architecture: all
+Architecture: any
 Depends:
- redis-server (<< ${binary:Version}.1~),
- redis-server (>= ${binary:Version}),
+ redis-server (= ${binary:Version}),
+ redis-module-search (= ${binary:Version}) [amd64 arm64],
+ redis-module-json (= ${binary:Version}) [amd64 arm64],
+ redis-module-bloom (= ${binary:Version}) [amd64 arm64],
+ redis-module-timeseries (= ${binary:Version}) [amd64 arm64],
  ${misc:Depends},
 Description: Persistent key-value database with network interface (metapackage)
  Redis is a key-value database in a similar vein to memcache but the dataset
@@ -43,7 +47,8 @@ Description: Persistent key-value database with network interface (metapackage)
  .
  The dataset is stored entirely in memory and periodically flushed to disk.
  .
- This package depends on the redis-server package.
+ This package depends on the redis-server package and all core Redis modules
+ (RediSearch, RedisJSON, RedisBloom, RedisTimeSeries) on supported architectures.
 
 Package: redis-sentinel
 Architecture: any
@@ -87,3 +92,55 @@ Description: Persistent key-value database with network interface (client)
  manipulating and querying data structures such as lists and sets.
  .
  This package contains the command line client and other tools.
+
+Package: redis-module-search
+Architecture: amd64 arm64
+Depends:
+ redis-server (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: RediSearch module for Redis
+ RediSearch is a Redis module that provides querying, secondary indexing, and
+ full-text search for Redis. These features enable multi-field queries,
+ aggregation, exact phrase matching, and numeric filtering for text queries.
+ .
+ This package contains the RediSearch module for Redis.
+
+Package: redis-module-json
+Architecture: amd64 arm64
+Depends:
+ redis-server (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: RedisJSON module for Redis
+ RedisJSON is a Redis module that implements ECMA-404 The JSON Data Interchange
+ Standard as a native data type. It allows storing, updating and fetching JSON
+ values from Redis keys (documents).
+ .
+ This package contains the RedisJSON module for Redis.
+
+Package: redis-module-bloom
+Architecture: amd64 arm64
+Depends:
+ redis-server (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: RedisBloom module for Redis
+ RedisBloom is a Redis module that provides probabilistic data structures for
+ Redis. These include Bloom Filter, Cuckoo Filter, Count-Min-Sketch, and
+ Top-K data structures.
+ .
+ This package contains the RedisBloom module for Redis.
+
+Package: redis-module-timeseries
+Architecture: amd64 arm64
+Depends:
+ redis-server (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: RedisTimeSeries module for Redis
+ RedisTimeSeries is a Redis module that adds a time series data structure to
+ Redis. It provides high performance ingestion and low latency queries for
+ time series data.
+ .
+ This package contains the RedisTimeSeries module for Redis.

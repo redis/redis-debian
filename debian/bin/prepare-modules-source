@@ -1,0 +1,183 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# Script to prepare Redis source package with pre-bundled modules
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEBIAN_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(dirname "$DEBIAN_DIR")"
+
+# Configuration
+REDIS_VERSION="${1:-}"
+REDIS_SOURCE_DIR="${2:-}"
+OUTPUT_DIR="${3:-}"
+
+# Expected module declaration directories in Redis source (upstream layout)
+# Each contains a Makefile with MODULE_REPO and MODULE_VERSION
+UPSTREAM_MODULE_DIRS=(redisbloom redisjson redistimeseries redisearch)
+
+# Fallback repositories by upstream name (used if Makefile missing or incomplete)
+declare -A FALLBACK_MODULE_REPOS=(
+  ["redisbloom"]="https://github.com/RedisBloom/RedisBloom.git"
+  ["redisjson"]="https://github.com/RedisJSON/RedisJSON.git"
+  ["redistimeseries"]="https://github.com/RedisTimeSeries/RedisTimeSeries.git"
+  ["redisearch"]="https://github.com/RediSearch/RediSearch.git"
+)
+
+# Target directory names expected by debian/rules build (local layout)
+# We map upstream names -> local names to avoid changing debian/rules
+#   redisbloom      -> bloom
+#   redisjson       -> rejson
+#   redistimeseries -> timeseries
+#   redisearch      -> search
+declare -A UPSTREAM_TO_LOCAL_DIR=(
+  ["redisbloom"]=bloom
+  ["redisjson"]=rejson
+  ["redistimeseries"]=timeseries
+  ["redisearch"]=search
+)
+
+usage() {
+    cat << EOF
+Usage: $0 <redis_version> <redis_source_dir> <output_dir>
+
+Prepares Redis source package with pre-bundled modules for Debian packaging.
+
+Arguments:
+    redis_version     Redis version (e.g., 8.0.0)
+    redis_source_dir  Path to extracted Redis source directory
+    output_dir        Output directory for the prepared source package
+
+This script:
+1. Determines module versions from Redis source configuration
+2. Downloads and bundles module sources
+3. Creates proper directory structure for Debian packaging
+4. Ensures all sources are available offline during build
+
+Example:
+    $0 8.0.0 ./redis-8.0.0 ./output
+EOF
+}
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >&2
+}
+
+error() {
+    log "ERROR: $*"
+    exit 1
+}
+
+check_dependencies() {
+    local deps=("git" "curl" "jq" "tar")
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" >/dev/null 2>&1; then
+            error "Required dependency '$dep' not found"
+        fi
+    done
+}
+
+# Function to clone a specific module
+clone_module() {
+    local module_name="$1"
+    local module_url="$2"
+    local target_dir="$3"
+    local version="${4:-master}"
+
+    log "Cloning module '$module_name' from $module_url (version: $version)"
+
+    if [[ -d "$target_dir" ]]; then
+        log "Target directory $target_dir already exists, removing..."
+        rm -rf "$target_dir"
+    fi
+
+    # Clone the repository with submodules
+    git clone --depth 1 --recursive --branch "$version" "$module_url" "$target_dir"
+    log "Successfully cloned module '$module_name' to $target_dir"
+}
+
+# Function to parse MODULE_REPO and MODULE_VERSION from upstream Makefile
+parse_upstream_makefile() {
+    local makefile="$1"
+    local repo="" version=""
+    if [[ -f "$makefile" ]]; then
+        repo=$(grep -E '^\s*MODULE_REPO\s*=' "$makefile" | awk -F'=|#' '{gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}' | head -n1 || true)
+        version=$(grep -E '^\s*MODULE_VERSION\s*=' "$makefile" | awk -F'=|#' '{gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}' | head -n1 || true)
+    fi
+    echo "$repo|$version"
+}
+
+# Function to prepare modules directory structure
+prepare_modules_structure() {
+    local redis_src="$1"
+    local modules_dir="$redis_src/modules"
+
+    log "Preparing modules directory structure..."
+    mkdir -p "$modules_dir"
+
+    for upstream_name in "${UPSTREAM_MODULE_DIRS[@]}"; do
+        local decl_dir="$redis_src/modules/$upstream_name"
+        local makefile="$decl_dir/Makefile"
+        local parsed repo version
+        parsed=$(parse_upstream_makefile "$makefile")
+        repo="${parsed%%|*}"
+        version="${parsed##*|}"
+        local local_dir_name="${UPSTREAM_TO_LOCAL_DIR[$upstream_name]}"
+        local target_dir="$modules_dir/$local_dir_name"
+
+        if [[ -z "$repo" ]]; then
+            repo="${FALLBACK_MODULE_REPOS[$upstream_name]}"
+            [[ -z "$repo" ]] && { log "WARNING: No repo for $upstream_name and no fallback"; continue; }
+            log "Using fallback repo for $upstream_name: $repo"
+        fi
+        if [[ -z "$version" ]]; then
+            version="master"
+            log "Using fallback version for $upstream_name: $version"
+        fi
+
+        log "Cloning $upstream_name -> $local_dir_name from $repo (version: $version)"
+        clone_module "$upstream_name" "$repo" "$target_dir" "$version"
+    done
+
+    log "Modules directory structure prepared successfully"
+}
+
+# Main function
+main() {
+    if [[ $# -ne 3 ]]; then
+        usage
+        exit 1
+    fi
+    
+    local redis_version="$1"
+    local redis_source_dir="$2"
+    local output_dir="$3"
+    
+    log "Starting Redis modules source preparation"
+    log "Redis version: $redis_version"
+    log "Source directory: $redis_source_dir"
+    log "Output directory: $output_dir"
+    
+    # Validate inputs
+    if [[ ! -d "$redis_source_dir" ]]; then
+        error "Redis source directory does not exist: $redis_source_dir"
+    fi
+    
+    # Check dependencies
+    check_dependencies
+
+    # Create output directory
+    mkdir -p "$output_dir"
+
+    # Prepare modules structure (clone repos, verify module.conf exists)
+    prepare_modules_structure "$redis_source_dir"
+
+    log "Redis modules source preparation completed successfully"
+    log "Source package is ready for Debian packaging"
+}
+
+# Run main function if script is executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+case "${1:-}" in
+  configure|triggered)
+    : ;;
+  *)
+    exit 0 ;;
+esac
+CONF="/etc/redis/redis.conf"
+BEGIN="# BEGIN redis-module-json (autogen)"
+END="# END redis-module-json"
+if [ -f "$CONF" ]; then
+    if ! grep -Eq "^[[:space:]]*loadmodule[[:space:]]*/usr/lib/redis/modules/rejson\.so([[:space:]]|$)" "$CONF"; then
+        { echo ""; echo "$BEGIN"; echo "loadmodule /usr/lib/redis/modules/rejson.so"; echo "$END"; } >>"$CONF"
+    fi
+fi
+#DEBHELPER#
+exit 0

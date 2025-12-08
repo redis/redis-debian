@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+case "${1:-}" in
+  configure|triggered)
+    : ;;
+  *)
+    exit 0 ;;
+esac
+CONF="/etc/redis/redis.conf"
+BEGIN="# BEGIN redis-module-bloom (autogen)"
+END="# END redis-module-bloom"
+if [ -f "$CONF" ]; then
+    if ! grep -Eq "^[[:space:]]*loadmodule[[:space:]]*/usr/lib/redis/modules/redisbloom\.so([[:space:]]|$)" "$CONF"; then
+        { echo ""; echo "$BEGIN"; echo "loadmodule /usr/lib/redis/modules/redisbloom.so"; echo "$END"; } >>"$CONF"
+    fi
+fi
+#DEBHELPER#
+exit 0

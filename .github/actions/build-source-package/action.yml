@@ -63,6 +63,8 @@ runs:
       fi
 
       cp -pr debian redis-${VERSION}
+      # prepare modules sources for offline build
+      debian/bin/prepare-modules-source ${VERSION} redis-${VERSION} ./
       sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
       ( cd redis-${VERSION} && dpkg-buildpackage -S )
   - name: Upload source package artifact

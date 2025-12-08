@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+case "${1:-}" in
+  remove|purge)
+    : ;;
+  *)
+    exit 0 ;;
+esac
+CONF="/etc/redis/redis.conf"
+BEGIN="# BEGIN redis-module-search (autogen)"
+END="# END redis-module-search"
+if [ -f "$CONF" ]; then
+    if grep -Fqx "$BEGIN" "$CONF" && grep -Fqx "$END" "$CONF"; then
+        sed -i "/^$BEGIN$/,/^$END$/d" "$CONF"
+    fi
+    sed -i '/^[[:space:]]*loadmodule[[:space:]]*\/usr\/lib\/redis\/modules\/redisearch\.so\([[:space:]].*\)\?$/d' "$CONF" || true
+fi
+#DEBHELPER#
+exit 0

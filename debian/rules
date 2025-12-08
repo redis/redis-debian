@@ -22,9 +22,6 @@ endif
 %:
 	dh $@
 
-# BUILD_WITH_MODULES is needed by override_dh_auto_build as well as override_dh_auto_install,
-# so we export it here instead of passing it to override_dh_auto_build
-
 ARCH := $(shell dpkg --print-architecture)
 $(info Host Architecture: $(ARCH))
 TARGET_ARCH := $(DEB_HOST_ARCH)
@@ -37,38 +34,70 @@ ifneq ($(ARCH),$(TARGET_ARCH))
 endif
 
 ifeq ($(ARCH), amd64)
-	export BUILD_WITH_MODULES=yes
 	export DISABLE_WERRORS=yes
-	export INSTALL_RUST_TOOLCHAIN=yes
-else ifeq ($(ARCH), arm64)
-	export BUILD_WITH_MODULES=yes
-	export INSTALL_RUST_TOOLCHAIN=yes
-else ifeq ($(ARCH), i686)
-	export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=no
-else ifeq ($(ARCH), i386)
-	export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=no
 else ifeq ($(ARCH), armhf)
-	export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=no
 	export AR = arm-linux-gnueabihf-ar
+else ifneq ($(filter $(ARCH),i686 i386 arm64),)
+	# Supported architectures without special flags
 else
     $(warning Unsupported architecture: '$(ARCH)')
 endif
 
+# Module directories and their output files
+# Format: dir:name:output_file
+MODULES := \
+	modules/search:RediSearch:redisearch.so \
+	modules/rejson:RedisJSON:rejson.so \
+	modules/bloom:RedisBloom:redisbloom.so \
+	modules/timeseries:RedisTimeSeries:redistimeseries.so
+
+SUBDIRS := $(foreach m,$(MODULES),$(word 1,$(subst :, ,$(m))))
+MODULES_SUPPORTED := $(filter $(ARCH),amd64 arm64)
+
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
 	cp debian/conf-dist/sentinel.conf ./sentinel.conf
-	if [ "$(BUILD_WITH_MODULES)" = "yes" ]; then \
-		cp debian/conf-dist/redis_with_modules.conf ./redis.conf; \
+	$(MAKE) -f debian/rules generate-redis-conf
+ifneq ($(MODULES_SUPPORTED),)
+	$(MAKE) -f debian/rules build-modules
+	$(MAKE) -f debian/rules install-modules DESTDIR=$(CURDIR)/debian/tmp
+else
+	sed -i '/usr\/local\/lib\/redis\/modules\/\*\.so/d' debian/redis-server.install
+endif
+
+generate-redis-conf:
+	@set -e; \
+	out=./redis.conf; \
+	if [ -z "$(MODULES_SUPPORTED)" ]; then \
+	  cat debian/conf-dist/redis.conf > "$$out"; \
+	  echo "Generated $$out (non-module arch)"; \
 	else \
-		sed -i '/usr\/local\/lib\/redis\/modules\/\*\.so/d' debian/redis-server.install; \
-		cp debian/conf-dist/redis.conf ./redis.conf; \
+	  found=0; \
+	  for m in $(SUBDIRS); do \
+	    if [ -f "$$m/module.conf" ]; then found=1; break; fi; \
+	  done; \
+	  if [ "$$found" -eq 0 ]; then \
+	    echo "ERROR: No module.conf files found in module directories"; \
+	    echo "Expected module.conf in: $(SUBDIRS)"; \
+	    exit 1; \
+	  fi; \
+	  cat debian/conf-dist/redis.conf > "$$out"; \
+	  for m in $(SUBDIRS); do \
+	    if [ -f "$$m/module.conf" ]; then \
+	      printf "\n# === BEGIN %s/module.conf ===\n" "$$m" >> "$$out"; \
+	      cat "$$m/module.conf" >> "$$out"; \
+	      printf "\n# === END %s/module.conf ===\n" "$$m" >> "$$out"; \
+	    fi; \
+	  done; \
+	  echo "Generated $$out (merged module.conf files)"; \
 	fi
+
 	dh_auto_install
 
 override_dh_auto_build:
+ifneq ($(MODULES_SUPPORTED),)
+	$(MAKE) -f debian/rules handle-werrors
+endif
 	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
 
 override_dh_auto_test:
@@ -102,7 +131,58 @@ override_dh_compress:
 override_dh_installchangelogs:
 	dh_installchangelogs --keep 00-RELEASENOTES
 
+handle-werrors:
+ifeq ($(DISABLE_WERRORS),yes)
+	@echo "Disabling -Werror for all modules (including deps)"
+	@for dir in $(SUBDIRS); do \
+		echo "Processing $$dir"; \
+		find $$dir -type f \( -name "Makefile" -o -name "*.mk" -o -name "CMakeLists.txt" \) \
+			-exec sed -i 's/[[:space:]]-Werror\([[:space:]]\|$$\)/ /g' {} +; \
+	done
+else
+	@echo "handle-werrors: skipping (DISABLE_WERRORS=$(DISABLE_WERRORS))"
+endif
+
+
+build-modules:
+	@export PATH="/usr/local/bin:$$PATH"; \
+	export BOOST_ROOT="/opt/boost/boost_1_88_0"; \
+	export CMAKE_PREFIX_PATH="/opt/boost/boost_1_88_0:$$CMAKE_PREFIX_PATH"; \
+	echo "Using Boost at $${BOOST_ROOT}"; \
+	for mod in $(MODULES); do \
+	  moddir=$$(echo "$$mod" | cut -d: -f1); \
+	  name=$$(echo "$$mod" | cut -d: -f2); \
+	  if [ -d "$$moddir" ]; then \
+	    echo "Building $$name module..."; \
+	    cd "$$moddir"; \
+	    if [ "$$moddir" = "modules/search" ]; then \
+	      mkdir -p .git .install || true; \
+	      ln -sf "/opt/boost/boost_1_88_0" .install/boost; \
+	    fi; \
+	    $(MAKE) || { echo "ERROR: $$name build failed"; exit 1; }; \
+	    cd ../..; \
+	  else \
+	    echo "WARNING: $$name module source not found"; \
+	  fi; \
+	done
+
+install-modules:
+	@set -e; \
+	dest="$(DESTDIR)/usr/lib/redis/modules"; \
+	mkdir -p "$$dest"; \
+	for mod in $(MODULES); do \
+	  moddir=$$(echo "$$mod" | cut -d: -f1); \
+	  outfile=$$(echo "$$mod" | cut -d: -f3); \
+	  f=$$(find "$$moddir" -type f -name "$$outfile" -print -quit 2>/dev/null || true); \
+	  if [ -n "$$f" ]; then \
+	    echo "Installing $$outfile from $$f"; \
+	    install -Dm0755 "$$f" "$$dest/$$outfile"; \
+	  else \
+	    echo "Warning: $$outfile not found under $$moddir"; \
+	  fi; \
+	done
+
 override_dh_fixperms:
-	# Do not allow dh_fixperms to "fix" modules so files perms as
-	# it removes their x bit
+	# Do not allow dh_fixperms to "fix" modules .so files perms as
+	# it removes their x bit (required by Redis to load modules)
 	dh_fixperms -X/redis/modules
