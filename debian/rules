@@ -11,6 +11,7 @@ export CC CFLAGS CPPFLAGS LDFLAGS
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all,-format
 export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic
 export REDIS_CFLAGS='-Wno-error=uninitialized'
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 DEB_BUILD_OPTIONS = nocheck
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
