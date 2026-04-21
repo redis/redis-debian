@@ -10,11 +10,14 @@ host_arch=$(dpkg --print-architecture)
 
 echo "Setting up sbuild environment for distribution: $dist, architecture: $arch (host: $host_arch)"
 
-if ubuntu-distro-info --all | grep -Fqx "$dist"; then
-    disttype="ubuntu"
-else
-    disttype="debian"
-fi
+case "$dist" in
+    bullseye|bookworm|trixie|forky|sid)
+        disttype="debian"
+        ;;
+    *)
+        disttype="ubuntu"
+        ;;
+esac
 
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
