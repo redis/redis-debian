@@ -64,7 +64,10 @@ runs:
 
       cp -pr debian redis-${VERSION}
       sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
-      ( cd redis-${VERSION} && dpkg-buildpackage -S )
+      # -d skips the build-dependency check on the runner: clang-21/lld-21/llvm-21
+      # are only available inside the per-distro sbuild chroot (see setup_sbuild.sh),
+      # not on the GitHub runner. Source packaging itself does not compile anything.
+      ( cd redis-${VERSION} && dpkg-buildpackage -S -d )
   - name: Upload source package artifact
     uses: actions/upload-artifact@v4
     with:
