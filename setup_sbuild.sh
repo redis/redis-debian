@@ -91,19 +91,23 @@ schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y build-essential python3 python3-pip python3-venv python3-dev g++ clang
 
 # RediSearch builds with LTO and requires clang/lld/llvm 21 matching rustc 1.94's
-# bundled LLVM. LLVM 21 isn't available in the default repos for any of the
-# Ubuntu/Debian releases we build for, so we pull it from apt.llvm.org. Only
-# native amd64/arm64 chroots build modules, so we skip this for i386/armhf.
+# bundled LLVM. resolute (Ubuntu 25.10) ships LLVM 21 natively; for the other
+# Ubuntu/Debian releases we build for, LLVM 21 isn't in the default repos so we
+# pull it from apt.llvm.org. Only native amd64/arm64 chroots build modules, so
+# we skip this for i386/armhf.
 if [ "$arch" = "amd64" ] || [ "$arch" = "arm64" ]; then
-    schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y wget gnupg
-    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "
-        install -d /etc/apt/keyrings
-        wget -qO /etc/apt/keyrings/llvm.asc https://apt.llvm.org/llvm-snapshot.gpg.key
-        echo 'deb [signed-by=/etc/apt/keyrings/llvm.asc] http://apt.llvm.org/${dist}/ llvm-toolchain-${dist}-21 main' \
-            > /etc/apt/sources.list.d/llvm.list
-        apt-get update
+    if [ "$dist" != "resolute" ]; then
+        schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y wget gnupg
+        schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "
+            install -d /etc/apt/keyrings
+            wget -qO /etc/apt/keyrings/llvm.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+            echo 'deb [signed-by=/etc/apt/keyrings/llvm.asc] http://apt.llvm.org/${dist}/ llvm-toolchain-${dist}-21 main' \
+                > /etc/apt/sources.list.d/llvm.list
+            apt-get update
+        "
+    fi
+    schroot -c source:${dist}-${arch}-sbuild -d / -- \
         apt-get install -y --no-install-recommends clang-21 lld-21 llvm-21
-    "
 fi
 
 # Install latest CMake version for Jammy and Bullseye
