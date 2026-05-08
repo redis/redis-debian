@@ -90,12 +90,9 @@ fi
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y build-essential python3 python3-pip python3-venv python3-dev g++ clang
 
-# RediSearch builds with LTO and requires clang/lld/llvm 21 matching rustc 1.94's
-# bundled LLVM. resolute (Ubuntu 25.10) ships LLVM 21 natively; for the other
-# Ubuntu/Debian releases we build for, LLVM 21 isn't in the default repos so we
-# wire up apt.llvm.org and let sbuild's build-dep resolver pull clang-21/lld-21/
-# llvm-21 from debian/control's Build-Depends-Arch. Only native amd64/arm64
-# chroots build modules, so we skip this for i386/armhf.
+# RediSearch's LTO build needs LLVM 21 (matches rustc 1.94's LLVM). resolute
+# ships it natively; for the rest, wire up apt.llvm.org and let sbuild pull
+# clang-21/lld-21/llvm-21 from Build-Depends-Arch. Skip for i386/armhf (no modules).
 if { [ "$arch" = "amd64" ] || [ "$arch" = "arm64" ]; } && [ "$dist" != "resolute" ]; then
     schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y wget gnupg
     schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "

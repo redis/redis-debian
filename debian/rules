@@ -70,10 +70,9 @@ override_dh_auto_install:
 	dh_auto_install
 
 override_dh_auto_build:
-ifeq ($(BUILD_WITH_MODULES),yes)
-	# RediSearch's LTO build requires clang/lld/llvm 21 (matching rustc 1.94's
-	# bundled LLVM). Drop CC so RediSearch's build.sh auto-detects clang-21
-	# from PATH; Redis core falls back to make's default cc (gcc).
+ifeq ($(BUILD_WITH_MODULES)_$(DEB_HOST_GNU_TYPE),yes_$(DEB_BUILD_GNU_TYPE))
+	# Native modules build: drop CC so RediSearch's build.sh picks up clang-21
+	# (matches rustc 1.94's LLVM); Redis core falls back to default cc.
 	env -u CC PATH=/usr/lib/llvm-21/bin:$$PATH \
 		dh_auto_build --parallel -- V=1 BUILD_TLS=yes
 else
