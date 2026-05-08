@@ -23,11 +23,14 @@ Build-Depends:
  wget,
  curl,
  g++ <!cross>,
- clang <!cross>,
  systemd,
  procps <!nocheck>,
  tcl <!nocheck>,
  tcl-tls <!nocheck>
+Build-Depends-Arch:
+ clang-21 [amd64 arm64] <!cross>,
+ lld-21 [amd64 arm64] <!cross>,
+ llvm-21 [amd64 arm64] <!cross>
 Standards-Version: 4.2.1
 Homepage: https://redis.io/
 
