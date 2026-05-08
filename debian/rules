@@ -71,14 +71,14 @@ override_dh_auto_install:
 
 override_dh_auto_build:
 ifeq ($(BUILD_WITH_MODULES),yes)
-  ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
 	# Native: drop CC so RediSearch picks up clang-21 (matches rustc 1.94's LLVM)
 	# for its LTO step; Redis core and other modules fall back to default cc.
 	env -u CC dh_auto_build --parallel -- V=1 BUILD_TLS=yes
-  else
+else
 	# Cross: clang-21 is gated by <!cross>, so disable LTO.
 	dh_auto_build --parallel -- V=1 BUILD_TLS=yes LTO=0
-  endif
+endif
 else
 	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
 endif
