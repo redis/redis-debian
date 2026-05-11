@@ -64,11 +64,12 @@ jobs:
       BUILD_EXCLUDE: ${{ needs.populate-env-vars.outputs.BUILD_EXCLUDE }}
       SMOKE_TEST_IMAGES: ${{ needs.populate-env-vars.outputs.SMOKE_TEST_IMAGES }}
       # Determine whether we should use special "unstable" release_tag. Assume
-      # that for unstable branch and for any external call, dispatch or schedule
-      # we are building unstable release. In other cases it's a regular PR/push
-      # build without using specific release_tag.
+      # that for unstable branch (push or PR), and for any external call,
+      # dispatch or schedule we are building unstable release. In other cases
+      # it's a regular PR/push build without using specific release_tag.
       release_tag: >-
         ${{ (github.ref_name == 'unstable'
+        || github.base_ref == 'unstable'
         || github.event_name == 'workflow_dispatch'
         || github.event_name == 'workflow_call'
         || github.event_name == 'schedule')
