@@ -3,11 +3,15 @@
 include /usr/share/dpkg/architecture.mk
 include /usr/share/dpkg/buildflags.mk
 
-ifneq ($(DEB_HOST_GNU_TYPE),)
+ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
 CC = $(DEB_HOST_GNU_TYPE)-gcc
+export CC
+else
+# sbuild leaks CC=...-gcc on native builds; drop it so RediSearch picks clang-21.
+unexport CC
 endif
 
-export CC CFLAGS CPPFLAGS LDFLAGS
+export CFLAGS CPPFLAGS LDFLAGS
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all,-format
 export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic
 export REDIS_CFLAGS='-Wno-error=uninitialized'
@@ -71,13 +75,11 @@ override_dh_auto_install:
 
 override_dh_auto_build:
 ifeq ($(BUILD_WITH_MODULES),yes)
-ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
-	# Native: drop CC so RediSearch picks up clang-21 (matches rustc 1.94's LLVM)
-	# for its LTO step; Redis core and other modules fall back to default cc.
-	env -u CC dh_auto_build --parallel -- V=1 BUILD_TLS=yes
-else
-	# Cross: clang-21 is gated by <!cross>, so disable LTO.
+ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+	# Cross + modules: clang-21 is gated by <!cross>, so disable LTO.
 	dh_auto_build --parallel -- V=1 BUILD_TLS=yes LTO=0
+else
+	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
 endif
 else
 	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
