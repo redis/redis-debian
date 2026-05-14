@@ -10,11 +10,14 @@ host_arch=$(dpkg --print-architecture)
 
 echo "Setting up sbuild environment for distribution: $dist, architecture: $arch (host: $host_arch)"
 
-if ubuntu-distro-info --all | grep -Fqx "$dist"; then
-    disttype="ubuntu"
-else
-    disttype="debian"
-fi
+case "$dist" in
+    bullseye|bookworm|trixie|forky|sid)
+        disttype="debian"
+        ;;
+    *)
+        disttype="ubuntu"
+        ;;
+esac
 
 # Determine base apt repository URL based on type of distribution and architecture.
 case "$disttype" in
@@ -86,6 +89,20 @@ fi
 # Install native build tools in the chroot
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get update
 schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y build-essential python3 python3-pip python3-venv python3-dev g++ clang
+
+# RediSearch's LTO build needs LLVM 21 (matches rustc 1.94's LLVM). resolute
+# ships it natively; for the rest, wire up apt.llvm.org and let sbuild pull
+# clang-21/lld-21/llvm-21 from Build-Depends-Arch. Skip for i386/armhf (no modules).
+if { [ "$arch" = "amd64" ] || [ "$arch" = "arm64" ]; } && [ "$dist" != "resolute" ]; then
+    schroot -c source:${dist}-${arch}-sbuild -d / -- apt-get install -y wget gnupg
+    schroot -c source:${dist}-${arch}-sbuild -d / -- bash -c "
+        install -d /etc/apt/keyrings
+        wget -qO /etc/apt/keyrings/llvm.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+        echo 'deb [signed-by=/etc/apt/keyrings/llvm.asc] http://apt.llvm.org/${dist}/ llvm-toolchain-${dist}-21 main' \
+            > /etc/apt/sources.list.d/llvm.list
+        apt-get update
+    "
+fi
 
 # Install latest CMake version for Jammy and Bullseye
 if [ "$dist" = "jammy" ] || [ "$dist" = "bullseye" ]; then
