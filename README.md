@@ -45,7 +45,9 @@ This will start `redis-server` with `/etc/redis/redis.conf`.
 
 Redis officially tests the latest version of this distribution against the following OSes:
 
+- Ubuntu 26.04 (Resolute Raccoon)
 - Ubuntu 24.04 (Noble Numbat)
 - Ubuntu 22.04 (Jammy Jellyfish)
+- Debian 13 (Trixie)
 - Debian 12 (Bookworm)
 - Debian 11 (Bullseye)
