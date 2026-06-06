@@ -1,4 +1,6 @@
 name: "Run smoke tests"
+description: "Run smoke tests against the built Debian packages"
+
 inputs:
   run_id:
     description: "Run ID to download artifacts from"
@@ -21,7 +23,7 @@ runs:
       DIST=$(echo "$IMAGE" | cut -d':' -f2)
       echo "distribution=$DIST" >> $GITHUB_OUTPUT
   - name: Get binary packages
-    uses: actions/download-artifact@v4
+    uses: actions/download-artifact@v7
     with:
       name: binary-${{ steps.extract_dist.outputs.distribution }}-${{ inputs.arch }}
   - name: Install packages
