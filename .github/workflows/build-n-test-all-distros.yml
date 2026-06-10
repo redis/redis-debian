@@ -34,7 +34,7 @@ jobs:
         dist: ${{ fromJSON(inputs.BUILD_DISTS) }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         # On PRs keep the PR head even when release_tag=unstable, so the PR's
         # debian/ packaging is what gets tested; the redis source tarball is
@@ -64,7 +64,7 @@ jobs:
     needs: build-source-package
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         # See build-source-package above.
         ref: ${{ github.event_name != 'pull_request' && inputs.release_tag == 'unstable' && 'unstable' || '' }}
@@ -109,7 +109,7 @@ jobs:
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         # See build-source-package above.
         ref: ${{ github.event_name != 'pull_request' && inputs.release_tag == 'unstable' && 'unstable' || '' }}
