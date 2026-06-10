@@ -1,4 +1,6 @@
 name: "Build binary package"
+description: "Build binary .deb package for a given distribution and architecture"
+
 inputs:
   run_id:
     description: "Run ID to download artifacts from"
@@ -44,7 +46,7 @@ runs:
       shell: bash
       run: sudo ./setup_sbuild.sh ${{ inputs.dist }} ${{ env.BUILD_ARCH }}
     - name: Get source package
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: source-${{ inputs.dist }}
         run-id: ${{ inputs.run_id }}
@@ -61,7 +63,7 @@ runs:
             --chroot-setup-commands="apt-get update && apt-get install -y build-essential" \
             *.dsc
     - name: Upload binary package artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: binary-${{ inputs.dist }}-${{ inputs.arch }}
         path: |
