@@ -1,4 +1,5 @@
 name: "Upload deb to S3"
+description: "Sign and upload Debian packages to S3"
 
 inputs:
   run_id:
@@ -72,7 +73,7 @@ runs:
   # For internal release we have an IAM role that we need to assume
   - name: Configure aws credentials for internal release
     if: ${{ inputs.release_type == 'internal' }}
-    uses: aws-actions/configure-aws-credentials@v4.3.1
+    uses: aws-actions/configure-aws-credentials@v6
     with:
       role-to-assume: ${{ inputs.APT_S3_IAM_ARN }}
       aws-region: us-east-1
@@ -94,7 +95,7 @@ runs:
       APT_SIGNING_KEY: ${{ inputs.APT_SIGNING_KEY }}
 
   - name: Get binary packages
-    uses: actions/download-artifact@v4
+    uses: actions/download-artifact@v7
     with:
       run-id: ${{ inputs.run_id }}
       github-token: ${{ inputs.gh_token }}
