@@ -1,4 +1,5 @@
 name: "Build source package"
+description: "Build a Debian source package (.dsc + tarball) for a given distribution"
 
 inputs:
   dist:
@@ -43,7 +44,7 @@ runs:
       sed -i "s/@RELEASE@/${{ inputs.dist }}/g" redis-${VERSION}/debian/changelog
       ( cd redis-${VERSION} && dpkg-buildpackage -S )
   - name: Upload source package artifact
-    uses: actions/upload-artifact@v4
+    uses: actions/upload-artifact@v7
     with:
       name: source-${{ inputs.dist }}
       path: |

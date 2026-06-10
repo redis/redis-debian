@@ -34,9 +34,12 @@ jobs:
         dist: ${{ fromJSON(inputs.BUILD_DISTS) }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
-        ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+        # On PRs keep the PR head even when release_tag=unstable, so the PR's
+        # debian/ packaging is what gets tested; the redis source tarball is
+        # still fetched from redis/redis@unstable inside build-source-package.
+        ref: ${{ github.event_name != 'pull_request' && inputs.release_tag == 'unstable' && 'unstable' || '' }}
     - name: Ensure Release Branch
       if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
@@ -61,9 +64,10 @@ jobs:
     needs: build-source-package
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
-        ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+        # See build-source-package above.
+        ref: ${{ github.event_name != 'pull_request' && inputs.release_tag == 'unstable' && 'unstable' || '' }}
     - name: Ensure Release Branch
       if: inputs.release_tag != '' && inputs.release_tag != 'unstable'
       id: ensure-branch
@@ -105,9 +109,10 @@ jobs:
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
-        ref: ${{ inputs.release_tag == 'unstable' && 'unstable' || '' }}
+        # See build-source-package above.
+        ref: ${{ github.event_name != 'pull_request' && inputs.release_tag == 'unstable' && 'unstable' || '' }}
     - uses: ./.github/actions/run-smoke-tests
       with:
         image: ${{ matrix.image }}
