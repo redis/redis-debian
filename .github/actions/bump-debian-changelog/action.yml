@@ -1,3 +1,6 @@
+name: "Bump debian changelog"
+description: "Bump debian/changelog with the release tag and create a verified commit"
+
 inputs:
   release_tag:
     description: 'Release tag to build'
@@ -19,7 +22,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout common functions
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: redis-developer/redis-oss-release-automation
         ref: main
@@ -33,7 +36,7 @@ runs:
 
     - name: Create verified commit
       if: steps.bump-version.outputs.changed_files != ''
-      uses: iarekylew00t/verified-bot-commit@v1
+      uses: iarekylew00t/verified-bot-commit@v2
       with:
         message: ${{ inputs.release_tag }}
         files: ${{ steps.bump-version.outputs.changed_files }}
