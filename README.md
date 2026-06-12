@@ -1,4 +1,4 @@
-This repository holds the `debian/` package configuration and handles automation tasks for creating source packages and pushing them to `ppa:redislabs/redis`.
+This repository contains the debian/ubuntu package configuration and automation for building Redis source and binary packages, then publishing them to the official packages.redis.io repositories for Ubuntu and Debian.
 
 The Debian package is derived from work done by [Chris Lea](https://github.com/chrislea).
 
@@ -16,30 +16,71 @@ sudo apt-get install redis
 ```
 
 > [!TIP]
-> To install an earlier version, say `7.4.2`, run the following command:
-> ```sh
-> sudo apt-get install redis=6:7.4.2-1rl1~jammy1
+> The most recent version of Redis Open Source will be installed, along with
+> `redis-tools`.
+>
+> To install an earlier release series, first add the repository as shown above,
+> but do not install `redis` yet. Create `/etc/apt/preferences.d/redis` to pin
+> the mainline version you want to install. For example, to install the latest
+> Redis Open Source 7.4 package:
+> ```text
+> Package: redis redis-server redis-sentinel redis-tools
+> Pin: version 6:7.4.*
+> Pin-Priority: 1001
 > ```
 >
-> You could view the available versions by running `apt policy redis`.
+> Then install Redis:
+> ```sh
+> sudo apt-get install redis
+> ```
+>
+> With this preference file, APT installs the latest package matching the pinned
+> `7.4` release series.
+>
+> You can list the available versions with:
+> ```sh
+> apt policy redis
+> ```
+>
+> To install an exact package version instead, note the full version string
+> from the command above and explicitly install all Redis packages using that
+> same version. For example, on Ubuntu 22.04 (Jammy), to install Redis Open
+> Source 7.4.9:
+> ```sh
+> sudo apt-get install \
+>   redis=6:7.4.9-1rl1~jammy1 \
+>   redis-server=6:7.4.9-1rl1~jammy1 \
+>   redis-sentinel=6:7.4.9-1rl1~jammy1 \
+>   redis-tools=6:7.4.9-1rl1~jammy1
+> ```
 
 ## Starting Redis
 
-To start the `redis-server`:
+To start Redis using systemd:
+
 ```sh
-redis-server /etc/redis/redis.conf &
+sudo systemctl start redis-server
 ```
 
-Note that `redis-server` output is redirected to `/var/log/redis/redis-server.log`.
+This starts `redis-server` with the configuration file at `/etc/redis/redis.conf`.
 
 > [!TIP]
-> Redis will not start automatically, nor will it start at boot time. To do this, run the following commands.
+> To ensure Redis starts automatically at boot time, enable the service:
+>
 > ```sh
 > sudo systemctl enable redis-server
-> sudo systemctl start redis-server
 > ```
 
-This will start `redis-server` with `/etc/redis/redis.conf`.
+### Starting Redis manually
+
+In environments where systemd is not available, such as containers, you can start `redis-server` manually:
+
+```sh
+redis-server /etc/redis/redis.conf --daemonize yes
+```
+
+When started this way, `redis-server` runs in the background, uses `/etc/redis/redis.conf`, writes its PID to `/run/redis.pid`, and redirects its output to `/var/log/redis/redis-server.log`.
+
 
 ## Supported Operating Systems
 
@@ -50,4 +91,3 @@ Redis officially tests the latest version of this distribution against the follo
 - Ubuntu 22.04 (Jammy Jellyfish)
 - Debian 13 (Trixie)
 - Debian 12 (Bookworm)
-- Debian 11 (Bullseye)
