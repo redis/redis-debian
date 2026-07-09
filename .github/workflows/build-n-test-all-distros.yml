@@ -54,7 +54,7 @@ jobs:
         release_tag: ${{ inputs.release_tag }}
 
   build-binary-package:
-    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -97,7 +97,7 @@ jobs:
         echo "archs=$filtered_archs" >> $GITHUB_OUTPUT
 
   smoke-test-packages:
-    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu24-arm64-2-8' || 'ubuntu-24.04' }}
+    runs-on: ${{ contains(matrix.arch, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     needs:
       - build-binary-package
       - smoke-test-archs
