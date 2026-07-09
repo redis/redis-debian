@@ -29,9 +29,9 @@ runs:
         # Version format:
         # https://www.debian.org/doc/debian-policy/ch-controlfields.html#version
         VERSION=$(head -1 debian/changelog | awk '{print $2}' | sed 's/(\([0-9]\+:\)\?\(.*\)-[^-]\+)$/\2/g')
-        echo "VERSION=${VERSION}" >> $GITHUB_ENV
-        URL="https://github.com/redis/redis/archive/${VERSION}.tar.gz"
+        URL="https://github.com/redis/redis/releases/download/${VERSION}/redis-full.tar.gz"
       fi
+      echo "VERSION=${VERSION}" >> $GITHUB_ENV
       echo "Determined version $VERSION"
       echo "URL=${URL}"
       echo "URL=${URL}" >> $GITHUB_OUTPUT
@@ -44,23 +44,13 @@ runs:
     run: |
       mkdir -p redis-${VERSION}
       tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
-      sed -i 's/INSTALL_BIN=\$(PREFIX)\/bin/INSTALL_BIN=\$(DESTDIR)\$(PREFIX)\/bin/' redis-${VERSION}/src/Makefile
 
       if [ "${{ inputs.release_tag }}" == "unstable" ]; then
-        echo "===== Updating all Redis module versions to 'master' ====="
-        find redis-${VERSION}/modules -name "Makefile" -type f | while read -r makefile; do
-          echo "Processing $makefile"
-          echo "  Before change:"
-          grep "MODULE_VERSION" "$makefile" || echo "  No MODULE_VERSION found"
-
-          # Update the MODULE_VERSION to 'master'
-          sed -i 's/MODULE_VERSION = .*/MODULE_VERSION = master/g' "$makefile"
-
-          echo "  After change:"
-          grep "MODULE_VERSION" "$makefile" || echo "  No MODULE_VERSION found after update"
-          echo "-----------------------------------"
-        done
-        echo "===== Module version updates completed ====="
+        echo "===== Pinning all bundled modules to 'master' and cloning (shallow) ====="
+        ( cd redis-${VERSION} \
+          && yq -i '.modules[].ref = "master"' modules/modules.yaml \
+          && make modules-update MODULES_UPDATE_SHALLOW=1 )
+        echo "===== Module sources cloned ====="
       fi
 
       cp -pr debian redis-${VERSION}

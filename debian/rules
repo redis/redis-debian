@@ -16,6 +16,8 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all,-format
 export DEB_LDFLAGS_MAINT_APPEND = -ldl -latomic
 export REDIS_CFLAGS='-Wno-error=uninitialized'
 export CMAKE_POLICY_VERSION_MINIMUM=3.5
+export BUILD_TLS = yes
+export V = 1
 DEB_BUILD_OPTIONS = nocheck
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -26,9 +28,6 @@ endif
 
 %:
 	dh $@
-
-# BUILD_WITH_MODULES is needed by override_dh_auto_build as well as override_dh_auto_install,
-# so we export it here instead of passing it to override_dh_auto_build
 
 ARCH := $(shell dpkg --print-architecture)
 $(info Host Architecture: $(ARCH))
@@ -42,21 +41,15 @@ ifneq ($(ARCH),$(TARGET_ARCH))
 endif
 
 ifeq ($(ARCH), amd64)
-	export BUILD_WITH_MODULES=yes
-	export DISABLE_WERRORS=yes
-	export INSTALL_RUST_TOOLCHAIN=yes
+	WITH_MODULES = yes
 else ifeq ($(ARCH), arm64)
-	export BUILD_WITH_MODULES=yes
-	export INSTALL_RUST_TOOLCHAIN=yes
+	WITH_MODULES = yes
 else ifeq ($(ARCH), i686)
-	export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=no
+	WITH_MODULES = no
 else ifeq ($(ARCH), i386)
-	export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=no
+	WITH_MODULES = no
 else ifeq ($(ARCH), armhf)
-	export BUILD_WITH_MODULES=no
-	export INSTALL_RUST_TOOLCHAIN=no
+	WITH_MODULES = no
 	export AR = arm-linux-gnueabihf-ar
 else
     $(warning Unsupported architecture: '$(ARCH)')
@@ -65,24 +58,29 @@ endif
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
 	cp debian/conf-dist/sentinel.conf ./sentinel.conf
-	if [ "$(BUILD_WITH_MODULES)" = "yes" ]; then \
-		cp debian/conf-dist/redis_with_modules.conf ./redis.conf; \
-	else \
-		sed -i '/usr\/local\/lib\/redis\/modules\/\*\.so/d' debian/redis-server.install; \
-		cp debian/conf-dist/redis.conf ./redis.conf; \
-	fi
-	dh_auto_install
+ifeq ($(WITH_MODULES),yes)
+	$(MAKE) deploy DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr/local
+	# loadmodule lines must point at the final installed path, not the staging one.
+	$(MAKE) sync-redis-conf PREFIX=/usr/lib/redis/modules ASSUME_BUILT=1
+	mv -f redis-full.conf redis.conf
+else
+	sed -i '/usr\/local\/lib\/redis\/modules\/\*\.so/d' debian/redis-server.install
+	$(MAKE) deploy redis DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr/local
+	$(MAKE) sync-redis-conf none
+	mv -f redis-full.conf redis.conf
+endif
 
 override_dh_auto_build:
-ifeq ($(BUILD_WITH_MODULES),yes)
+ifeq ($(WITH_MODULES),yes)
+	$(MAKE) -C modules install-rust INSTALL_RUST_TOOLCHAIN=yes
 ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
 	# Cross + modules: clang-21 is gated by <!cross>, so disable LTO.
-	dh_auto_build --parallel -- V=1 BUILD_TLS=yes LTO=0
+	dh_auto_build -- LTO=0
 else
-	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
+	dh_auto_build
 endif
 else
-	dh_auto_build --parallel -- V=1 BUILD_TLS=yes
+	dh_auto_build -- build redis
 endif
 
 override_dh_auto_test:
