@@ -32,11 +32,22 @@ runs:
         FULL_URL="https://github.com/redis/redis/releases/download/${VERSION}/redis-full.tar.gz"
         TAG_URL="https://github.com/redis/redis/archive/refs/tags/${VERSION}.tar.gz"
 
-        if curl --fail --silent --show-error --location --head "$FULL_URL" --output /dev/null; then
-          URL="$FULL_URL"
-        else
-          URL="$TAG_URL"
+        if ! HTTP_CODE=$(curl --silent --show-error --location --head --output /dev/null --write-out '%{http_code}' "$FULL_URL"); then
+          echo "Failed to check $FULL_URL" >&2
+          exit 1
         fi
+        case "$HTTP_CODE" in
+          2*)
+            URL="$FULL_URL"
+            ;;
+          404)
+            URL="$TAG_URL"
+            ;;
+          *)
+            echo "Unexpected HTTP status while checking $FULL_URL: $HTTP_CODE" >&2
+            exit 1
+            ;;
+        esac
       fi
       echo "VERSION=${VERSION}" >> $GITHUB_ENV
       echo "Determined version $VERSION"
