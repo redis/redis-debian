@@ -22,9 +22,11 @@ runs:
     id: determine-version
     shell: bash
     run: |
+      # MODULES_UPDATE=1 means the tarball has no bundled modules and needs 'make modules-update'.
       if [ "${{ inputs.release_tag }}" == "unstable" ]; then
         VERSION="unstable"
         URL="https://github.com/redis/redis/archive/refs/heads/${VERSION}.tar.gz"
+        MODULES_UPDATE=1
       else
         # Version format:
         # https://www.debian.org/doc/debian-policy/ch-controlfields.html#version
@@ -38,10 +40,14 @@ runs:
         fi
         case "$HTTP_CODE" in
           2*)
+            # Public release: redis-full archive already bundles the modules.
             URL="$FULL_URL"
+            MODULES_UPDATE=0
             ;;
           404)
+            # Internal release: tag has no redis-full archive, fetch modules via 'make modules-update'.
             URL="$TAG_URL"
+            MODULES_UPDATE=1
             ;;
           *)
             echo "Unexpected HTTP status while checking $FULL_URL: $HTTP_CODE" >&2
@@ -53,6 +59,7 @@ runs:
       echo "Determined version $VERSION"
       echo "URL=${URL}"
       echo "URL=${URL}" >> $GITHUB_OUTPUT
+      echo "MODULES_UPDATE=${MODULES_UPDATE}" >> $GITHUB_ENV
   - name: Get source tarball
     shell: bash
     run: |
@@ -63,11 +70,14 @@ runs:
       mkdir -p redis-${VERSION}
       tar --extract --gunzip --file redis_${VERSION}.orig.tar.gz --strip-components=1 -C redis-${VERSION}
 
-      if [ "${{ inputs.release_tag }}" == "unstable" ]; then
-        echo "===== Pinning all bundled modules to 'master' and cloning (shallow) ====="
-        ( cd redis-${VERSION} \
-          && yq -i '.modules[].ref = "master"' modules/modules.yaml \
-          && make modules-update MODULES_UPDATE_SHALLOW=1 )
+      # Only fetch modules when needed and when this source tree defines them via modules/modules.yaml.
+      if [ "$MODULES_UPDATE" == "1" ] && [ -f redis-${VERSION}/modules/modules.yaml ]; then
+        if [ "${{ inputs.release_tag }}" == "unstable" ]; then
+          echo "===== Pinning all bundled modules to 'master' ====="
+          ( cd redis-${VERSION} && yq -i '.modules[].ref = "master"' modules/modules.yaml )
+        fi
+        echo "===== Cloning module sources (shallow) ====="
+        ( cd redis-${VERSION} && make modules-update MODULES_UPDATE_SHALLOW=1 )
         echo "===== Module sources cloned ====="
       fi
 
