@@ -1,3 +1,12 @@
+redis (6:8.10.0-1rl2~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Restore the Debian defaults in the generated redis.conf: supervised auto,
+    logfile /var/log/redis/redis-server.log, dir /var/lib/redis, and pidfile
+    commented out. These were lost when conf-dist/redis.conf was dropped in
+    favour of generating the conf from upstream.
+
+ -- Redis Team <redis@redis.io>  Thu, 30 Jul 2026 14:39:23 +0300
+
 redis (6:8.10.0-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Redis 8.10.0: https://github.com/redis/redis/releases/tag/8.10.0
