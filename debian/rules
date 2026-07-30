@@ -55,6 +55,21 @@ else
     $(warning Unsupported architecture: '$(ARCH)')
 endif
 
+# Upstream defaults assume a foreground single-instance run; restore the values
+# debian/conf-dist/redis.conf carried, matching conf-dist/sentinel.conf.
+define debianize-conf
+	sed -i \
+		-e 's|^# supervised auto$$|supervised auto|' \
+		-e 's|^pidfile /var/run/redis_6379\.pid$$|#pidfile /run/redis/redis-server.pid|' \
+		-e 's|^logfile ""$$|logfile /var/log/redis/redis-server.log|' \
+		-e 's|^dir \./$$|dir /var/lib/redis|' \
+		redis.conf
+	grep -qx 'supervised auto' redis.conf
+	grep -qx 'logfile /var/log/redis/redis-server.log' redis.conf
+	grep -qx 'dir /var/lib/redis' redis.conf
+	! grep -qx 'pidfile .*' redis.conf
+endef
+
 override_dh_auto_install:
 	debian/bin/generate-systemd-service-files
 	cp debian/conf-dist/sentinel.conf ./sentinel.conf
@@ -63,11 +78,13 @@ ifeq ($(WITH_MODULES),yes)
 	# loadmodule lines must point at the final installed path, not the staging one.
 	$(MAKE) sync-redis-conf PREFIX=/usr/lib/redis/modules ASSUME_BUILT=1
 	mv -f redis-full.conf redis.conf
+	$(debianize-conf)
 else
 	sed -i '/usr\/local\/lib\/redis\/modules\/\*\.so/d' debian/redis-server.install
 	$(MAKE) deploy redis DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr/local
 	$(MAKE) sync-redis-conf none
 	mv -f redis-full.conf redis.conf
+	$(debianize-conf)
 endif
 
 override_dh_auto_build:
