@@ -1,3 +1,9 @@
+redis (6:8.10.1-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 8.10.1: https://github.com/redis/redis/releases/tag/8.10.1
+
+ -- Redis Team <redis@redis.io>  Tue, 18 Aug 2026 05:44:35 +0000
+
 redis (6:8.10.0-1rl2~@RELEASE@1) @RELEASE@; urgency=low
 
   * Restore the Debian defaults in the generated redis.conf: supervised auto,
