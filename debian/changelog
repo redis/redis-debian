@@ -1,3 +1,9 @@
+redis (6:8.2.9-1rl1~@RELEASE@1) @RELEASE@; urgency=low
+
+  * Redis 8.2.9: https://github.com/redis/redis/releases/tag/8.2.9
+
+ -- Redis Team <redis@redis.io>  Tue, 18 Aug 2026 05:42:54 +0000
+
 redis (6:8.2.8-1rl1~@RELEASE@1) @RELEASE@; urgency=low
 
   * Redis 8.2.8: https://github.com/redis/redis/releases/tag/8.2.8
