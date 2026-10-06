@@ -31,7 +31,7 @@ runs:
         # Version format:
         # https://www.debian.org/doc/debian-policy/ch-controlfields.html#version
         VERSION=$(head -1 debian/changelog | awk '{print $2}' | sed 's/(\([0-9]\+:\)\?\(.*\)-[^-]\+)$/\2/g')
-        FULL_URL="https://github.com/redis/redis/releases/download/${VERSION}/redis-full.tar.gz"
+        FULL_URL="https://github.com/redis/redis/releases/download/${VERSION}/redis-${VERSION}.tar.gz"
         TAG_URL="https://github.com/redis/redis/archive/refs/tags/${VERSION}.tar.gz"
 
         if ! HTTP_CODE=$(curl --silent --show-error --location --head --output /dev/null --write-out '%{http_code}' "$FULL_URL"); then
@@ -40,12 +40,12 @@ runs:
         fi
         case "$HTTP_CODE" in
           2*)
-            # Public release: redis-full archive already bundles the modules.
+            # Public release: redis-${VERSION} release archive already bundles the modules.
             URL="$FULL_URL"
             MODULES_UPDATE=0
             ;;
           404)
-            # Internal release: tag has no redis-full archive, fetch modules via 'make modules-update'.
+            # Internal release: tag has no release archive, fetch modules via 'make modules-update'.
             URL="$TAG_URL"
             MODULES_UPDATE=1
             ;;
