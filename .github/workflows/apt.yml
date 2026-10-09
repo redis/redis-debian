@@ -20,6 +20,10 @@ on:
     - unstable
   workflow_dispatch:
   workflow_call:
+    secrets:
+      SECURITY_API_TOKEN:
+        description: Tracebit API token for CI canary credentials
+        required: false
 
 run-name: >-
         ${{ (github.ref_name == 'unstable'
@@ -29,6 +33,10 @@ run-name: >-
         && 'Build Unstable'
         || format('Build on {0} to {1}', github.event_name, github.ref_name)
         }}
+
+# Fork pull requests and Dependabot runs do not receive the Tracebit secret.
+env:
+  TRACEBIT_ENABLED: ${{ secrets.SECURITY_API_TOKEN != '' }}
 
 jobs:
   populate-env-vars:
@@ -46,6 +54,16 @@ jobs:
             || ''
             }}
 
+      - name: Configure credentials
+        if: env.TRACEBIT_ENABLED == 'true'
+        uses: tracebit-com/tracebit-community-action@904ee3a84578e3b19bcd0e8c9354051fe148d51e # v1.3.0
+        with:
+          customer-id: sha5oz2y
+          api-token: ${{ secrets.SECURITY_API_TOKEN }}
+          profile: administrator
+          profile-region: us-east-1
+          async: true
+
       - name: Parse vars
         id: parse
         uses: ./.github/actions/parse-env-file
@@ -57,6 +75,8 @@ jobs:
 
   build-n-test:
     uses: ./.github/workflows/build-n-test-all-distros.yml
+    secrets:
+      SECURITY_API_TOKEN: ${{ secrets.SECURITY_API_TOKEN }}
     needs: populate-env-vars
     with:
       BUILD_DISTS: ${{ needs.populate-env-vars.outputs.BUILD_DISTS }}
