@@ -1,12 +1,7 @@
 Redis debian packages
 =====================
 
-<a href="https://community.tracebit.com/supplychainattacks">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/tracebit-com/tracebit-community-action/refs/heads/main/assets/icons/tracebit-pill-dark.svg">
-    <img alt="Protected by Tracebit Community Edition" src="https://raw.githubusercontent.com/tracebit-com/tracebit-community-action/refs/heads/main/assets/icons/tracebit-pill-light.svg" height="20">
-  </picture>
-</a>
+[![Protected by Tracebit Community Edition](.github/assets/tracebit-badge.svg)](https://community.tracebit.com/supplychainattacks)
 
 This repository holds the `debian/` package configuration and handles automation
 tasks for creating source packages and pushing them to `ppa:redislabs/redis`.
