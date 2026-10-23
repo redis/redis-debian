@@ -17,7 +17,7 @@ runs:
     run: |
       sudo apt-get update && \
       sudo apt-get install \
-      debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev
+      debhelper dput tcl-tls libsystemd-dev pkgconf cmake clang libssl-dev libzstd-dev
   - name: Determine version
     id: determine-version
     shell: bash
